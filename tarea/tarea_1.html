@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; line-height: 1.6;">
+  <h1>Listado de etiquetas HTML</h1>
+
+  <!-- ETIQUETA 1 -->
+  <section>
+    <h2>1. &lt;details&gt; y &lt;summary&gt;</h2>
+    <p>Despliegue interactivo de información:</p>
+
+    <details>
+      <summary>Contenido de la sección</summary>
+      <p>La etiqueta <code>&lt;details&gt;</code> almacena información complementaria que permanece oculta hasta que el usuario activa el elemento <code>&lt;summary&gt;</code>.</p>
+    </details>
+  </section>
+
+  <!-- ETIQUETA 2 -->
+  <section>
+    <h2>2. &lt;mark&gt;</h2>
+    <p>Resaltado semántico de texto:</p>
+
+    <p>El estándar HTML permite destacar información <mark>relevante o prioritaria</mark> de manera nativa sin recurrir a estilos personalizados.</p>
+  </section>
+
+  <!-- ETIQUETA 3 -->
+  <section>
+    <h2>3. &lt;progress&gt;</h2>
+    <p>Visualización del estado de una tarea:</p>
+
+    <label for="progreso-descarga">Descarga de archivo:</label>
+    <progress id="progreso-descarga" value="70" max="100">70%</progress>
+  </section>
+
+  <!-- ETIQUETA 4 -->
+  <section>
+    <h2>4. &lt;meter&gt;</h2>
+    <p>Indicador de rango escalar fijo:</p>
+
+    <label for="uso-disco">Uso de almacenamiento:</label>
+    <meter id="uso-disco" value="85" min="0" max="100" low="30" high="80" optimum="50">85%</meter>
+  </section>
+
+  <!-- ETIQUETA 5 -->
+  <section>
+    <h2>5. &lt;time&gt;</h2>
+    <p>Representación semántica de fechas y horas:</p>
+
+    <p>La conferencia principal dará inicio el <time datetime="2026-10-15">15 de octubre de 2026</time>.</p>
+  </section>
+
+  <!-- ETIQUETA 6 -->
+  <section>
+    <h2>6. &lt;kbd&gt;</h2>
+    <p>Indicación de comandos o teclas de entrada:</p>
+
+    <p>Para guardar los cambios en el editor, presione la combinación <kbd>Ctrl</kbd> + <kbd>S</kbd>.</p>
+  </section>
+
+  <!-- ETIQUETA 7 -->
+  <section>
+    <h2>7. &lt;abbr&gt;</h2>
+    <p>Definición de acrónimos o abreviaturas:</p>
+
+    <p>El consorcio <abbr title="World Wide Web Consortium">W3C</abbr> supervisa las especificaciones técnicas web.</p>
+  </section>
+
+  <!-- ETIQUETA 8 -->
+  <section>
+    <h2>8. &lt;datalist&gt;</h2>
+    <p>Lista de opciones predefinidas con autocompletado:</p>
+
+    <label for="navegador">Seleccione un navegador web:</label>
+    <input list="navegadores" id="navegador" name="navegador">
+
+    <datalist id="navegadores">
+      <option value="Firefox">
+      <option value="Chrome">
+      <option value="Safari">
+      <option value="Edge">
+    </datalist>
+  </section>
+
+  <!-- ETIQUETA 9 -->
+  <section>
+    <h2>9. &lt;blockquote&gt;</h2>
+    <p>Cita bibliográfica en bloque:</p>
+
+    <blockquote cite="https://www.w3.org/">
+      <p>El diseño web inclusivo permite que el software sea accesible independientemente del hardware o software empleado.</p>
+    </blockquote>
+  </section>
+
+  <!-- ETIQUETA 10 -->
+  <section>
+    <h2>10. &lt;figure&gt; y &lt;figcaption&gt;</h2>
+    <p>Contenido multimedia con descripción asociada:</p>
+
+    <figure style="margin: 0; padding: 10px; border: 1px solid #ddd;">
+      <pre><code>console.log("Estructura de datos");</code></pre>
+      <figcaption>Figura 1.0: Inicialización de mensaje en consola.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ETIQUETA 11 -->
+  <section>
+    <h2>11. &lt;address&gt;</h2>
+    <p>Información de contacto del responsable:</p>
+
+    <address>
+      Contacto institucional: <a href="mailto:soporte@uleam.edu.ec">soporte@uleam.edu.ec</a><br>
+      Manta, Ecuador
+    </address>
+  </section>
+
+  <!-- ETIQUETA 12 -->
+  <section>
+    <h2>12. &lt;output&gt;</h2>
+    <p>Visualización del cálculo generado por controles:</p>
+
+    <form oninput="resultado.value = parseInt(a.value) + parseInt(b.value)">
+      <input type="range" id="a" value="20"> +
+      <input type="number" id="b" value="10"> =
+      <output name="resultado" for="a b">30</output>
+    </form>
+  </section>
+
+  <!-- ETIQUETA 13 -->
+  <section>
+    <h2>13. &lt;del&gt; e &lt;ins&gt;</h2>
+    <p>Control de modificaciones y revisiones textuales:</p>
+
+    <p>Costo del curso regular: <del>$120.00</del> <ins>$80.00</ins> por matrícula anticipada.</p>
+  </section>
+
+  <!-- ETIQUETA 14 -->
+  <section>
+    <h2>14. &lt;cite&gt;</h2>
+    <p>Referencia formal a obras intelectuales:</p>
+
+    <p>Los principios de arquitectura de software se analizan detalladamente en <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite>.</p>
+  </section>
+
+  <!-- ETIQUETA 15 -->
+  <section>
+    <h2>15. &lt;sub&gt; y &lt;sup&gt;</h2>
+    <p>Notación en subíndice y superíndice:</p>
+
+    <p>Composición molecular del agua: H<sub>2</sub>O</p>
+    <p>Cálculo de complejidad exponencial: 2<sup>n</sup></p>
+  </section>
+
+  <!-- ETIQUETA 16 -->
+  <section>
+    <h2>16. &lt;wbr&gt;</h2>
+    <p>Punto de quiebre de palabra sugerido:</p>
+
+    <p>RutaDeAccesoDelSistema<wbr>ModuloDeAutenticacion<wbr>ServicioPrincipal.config</p>
+  </section>
+
+  <!-- ETIQUETA 17 -->
+  <section>
+    <h2>17. &lt;fieldset&gt; y &lt;legend&gt;</h2>
+    <p>Agrupación semántica de campos de formulario:</p>
+
+    <fieldset>
+      <legend>Credenciales de acceso</legend>
+      <label for="usuario">Usuario:</label>
+      <input type="text" id="usuario" name="usuario"><br><br>
+      <label for="clave">Contraseña:</label>
+      <input type="password" id="clave" name="clave">
+    </fieldset>
+  </section>
+
+  <!-- ETIQUETA 18 -->
+  <section>
+    <h2>18. &lt;optgroup&gt;</h2>
+    <p>Agrupamiento categórico de opciones de selección:</p>
+
+    <label for="carrera">Seleccione una titulación:</label>
+    <select id="carrera" name="carrera">
+      <optgroup label="Ingeniería y Ciencias">
+        <option value="sistemas">Ingeniería en Tecnologías de la Información</option>
+        <option value="civil">Ingeniería Civil</option>
+      </optgroup>
+      <optgroup label="Ciencias Sociales y Humanidades">
+        <option value="derecho">Derecho</option>
+        <option value="comunicacion">Comunicación Social</option>
+      </optgroup>
+    </select>
+  </section>
+
+  <!-- ETIQUETA 19 -->
+  <section>
+    <h2>19. &lt;samp&gt;</h2>
+    <p>Salida formal de un entorno de ejecución o consola:</p>
+
+    <p>Respuesta de la terminal: <samp>HTTP/1.1 200 OK</samp></p>
+  </section>
+
+  <!-- ETIQUETA 20 -->
+  <section>
+      <h2>20. &lt;bdo&gt;</h2>
+      <p>Anulación explícita de la dirección de lectura de texto:</p>
+
+      <p>Texto estándar: Algoritmos y estructuras de datos.</p>
+      <p>Texto invertido con bdo: <bdo dir="rtl">Algoritmos y estructuras de datos.</bdo></p>
+  </section>
+
+</body>
+</html>

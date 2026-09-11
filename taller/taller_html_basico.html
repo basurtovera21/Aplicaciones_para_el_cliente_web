@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Especificación de versión: HTML5 -->
+  <meta charset="UTF-8"> <!-- Codificación de caracteres universal (tildes, eñes) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ajuste de escala responsiva para dispositivos móviles -->
+  <title>Portal Web en HTML5</title> <!-- Título formal que se muestra en la pestaña del navegador -->
+</head>
+<body>
+
+  <!-- FASE 1 Y FASE 3: ENCABEZADO Y NAVEGACIÓN
+       Contiene la identidad principal del sitio y accesos rápidos -->
+  <header>
+    <!-- Encabezado de nivel 1: Título jerárquico principal del documento -->
+    <h1>Desarrollo web front-end</h1>
+    <p>Conversión de datos en una interfaz gráfica para interacción directa del usuario</p>
+
+    <!-- Menú semántico de navegación -->
+    <nav>
+      <ul>
+        <!-- Enlace interno relativo: salta directamente al elemento con id="formulario" -->
+        <li><a href="#formulario">Formulario de registro</a></li>
+
+        <!-- Enlace externo absoluto: abre enlace en pestaña nueva (_blank) con seguridad reforzada -->
+        <li><a href="https://es.wikipedia.org/wiki/Desarrollo_web_front-end" target="_blank" rel="noopener noreferrer">Referencia bibliográfica</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- FASE 2: CONTENIDO PRINCIPAL Y RECURSOS
+       Agrupa la información temática central del documento -->
+  <main>
+
+    <!-- Sección 1: Introducción y definición conceptual -->
+    <section>
+      <h2>Front-End</h2>
+      <p>El desarrollo web front-end es la práctica de convertir datos en una interfaz gráfica para que los usuarios puedan ver e interactuar con la información mediante el uso de tecnologías web en el navegador.</p>
+    </section>
+
+    <!-- Sección 2: Tecnologías esenciales (lista con resaltado semántico) -->
+    <section>
+      <h2>Herramientas y tecnologías</h2>
+      <ul>
+        <!-- <strong> aporta peso semántico de importancia y formato en negrita -->
+        <li><strong>HTML.-</strong> Estructura fundamental del documento web.</li>
+        <li><strong>CSS.-</strong> Controla el aspecto visual, el diseño, la presentación y la adaptación a diferentes pantallas.</li>
+        <li><strong>JavaScript.-</strong> Transforma una página estática en una interfaz dinámica e interactiva.</li>
+      </ul>
+    </section>
+
+    <!-- Sección 3: Inserción de recurso multimedia gráfico -->
+    <section>
+      <h2>Recurso visual</h2>
+      <!-- src define la ruta; alt es obligatorio por accesibilidad; width ajusta el tamaño -->
+      <img src="https://www.santanderopenacademy.com/content/dam/becasmicrosites/01-soa-blog/new-desarrollo-paginas-web.jpeg" alt="Referencia visual de programación y desarrollo web front-end" width="25%">
+    </section>
+
+    <!-- FASE 3: FORMULARIO INTERACTIVO DE CAPTURA
+         id="formulario" sirve de ancla para la navegación superior -->
+    <section id="formulario">
+      <h2>Formulario de Registro</h2>
+
+      <!-- action simula el destino del backend; method="post" envía datos de forma segura -->
+      <form action="#" method="post">
+
+        <!-- Campo 1: Texto plano (requerido) -->
+        <div>
+          <!-- label for se asocia al id del input para mejorar accesibilidad y área táctil -->
+          <label for="nombre">Nombre completo:</label><br>
+          <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <br>
+
+        <!-- Campo 2: Correo electrónico con validación sintáctica nativa del navegador -->
+        <div>
+          <label for="correo">Correo electrónico:</label><br>
+          <input type="email" id="correo" name="correo" required>
+        </div>
+        <br>
+
+        <!-- Campo 3: Lista desplegable de selección única -->
+        <div>
+          <label for="perfil">Perfil:</label><br>
+          <select id="perfil" name="perfil">
+            <option value="frontend">Desarrollador Front-End</option>
+            <option value="backend">Desarrollador Back-End</option>
+            <option value="fullstack">Desarrollador Full Stack</option>
+          </select>
+        </div>
+        <br>
+
+        <!-- Campo 4: Entrada multilínea de texto -->
+        <div>
+          <label for="comentarios">Comentarios:</label><br>
+          <textarea id="comentarios" name="comentarios" rows="4" cols="40"></textarea>
+        </div>
+        <br>
+
+        <!-- Control de envío: Valida y procesa los campos del formulario -->
+        <button type="submit">Registrar</button>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- FASE 3: PIE DE PÁGINA INSTITUCIONAL
+       Cierre formal, autoría y créditos del sitio -->
+  <footer>
+    <hr> <!-- Regla divisoria horizontal -->
+    <!-- &copy; imprime el símbolo de copyright de forma estándar -->
+    <p>&copy; 2026 Aplicaciones para el cliente Web ("A"). Basurto Vera Carlos Eduardo. Todos los derechos reservados.</p>
+  </footer>
+
+</body>
+</html>
