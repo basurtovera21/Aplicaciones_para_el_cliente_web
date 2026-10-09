@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio de sesión</title>
+  <link rel="stylesheet" href="estilos/general.css">
+  <link rel="stylesheet" href="estilos/inicio-sesion.css">
+</head>
+<body>
+
+  <header class="barra-navegacion">
+    <div class="barra-navegacion-identidad">
+      <img src="recursos/imagenes/logotipo-uleam.png" alt="logotipo" class="barra-navegacion-identificador">
+      <span class="barra-navegacion-titulo">Inveh</span>
+    </div>
+
+    <div class="barra-navegacion-usuario">
+      <span>Plataforma de identificación y control vehicular</span>
+    </div>
+  </header>
+
+  <main class="pantalla-inicio-sesion-contenedor">
+    <h1 class="titulo-accion-inicio-sesion">Iniciar sesión</h1>
+
+    <section class="tarjeta-formulario-inicio-sesion">
+      <p class="indicacion-texto-inicio-sesion">
+        Acceda utilizando sus credenciales institucionales.
+      </p>
+
+      <form id="formulario-autenticacion" class="cuerpo-formulario-inicio-sesion" novalidate>
+        <div class="bloque-campo-inicio-sesion">
+          <label for="campo-correo-institucional" class="etiqueta-formulario-inicio-sesion">
+            Correo institucional o usuario
+          </label>
+          <div class="caja-entrada-con-icono">
+            <img src="recursos/imagenes/correo.svg" alt="correo" class="icono-imagen icono-entrada-izquierda">
+            <input 
+              type="text" 
+              id="campo-correo-institucional" 
+              class="campo-texto-inicio-sesion" 
+              placeholder="usuario@live.uleam.edu.ec"
+              autocomplete="off"
+            >
+          </div>
+          <span class="texto-alerta-error" id="mensaje-error-correo"></span>
+        </div>
+
+
+        <div class="bloque-campo-inicio-sesion">
+          <label for="campo-clave-acceso" class="etiqueta-formulario-inicio-sesion">
+            Contraseña
+          </label>
+          <div class="caja-entrada-con-icono">
+            <button 
+              type="button" 
+              class="boton-mostrar-clave" 
+              id="boton-alternar-visualizacion-clave" 
+              aria-label="Mostrar clave"
+            >
+              <img src="recursos/imagenes/ojo.svg" alt="mostrar clave" class="icono-imagen" id="imagen-icono-ojo">
+            </button>
+            <input 
+              type="password" 
+              id="campo-clave-acceso" 
+              class="campo-texto-inicio-sesion" 
+              placeholder="••••••••"
+            >
+          </div>
+          <span class="texto-alerta-error" id="mensaje-error-clave"></span>
+        </div>
+
+        <button type="submit" class="boton-acceder" id="boton-enviar-acceso">
+          Acceder
+        </button>
+
+      </form>
+    </section>
+  </main>
+
+  <script src="scripts/validaciones.js"></script>
+</body>
+</html>
