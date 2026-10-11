@@ -10,6 +10,7 @@
 </head>
 <body>
 
+  <!-- Cabecera -->
   <header class="barra-navegacion">
     <div class="barra-navegacion-identidad">
       <img src="recursos/imagenes/logotipo-uleam.png" alt="logotipo" class="barra-navegacion-identificador">
@@ -26,6 +27,7 @@
 
   <main class="contenedor-usuario-inicio">
 
+    <!-- Resumen del usuario -->
     <section class="tarjeta-resumen-usuario">
       <div class="bloque-perfil-informacion">
         <div class="avatar-iniciales-usuario">BC</div>
@@ -45,6 +47,7 @@
       </div>
     </section>
 
+    <!-- Registro de vehículo -->
     <div class="fila-accion-vehiculo-adicional">
       <button type="button" class="boton-requerir-vehiculo" id="boton-abrir-registro-vehiculo">
         <img src="recursos/imagenes/mas.svg" alt="+" class="icono-imagen-boton">
@@ -52,6 +55,7 @@
       </button>
     </div>
 
+    <!-- Vehículos -->
     <div class="rejilla-vehiculos-usuario">
       <section class="tarjeta-vehiculo-registrado">
         <div class="fila-cabecera-vehiculo">
@@ -59,7 +63,7 @@
           <span class="etiqueta-estado-instalaciones">Dentro de las instalaciones</span>
         </div>
         <div class="bloque-identificador-sistema">
-          <span>Identificador: <strong>VEH-000639</strong></span>
+          <span>Identificador: VEH-000639</span>
         </div>
         <div class="rejilla-especificaciones-vehiculo">
           <div class="columna-especificacion">
@@ -81,9 +85,9 @@
           </button>
         </div>
       </section>
-
     </div>
 
+    <!-- Autorización de visitas -->
     <section class="tarjeta-autorizacion-visitas">
       <div class="textos-autorizacion-visitas">
         <h3 class="titulo-seccion-visitas">Autorización de visitas</h3>
@@ -96,6 +100,152 @@
         <span>Crear autorización</span>
       </button>
     </section>
+
+    <!-- Modal: Ficha vehicular -->
+    <div class="superposicion-modal" id="modal-ficha-vehicular" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-ficha">
+        
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Ficha vehicular</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <div class="cuerpo-grid-ficha">
+          
+          <div class="columna-modal">
+            <div class="fila-centrada-modal">
+              <span class="etiqueta-placa-ficha">KH463S</span>
+            </div>
+
+            <div class="tarjeta-qr-modal">
+              <img src="recursos/imagenes/codigo-qr.png" alt="Código QR vehicular" class="imagen-qr-modal">
+            </div>
+
+            <div class="tarjeta-informacion-modal">
+              <h4 class="subtitulo-modal">Información del vehículo</h4>
+              <div class="lista-datos-modal">
+                <p class="item-dato-modal">Tipo de vehículo: <span>Motocicleta</span></p>
+                <p class="item-dato-modal">Fabricante / Modelo: <span>Honda Navi</span></p>
+                <p class="item-dato-modal">Año de fabricación: <span>2024</span></p>
+                <p class="item-dato-modal">Color: <span>Negro</span></p>
+                <p class="item-dato-modal">Observaciones: <span>Sin observaciones</span></p>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="columna-modal">
+            <div class="fila-centrada-modal">
+              <span class="identificador-texto-modal">Identificador: VEH-000639</span>
+            </div>
+
+            <div class="tarjeta-informacion-modal">
+              <h4 class="subtitulo-modal">Información del registro</h4>
+              <div class="lista-datos-modal">
+                <p class="item-dato-modal">Fecha de registro: <span>02/10/2026</span></p>
+                <p class="item-dato-modal">Fecha de actualización: <span>03/10/2026</span></p>
+                <p class="item-dato-modal">Estado de autorización: <span>Autorizado</span></p>
+              </div>
+            </div>
+
+            <div class="tarjeta-informacion-modal">
+              <h4 class="subtitulo-modal">Información del propietario</h4>
+              <div class="lista-datos-modal">
+                <p class="item-dato-modal">Apellidos y nombres: <span>Basurto Vera Carlos Eduardo</span></p>
+                <p class="item-dato-modal">Número de identificación: <span>1316719804</span></p>
+                <p class="item-dato-modal">Correo institucional: <span>e1316719804@live.uleam.edu.ec</span></p>
+                <p class="item-dato-modal">Tipo de usuario: <span>Estudiante</span></p>
+                <p class="item-dato-modal">Facultad: <span>Ciencias de la vida y tecnologías</span></p>
+                <p class="item-dato-modal">Carrera: <span>Software</span></p>
+              </div>
+            </div>
+
+            <div class="contenedor-acciones-modal">
+              <button type="button" class="boton-aceptar-modal" data-modal-cerrar>
+                <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+                <span>Aceptar</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+        <!-- Modal: Confirmar desvinculación -->
+    <div class="superposicion-modal" id="modal-desvincular-vehiculo" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-mediano">
+        
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Confirmar desvinculación</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <div class="cuerpo-modal-confirmacion">
+          <div class="contenedor-imagen-alerta">
+            <img src="recursos/imagenes/alerta.svg" alt="Alerta" class="icono-visual-alerta">
+          </div>
+          
+          <div class="bloque-texto-informativo">
+            <p class="identificador-vehiculo-enfasis">Identificador: VEH-000639</p>
+            <p class="descripcion-alerta-modal">
+              Al desvincular este vehículo, su autorización de acceso quedará invalidada y no podrá ingresar a las instalaciones.
+            </p>
+          </div>
+        </div>
+
+        <div class="contenedor-acciones-horizontal">
+          <button type="button" class="boton-accion-modal fondo-peligro" id="boton-proceder-desvincular">
+            <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+            <span>Sí, desvincular</span>
+          </button>
+          
+          <button type="button" class="boton-accion-modal fondo-neutro" data-modal-cerrar>
+            <img src="recursos/imagenes/eliminar.svg" alt="" class="icono-boton-modal">
+            <span>Cancelar</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Modal: Desvinculación completada -->
+    <div class="superposicion-modal" id="modal-desvinculacion-exito" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-mediano">
+        
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Desvinculación completada</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <div class="cuerpo-modal-confirmacion">
+          <div class="contenedor-imagen-alerta">
+            <img src="recursos/imagenes/confirmacion.svg" alt="Éxito" class="icono-visual-alerta">
+          </div>
+          
+          <div class="bloque-texto-informativo">
+            <p class="descripcion-alerta-modal">
+              La desvinculación se ha realizado satisfactoriamente. El vehículo ya no se encuentra asociado a la cuenta institucional y no dispone de autorización para acceder a las instalaciones.
+            </p>
+          </div>
+        </div>
+
+        <div class="contenedor-acciones-centrado">
+          <button type="button" class="boton-accion-modal fondo-neutro" data-modal-cerrar>
+            <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+            <span>Aceptar</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
 
   </main>
 

@@ -43,3 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const botonProceder = document.getElementById('boton-proceder-desvincular');
+
+    if (botonProceder) {
+        botonProceder.addEventListener('click', () => {
+            cerrarModal('modal-desvincular-vehiculo');
+            setTimeout(() => {
+                abrirModal('modal-desvinculacion-exito');
+            }, 400);
+        });
+    }
+});

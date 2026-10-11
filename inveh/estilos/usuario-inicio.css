@@ -34,7 +34,7 @@
   border-radius: 50%;
   background-color: var(--fondo-barra-superior);
   color: var(--color-texto-blanco);
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 500;
   box-shadow: 0 4px 8px rgba(141, 153, 174, 0.4);
   display: flex;
