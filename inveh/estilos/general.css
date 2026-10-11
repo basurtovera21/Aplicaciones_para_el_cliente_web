@@ -99,10 +99,18 @@ body {
   cursor: pointer;
   display: flex;
   align-items: center;
-  padding: 6px;
-  border-radius: 6px;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.boton-cerrar-sesion img,
+.boton-cerrar-sesion .icono-imagen {
+  width: 36px;
+  height: 36px;
 }
 
 .boton-cerrar-sesion:hover {
-  background-color: rgba(141, 153, 174, 0.15);
+  background-color: rgba(141, 153, 174, 0.25);
 }

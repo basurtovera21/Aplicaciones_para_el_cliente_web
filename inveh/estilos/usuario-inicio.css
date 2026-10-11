@@ -1,0 +1,310 @@
+.contenedor-usuario-inicio {
+  min-height: calc(100vh - 98px);
+  max-width: 1440px;
+  width: 98%;
+  margin: 0 auto;
+  padding: 36px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 36px;
+  background-color: var(--fondo-principal);
+  overflow: hidden;
+}
+
+.tarjeta-resumen-usuario {
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-redondeo-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+  width: 100%;
+  padding: 38px 36px;
+  box-sizing: border-box;
+}
+
+.bloque-perfil-informacion {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.avatar-iniciales-usuario {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--fondo-barra-superior);
+  color: var(--color-texto-blanco);
+  font-size: 28px;
+  font-weight: 500;
+  box-shadow: 0 4px 8px rgba(141, 153, 174, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.detalles-personales-usuario {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+
+.fila-superior-perfil {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nombre-rol-usuario {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+}
+
+.indicador-contador-vehiculos {
+  background-color: #E2E8F0;
+  color: var(--color-texto-cuerpo);
+  font-size: 14px;
+  font-weight: 400;
+  padding: 10px 32px;
+  border-radius: 16px;
+  box-shadow: 0 3px 6px rgba(141, 153, 174, 0.3);
+}
+
+.fila-datos-institucionales {
+  display: flex;
+  gap: 36px;
+  font-size: 12px;
+  color: var(--color-texto-atenuado);
+}
+
+.fila-datos-institucionales strong {
+  color: var(--color-texto-cuerpo);
+  font-weight: 400;
+}
+
+.fila-accion-vehiculo-adicional {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.boton-requerir-vehiculo {
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+  font-family: inherit;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.boton-requerir-vehiculo:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+.rejilla-vehiculos-usuario {
+  display: flex;
+  gap: 36px;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.rejilla-vehiculos-usuario:empty {
+  display: none;
+}
+
+.tarjeta-vehiculo-registrado {
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-redondeo-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+  width: 594px;
+  box-sizing: border-box;
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.fila-cabecera-vehiculo {
+  display: flex;
+  gap: 36px;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.etiqueta-placa-vehicular {
+  background-color: #546A7B;
+  color: var(--color-texto-blanco);
+  font-size: 18px;
+  font-weight: 500;
+  width: 243px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: var(--radio-redondeo-boton);
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(84, 106, 123, 0.35);
+}
+
+.etiqueta-estado-instalaciones {
+  background-color: #BDD5EA55;
+  color: var(--color-texto-cuerpo);
+  font-size: 14px;
+  width: 243px;
+  height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: var(--radio-redondeo-boton);
+  white-space: nowrap;
+  box-sizing: border-box;
+  box-shadow: 0 2px 6px rgba(141, 153, 174, 0.25);
+  flex-shrink: 0;
+}
+
+.bloque-identificador-sistema {
+  text-align: center;
+  font-size: 16px;
+  color: var(--color-texto-cuerpo);
+  margin: 0;
+}
+
+.bloque-identificador-sistema strong {
+  font-weight: 500;
+}
+
+.rejilla-especificaciones-vehiculo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--color-texto-atenuado);
+  line-height: 1.8;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rejilla-especificaciones-vehiculo span {
+  color: var(--color-texto-cuerpo);
+}
+
+.fila-botones-accion-vehiculo {
+  display: flex;
+  gap: 36px;
+  margin-top: 6px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.boton-ficha-vehicular {
+  width: 243px;
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+  font-family: inherit;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.boton-ficha-vehicular:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+.boton-desvincular-vehiculo {
+  width: 243px;
+  background-color: var(--color-alerta-salmon-fondo);
+  color: var(--color-alerta-salmon-texto);
+  font-family: inherit;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.boton-desvincular-vehiculo:hover {
+  background-color: var(--color-alerta-salmon-hover);
+}
+
+.tarjeta-autorizacion-visitas {
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-redondeo-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+  width: 100%;
+  box-sizing: border-box;
+  padding: 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.titulo-seccion-visitas {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  margin-bottom: 6px;
+}
+
+.descripcion-seccion-visitas {
+  font-size: 14px;
+  color: var(--color-texto-atenuado);
+  margin: 0;
+}
+
+.boton-crear-autorizacion {
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+  font-family: inherit;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  padding: 8px 14px;
+  width: 243px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.boton-crear-autorizacion:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+.icono-imagen-boton {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}

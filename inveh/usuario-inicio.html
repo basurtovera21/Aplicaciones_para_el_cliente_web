@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inveh</title>
+  <link rel="stylesheet" href="estilos/general.css">
+  <link rel="stylesheet" href="estilos/modal.css">
+  <link rel="stylesheet" href="estilos/usuario-inicio.css">
+</head>
+<body>
+
+  <header class="barra-navegacion">
+    <div class="barra-navegacion-identidad">
+      <img src="recursos/imagenes/logotipo-uleam.png" alt="logotipo" class="barra-navegacion-identificador">
+      <span class="barra-navegacion-titulo">Inveh</span>
+    </div>
+
+    <div class="barra-navegacion-usuario">
+      <span>Basurto Vera Carlos Eduardo</span>
+      <button type="button" class="boton-cerrar-sesion" id="boton-cerrar-sesion" aria-label="cerrar sesión">
+        <img src="recursos/imagenes/cerrar-sesion.svg" alt="cerrar sesión" class="icono-imagen">
+      </button>
+    </div>
+  </header>
+
+  <main class="contenedor-usuario-inicio">
+
+    <section class="tarjeta-resumen-usuario">
+      <div class="bloque-perfil-informacion">
+        <div class="avatar-iniciales-usuario">BC</div>
+        <div class="detalles-personales-usuario">
+          <div class="fila-superior-perfil">
+            <h2 class="nombre-rol-usuario">Basurto Vera Carlos Eduardo (Estudiante)</h2>
+            <div class="indicador-contador-vehiculos">
+              Registro de vehículos: 1 de 2 permitidos
+            </div>
+          </div>
+          <div class="fila-datos-institucionales">
+            <span>Número de identificación: <strong>1316719804</strong></span>
+            <span>Correo institucional: <strong>e1316719804@live.uleam.edu.ec</strong></span>
+            <span>Facultad: <strong>Ciencias de la vida y tecnologías</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="fila-accion-vehiculo-adicional">
+      <button type="button" class="boton-requerir-vehiculo" id="boton-abrir-registro-vehiculo">
+        <img src="recursos/imagenes/mas.svg" alt="+" class="icono-imagen-boton">
+        <span>Requerir vehículo adicional</span>
+      </button>
+    </div>
+
+    <div class="rejilla-vehiculos-usuario">
+      <section class="tarjeta-vehiculo-registrado">
+        <div class="fila-cabecera-vehiculo">
+          <span class="etiqueta-placa-vehicular">KH463S</span>
+          <span class="etiqueta-estado-instalaciones">Dentro de las instalaciones</span>
+        </div>
+        <div class="bloque-identificador-sistema">
+          <span>Identificador: <strong>VEH-000639</strong></span>
+        </div>
+        <div class="rejilla-especificaciones-vehiculo">
+          <div class="columna-especificacion">
+            <p>Tipo de vehículo: <span>Motocicleta</span></p>
+            <p>Color: <span>Negro</span></p>
+          </div>
+          <div class="columna-especificacion">
+            <p>Fabricante / Modelo: <span>Honda Navi</span></p>
+          </div>
+        </div>
+        <div class="fila-botones-accion-vehiculo">
+          <button type="button" class="boton-ficha-vehicular" id="boton-abrir-ficha-vehicular">
+            <img src="recursos/imagenes/ficha-vehicular.svg" alt="ficha-vehicular" class="icono-imagen-boton">
+            <span>Ficha vehicular</span>
+          </button>
+          <button type="button" class="boton-desvincular-vehiculo" id="boton-abrir-desvincular-vehiculo">
+            <img src="recursos/imagenes/eliminar.svg" alt="x" class="icono-imagen-boton">
+            <span>Desvincular vehículo</span>
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <section class="tarjeta-autorizacion-visitas">
+      <div class="textos-autorizacion-visitas">
+        <h3 class="titulo-seccion-visitas">Autorización de visitas</h3>
+        <p class="descripcion-seccion-visitas">
+          Preautorice el acceso vehicular de sus visitas antes de su llegada a las instalaciones.
+        </p>
+      </div>
+      <button type="button" class="boton-crear-autorizacion" id="boton-abrir-crear-autorizacion">
+        <img src="recursos/imagenes/crear-autorizacion.svg" alt="crear-autorizacion" class="icono-imagen-boton">
+        <span>Crear autorización</span>
+      </button>
+    </section>
+
+  </main>
+
+  <script src="scripts/modal.js"></script>
+  <script src="scripts/usuario-inicio.js"></script>
+</body>
+</html>
