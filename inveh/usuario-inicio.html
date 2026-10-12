@@ -246,10 +246,278 @@
       </div>
     </div>
 
+        <!-- Modal: Solicitud de registro vehicular -->
+    <div class="superposicion-modal" id="modal-registro-vehiculo" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-registro">
+        
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Solicitud de registro vehicular</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar>
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <div class="banner-informativo-registro">
+          <img src="recursos/imagenes/informacion.svg" alt="Info" class="icono-banner-grande">
+          <p class="texto-banner-unico">
+            <strong>Estado de autorización:</strong> Una vez enviada la solicitud, el vehículo quedará en estado Pendiente mientras se realiza la revisión correspondiente.
+          </p>
+        </div>
+
+        <form class="formulario-registro-vehiculo" id="form-registro-vehiculo" novalidate>
+          <div class="cuerpo-grid-formulario">
+            
+            <div class="bloque-campo-formulario">
+              <label class="etiqueta-formulario">Placa vehicular</label>
+              <input type="text" class="campo-texto-modal" id="placa-vehiculo" placeholder="Ej. PCN9041">
+              <span class="texto-alerta-error"></span>
+            </div>
+
+            <div class="bloque-campo-formulario">
+              <label class="etiqueta-formulario">Tipo de vehículo</label>
+              <select class="campo-texto-modal" id="tipo-vehiculo">
+                <option value="" disabled selected>Elija una opción</option>
+                <option value="automovil">Automóvil</option>
+                <option value="motocicleta">Motocicleta</option>
+                <option value="camioneta">Camioneta</option>
+                <option value="suv">SUV</option>
+                <option value="furgoneta">Furgoneta</option>
+                <option value="bus">Bus / buseta</option>
+                <option value="camion">Camión</option>
+                <option value="otro">Otro</option>
+              </select>
+              <span class="texto-alerta-error"></span>
+            </div>
+
+            <div class="bloque-campo-formulario">
+              <label class="etiqueta-formulario">Fabricante</label>
+              <input type="text" class="campo-texto-modal" id="fabricante-vehiculo" placeholder="Ej. Toyota">
+              <span class="texto-alerta-error"></span>
+            </div>
+
+            <div class="bloque-campo-formulario">
+              <label class="etiqueta-formulario">Modelo</label>
+              <input type="text" class="campo-texto-modal" id="modelo-vehiculo" placeholder="Ej. Raize">
+              <span class="texto-alerta-error"></span>
+            </div>
+
+            <div class="bloque-campo-formulario">
+              <label class="etiqueta-formulario">Color</label>
+              <input type="text" class="campo-texto-modal" id="color-vehiculo" placeholder="Ej. Blanco">
+              <span class="texto-alerta-error"></span>
+            </div>
+
+            <div class="bloque-campo-formulario">
+              <label class="etiqueta-formulario">Año de fabricación</label>
+              <input type="number" class="campo-texto-modal" id="anio-vehiculo" placeholder="Ej. 2020" min="0">
+              <span class="texto-alerta-error"></span>
+            </div>
+
+            <div class="bloque-campo-formulario campo-ancho-completo">
+              <label class="etiqueta-formulario">Observaciones</label>
+              <textarea class="campo-area-texto-modal" id="observaciones-vehiculo" placeholder="Proporcione información adicional que facilite la identificación del vehículo. (Opcional)"></textarea>
+              <span class="texto-alerta-error"></span>
+            </div>
+          </div>
+
+          <div class="contenedor-acciones-extremos">
+            <button type="submit" class="boton-accion-modal fondo-neutro">
+              <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+              <span>Enviar solicitud</span>
+            </button>
+            
+            <button type="button" class="boton-accion-modal fondo-cancelar" data-modal-cerrar>
+              <img src="recursos/imagenes/eliminar.svg" alt="" class="icono-boton-modal">
+              <span>Cancelar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+        <!-- Modal: Solicitud registrada correctamente -->
+    <div class="superposicion-modal" id="modal-registro-exito" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-mediano">
+        
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Solicitud registrada correctamente</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <div class="cuerpo-modal-confirmacion">
+          <div class="contenedor-imagen-alerta">
+            <img src="recursos/imagenes/confirmacion.svg" alt="Éxito" class="icono-visual-alerta">
+          </div>
+          
+          <div class="bloque-texto-informativo">
+            <p class="descripcion-alerta-modal" id="info-fecha-registro">
+            </p>
+          </div>
+        </div>
+
+        <div class="contenedor-acciones-centrado">
+          <button type="button" class="boton-accion-modal fondo-neutro" data-modal-cerrar>
+            <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+            <span>Aceptar</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+        <!-- MODAL: Autorización de acceso vehicular -->
+    <div class="superposicion-modal" id="modal-crear-autorizacion" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-registro">
+        
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Autorización de acceso vehicular</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar>
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <div class="banner-informativo-registro">
+          <img src="recursos/imagenes/informacion.svg" alt="Info" class="icono-banner-grande">
+          <p class="texto-banner-unico">
+            Los datos registrados facilitarán el proceso de identificación y control de acceso vehicular dentro de las instalaciones de la institución.
+          </p>
+        </div>
+
+        <form class="formulario-registro-vehiculo" id="form-crear-autorizacion" novalidate>
+          
+          <div class="seccion-formulario-modal">
+            <h4 class="titulo-seccion-grande">Información del visitante</h4>
+            <div class="cuerpo-grid-formulario">
+              <div class="bloque-campo-formulario">
+                <label class="etiqueta-formulario">Apellidos y nombres</label>
+                <input type="text" class="campo-texto-modal" placeholder="Ej. Gutiérrez Mero Luis Alfonso">
+                <span class="texto-alerta-error"></span>
+              </div>
+              <div class="bloque-campo-formulario">
+                <label class="etiqueta-formulario">Tipo de identificación</label>
+                <select class="campo-texto-modal">
+                  <option value="" disabled selected>Elija una opción</option>
+                  <option value="cedula">Cédula de identidad</option>
+                  <option value="pasaporte">Pasaporte</option>
+                  <option value="extranjero">Documento de identidad extranjero</option>
+                </select>
+                <span class="texto-alerta-error"></span>
+              </div>
+              <div class="bloque-campo-formulario">
+                <label class="etiqueta-formulario">Número de identificación</label>
+                <input type="text" class="campo-texto-modal" placeholder="Ej. 1307892139">
+                <span class="texto-alerta-error"></span>
+              </div>
+              <div class="bloque-campo-formulario">
+                <label class="etiqueta-formulario">Número de teléfono</label>
+                <input type="text" class="campo-texto-modal" placeholder="Ej. 0991237891">
+                <span class="texto-alerta-error"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="seccion-formulario-modal">
+            <button type="button" class="boton-desplegar-compacto" data-objetivo="seccion-vehiculo">
+              <h4 class="titulo-seccion-grande">Información del vehículo</h4>
+              <img src="../recursos/imagenes/select-negro.svg" alt="v" class="icono-flecha-pequena">
+            </button>
+            
+            <div class="contenido-desplegable" id="seccion-vehiculo">
+              <div class="cuerpo-grid-formulario">
+                <div class="bloque-campo-formulario">
+                  <label class="etiqueta-formulario">Placa vehicular</label>
+                  <input type="text" class="campo-texto-modal" placeholder="Ej. PCN9041">
+                </div>
+                <div class="bloque-campo-formulario">
+                  <label class="etiqueta-formulario">Tipo de vehículo</label>
+                  <select class="campo-texto-modal">
+                    <option value="" disabled selected>Elija una opción</option>
+                    <option value="automovil">Automóvil</option>
+                    <option value="motocicleta">Motocicleta</option>
+                    <option value="camioneta">Camioneta</option>
+                    <option value="suv">SUV</option>
+                    <option value="furgoneta">Furgoneta</option>
+                    <option value="bus">Bus / buseta</option>
+                    <option value="camion">Camión</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+                <div class="bloque-campo-formulario">
+                  <label class="etiqueta-formulario">Fabricante</label>
+                  <input type="text" class="campo-texto-modal" placeholder="Ej. Toyota">
+                </div>
+                <div class="bloque-campo-formulario">
+                  <label class="etiqueta-formulario">Modelo</label>
+                  <input type="text" class="campo-texto-modal" placeholder="Ej. Raize">
+                </div>
+                <div class="bloque-campo-formulario">
+                  <label class="etiqueta-formulario">Color</label>
+                  <input type="text" class="campo-texto-modal" placeholder="Ej. Blanco">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="seccion-formulario-modal">
+            <button type="button" class="boton-desplegar-compacto" data-objetivo="seccion-visita">
+              <h4 class="titulo-seccion-grande">Detalle de la visita</h4>
+              <img src="../recursos/imagenes/select-negro.svg" alt="v" class="icono-flecha-pequena">
+            </button>
+
+            <div class="contenido-desplegable" id="seccion-visita">
+              <div class="cuerpo-grid-formulario">
+                <div class="bloque-campo-formulario">
+                  <label class="etiqueta-formulario">Fecha programada</label>
+                  <input type="date" class="campo-texto-modal">
+                </div>
+                <div class="bloque-campo-formulario">
+                  <label class="etiqueta-formulario">Hora programada</label>
+                  <input type="time" class="campo-texto-modal">
+                </div>
+                <div class="bloque-campo-formulario">
+                  <label class="etiqueta-formulario">Motivo de la visita</label>
+                  <select class="campo-texto-modal">
+                    <option value="" disabled selected>Elija una opción</option>
+                    <option value="reunion">Reunión institucional</option>
+                    <option value="tramite">Trámite administrativo</option>
+                    <option value="academica">Actividad académica</option>
+                    <option value="servicios">Prestación de servicios</option>
+                    <option value="personal">Visita personal</option>
+                    <option value="entrega">Entrega o retiro de documentos</option>
+                    <option value="soporte">Mantenimiento o soporte técnico</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+                <div class="bloque-campo-formulario campo-ancho-completo">
+                  <label class="etiqueta-formulario">Área de destino</label>
+                  <input type="text" class="campo-texto-modal" placeholder="Especifique la facultad, departamento u oficina de destino.">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="contenedor-acciones-extremos">
+            <button type="submit" class="boton-accion-modal fondo-neutro">
+              <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+              <span>Registrar autorización</span>
+            </button>
+            
+            <button type="button" class="boton-accion-modal fondo-cancelar" data-modal-cerrar>
+              <img src="recursos/imagenes/eliminar.svg" alt="" class="icono-boton-modal">
+              <span>Cancelar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
 
   </main>
 
   <script src="scripts/modal.js"></script>
+  <script src="scripts/validaciones.js"></script>
   <script src="scripts/usuario-inicio.js"></script>
 </body>
 </html>
