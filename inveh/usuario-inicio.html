@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inveh</title>
   <link rel="stylesheet" href="estilos/general.css">
-  <link rel="stylesheet" href="estilos/modal.css">
+  <link rel="stylesheet" href="estilos/modal-base.css">
+  <link rel="stylesheet" href="estilos/modal-formularios.css">
+  <link rel="stylesheet" href="estilos/modal-vistas.css">
   <link rel="stylesheet" href="estilos/usuario-inicio.css">
 </head>
 <body>
 
-  <!-- Cabecera -->
+  <!-- Cabecera institucional -->
   <header class="barra-navegacion">
     <div class="barra-navegacion-identidad">
       <img src="recursos/imagenes/logotipo-uleam.png" alt="logotipo" class="barra-navegacion-identificador">
@@ -18,7 +20,7 @@
     </div>
 
     <div class="barra-navegacion-usuario">
-      <span>Basurto Vera Carlos Eduardo</span>
+      <span class="nombre-usuario-sesion">Nombre de usuario</span>
       <button type="button" class="boton-cerrar-sesion" id="boton-cerrar-sesion" aria-label="cerrar sesión">
         <img src="recursos/imagenes/cerrar-sesion.svg" alt="cerrar sesión" class="icono-imagen">
       </button>
@@ -27,27 +29,27 @@
 
   <main class="contenedor-usuario-inicio">
 
-    <!-- Resumen del usuario -->
+    <!-- Usuario -->
     <section class="tarjeta-resumen-usuario">
       <div class="bloque-perfil-informacion">
-        <div class="avatar-iniciales-usuario">BC</div>
+        <div class="avatar-iniciales-usuario">-</div>
         <div class="detalles-personales-usuario">
           <div class="fila-superior-perfil">
-            <h2 class="nombre-rol-usuario">Basurto Vera Carlos Eduardo (Estudiante)</h2>
+            <h2 class="nombre-rol-usuario">Nombre y rol de usuario</h2>
             <div class="indicador-contador-vehiculos">
-              Registro de vehículos: 1 de 2 permitidos
+              Registro de vehículos:
             </div>
           </div>
           <div class="fila-datos-institucionales">
-            <span>Número de identificación: <strong>1316719804</strong></span>
-            <span>Correo institucional: <strong>e1316719804@live.uleam.edu.ec</strong></span>
-            <span>Facultad: <strong>Ciencias de la vida y tecnologías</strong></span>
+            <span>Número de identificación: <span class="dato-valor">-</span></span>
+            <span>Correo institucional: <span class="dato-valor">-</span></span>
+            <span>Facultad: <span class="dato-valor">-</span></span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Registro de vehículo -->
+    <!-- Botón: Registrar vehículo -->
     <div class="fila-accion-vehiculo-adicional">
       <button type="button" class="boton-requerir-vehiculo" id="boton-abrir-registro-vehiculo">
         <img src="recursos/imagenes/mas.svg" alt="+" class="icono-imagen-boton">
@@ -56,55 +58,26 @@
     </div>
 
     <!-- Vehículos -->
-    <div class="rejilla-vehiculos-usuario">
-      <section class="tarjeta-vehiculo-registrado">
-        <div class="fila-cabecera-vehiculo">
-          <span class="etiqueta-placa-vehicular">KH463S</span>
-          <span class="etiqueta-estado-instalaciones">Dentro de las instalaciones</span>
-        </div>
-        <div class="bloque-identificador-sistema">
-          <span>Identificador: VEH-000639</span>
-        </div>
-        <div class="rejilla-especificaciones-vehiculo">
-          <div class="columna-especificacion">
-            <p>Tipo de vehículo: <span>Motocicleta</span></p>
-            <p>Color: <span>Negro</span></p>
-          </div>
-          <div class="columna-especificacion">
-            <p>Fabricante / Modelo: <span>Honda Navi</span></p>
-          </div>
-        </div>
-        <div class="fila-botones-accion-vehiculo">
-          <button type="button" class="boton-ficha-vehicular" id="boton-abrir-ficha-vehicular">
-            <img src="recursos/imagenes/ficha-vehicular.svg" alt="ficha-vehicular" class="icono-imagen-boton">
-            <span>Ficha vehicular</span>
-          </button>
-          <button type="button" class="boton-desvincular-vehiculo" id="boton-abrir-desvincular-vehiculo">
-            <img src="recursos/imagenes/eliminar.svg" alt="x" class="icono-imagen-boton">
-            <span>Desvincular vehículo</span>
-          </button>
-        </div>
-      </section>
-    </div>
+    <div class="rejilla-vehiculos-usuario"></div>
 
     <!-- Autorización de visitas -->
     <section class="tarjeta-autorizacion-visitas">
       <div class="textos-autorizacion-visitas">
         <h3 class="titulo-seccion-visitas">Autorización de visitas</h3>
         <p class="descripcion-seccion-visitas">
-          Preautorice el acceso vehicular de sus visitas antes de su llegada a las instalaciones.
+          Solicite la autorización de acceso vehicular para sus visitas antes de su llegada a las instalaciones.
         </p>
       </div>
       <button type="button" class="boton-crear-autorizacion" id="boton-abrir-crear-autorizacion">
-        <img src="recursos/imagenes/crear-autorizacion.svg" alt="crear-autorizacion" class="icono-imagen-boton">
-        <span>Crear autorización</span>
+        <img src="recursos/imagenes/crear-autorizacion.svg" alt="+" class="icono-imagen-boton">
+        <span>Solicitar autorización</span>
       </button>
     </section>
 
-    <!-- Modal: Ficha vehicular -->
+
+    <!-- Modal 1: Ficha Vehicular -->
     <div class="superposicion-modal" id="modal-ficha-vehicular" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-ficha">
-        
         <div class="cabecera-modal">
           <h3 class="titulo-modal">Ficha vehicular</h3>
           <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
@@ -113,166 +86,140 @@
         </div>
 
         <div class="cuerpo-grid-ficha">
-          
           <div class="columna-modal">
             <div class="fila-centrada-modal">
-              <span class="etiqueta-placa-ficha">KH463S</span>
+              <span class="etiqueta-placa-ficha">-</span>
             </div>
-
             <div class="tarjeta-qr-modal">
-              <img src="recursos/imagenes/codigo-qr.png" alt="Código QR vehicular" class="imagen-qr-modal">
+              <img src="" alt="QR" class="imagen-qr-modal">
             </div>
-
             <div class="tarjeta-informacion-modal">
               <h4 class="subtitulo-modal">Información del vehículo</h4>
               <div class="lista-datos-modal">
-                <p class="item-dato-modal">Tipo de vehículo: <span>Motocicleta</span></p>
-                <p class="item-dato-modal">Fabricante / Modelo: <span>Honda Navi</span></p>
-                <p class="item-dato-modal">Año de fabricación: <span>2024</span></p>
-                <p class="item-dato-modal">Color: <span>Negro</span></p>
-                <p class="item-dato-modal">Observaciones: <span>Sin observaciones</span></p>
+                <p class="item-dato-modal">Tipo de vehículo: <span>-</span></p>
+                <p class="item-dato-modal">Fabricante / Modelo: <span>-</span></p>
+                <p class="item-dato-modal">Año de fabricación: <span>-</span></p>
+                <p class="item-dato-modal">Color: <span>-</span></p>
+                <p class="item-dato-modal">Observaciones: <span>-</span></p>
               </div>
             </div>
           </div>
 
-
           <div class="columna-modal">
             <div class="fila-centrada-modal">
-              <span class="identificador-texto-modal">Identificador: VEH-000639</span>
+              <span class="identificador-texto-modal">Identificador: <span class="dato-valor">-</span></span>
             </div>
-
             <div class="tarjeta-informacion-modal">
               <h4 class="subtitulo-modal">Información del registro</h4>
               <div class="lista-datos-modal">
-                <p class="item-dato-modal">Fecha de registro: <span>02/10/2026</span></p>
-                <p class="item-dato-modal">Fecha de actualización: <span>03/10/2026</span></p>
-                <p class="item-dato-modal">Estado de autorización: <span>Autorizado</span></p>
+                <p class="item-dato-modal">Fecha de registro: <span>-</span></p>
+                <p class="item-dato-modal">Fecha de actualización: <span>-</span></p>
+                <p class="item-dato-modal">Estado de autorización: <span>-</span></p>
               </div>
             </div>
-
             <div class="tarjeta-informacion-modal">
               <h4 class="subtitulo-modal">Información del propietario</h4>
               <div class="lista-datos-modal">
-                <p class="item-dato-modal">Apellidos y nombres: <span>Basurto Vera Carlos Eduardo</span></p>
-                <p class="item-dato-modal">Número de identificación: <span>1316719804</span></p>
-                <p class="item-dato-modal">Correo institucional: <span>e1316719804@live.uleam.edu.ec</span></p>
-                <p class="item-dato-modal">Tipo de usuario: <span>Estudiante</span></p>
-                <p class="item-dato-modal">Facultad: <span>Ciencias de la vida y tecnologías</span></p>
-                <p class="item-dato-modal">Carrera: <span>Software</span></p>
+                <p class="item-dato-modal">Apellidos y nombres: <span>-</span></p>
+                <p class="item-dato-modal">Número de identificación: <span>-</span></p>
+                <p class="item-dato-modal">Correo institucional: <span>-</span></p>
+                <p class="item-dato-modal">Tipo de usuario: <span>-</span></p>
+                <p class="item-dato-modal">Facultad: <span>-</span></p>
+                <p class="item-dato-modal">Carrera: <span>-</span></p>
               </div>
             </div>
-
             <div class="contenedor-acciones-modal">
-              <button type="button" class="boton-aceptar-modal" data-modal-cerrar>
+              <button type="button" class="boton-accion-modal fondo-neutro" data-modal-cerrar>
                 <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
                 <span>Aceptar</span>
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </div>
 
-        <!-- Modal: Confirmar desvinculación -->
+    <!-- Modal 2: Confirmar desvinculación -->
     <div class="superposicion-modal" id="modal-desvincular-vehiculo" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-mediano">
-        
         <div class="cabecera-modal">
           <h3 class="titulo-modal">Confirmar desvinculación</h3>
           <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
             <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
           </button>
         </div>
-
         <div class="cuerpo-modal-confirmacion">
           <div class="contenedor-imagen-alerta">
             <img src="recursos/imagenes/alerta.svg" alt="Alerta" class="icono-visual-alerta">
           </div>
-          
           <div class="bloque-texto-informativo">
-            <p class="identificador-vehiculo-enfasis">Identificador: VEH-000639</p>
+            <p class="identificador-vehiculo-enfasis">Identificador: <span class="dato-valor">-</span></p>
             <p class="descripcion-alerta-modal">
               Al desvincular este vehículo, su autorización de acceso quedará invalidada y no podrá ingresar a las instalaciones.
             </p>
           </div>
         </div>
-
         <div class="contenedor-acciones-horizontal">
           <button type="button" class="boton-accion-modal fondo-peligro" id="boton-proceder-desvincular">
             <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
             <span>Sí, desvincular</span>
           </button>
-          
-          <button type="button" class="boton-accion-modal fondo-neutro" data-modal-cerrar>
+          <button type="button" class="boton-accion-modal fondo-cancelar" data-modal-cerrar>
             <img src="recursos/imagenes/eliminar.svg" alt="" class="icono-boton-modal">
             <span>Cancelar</span>
           </button>
         </div>
-
       </div>
     </div>
 
-    <!-- Modal: Desvinculación completada -->
+    <!-- Modal 3: Desvinculación completada -->
     <div class="superposicion-modal" id="modal-desvinculacion-exito" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-mediano">
-        
         <div class="cabecera-modal">
           <h3 class="titulo-modal">Desvinculación completada</h3>
           <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
             <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
           </button>
         </div>
-
         <div class="cuerpo-modal-confirmacion">
           <div class="contenedor-imagen-alerta">
             <img src="recursos/imagenes/confirmacion.svg" alt="Éxito" class="icono-visual-alerta">
           </div>
-          
-          <div class="bloque-texto-informativo">
-            <p class="descripcion-alerta-modal">
-              La desvinculación se ha realizado satisfactoriamente. El vehículo ya no se encuentra asociado a la cuenta institucional y no dispone de autorización para acceder a las instalaciones.
-            </p>
-          </div>
+          <p class="descripcion-alerta-modal">
+            La desvinculación se ha realizado satisfactoriamente. El vehículo ya no se encuentra asociado a la cuenta institucional y no dispone de autorización para acceder a las instalaciones.
+          </p>
         </div>
-
         <div class="contenedor-acciones-centrado">
           <button type="button" class="boton-accion-modal fondo-neutro" data-modal-cerrar>
             <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
             <span>Aceptar</span>
           </button>
         </div>
-
       </div>
     </div>
 
-        <!-- Modal: Solicitud de registro vehicular -->
+    <!-- Modal 4: Solicitud de registro vehicular -->
     <div class="superposicion-modal" id="modal-registro-vehiculo" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-registro">
-        
         <div class="cabecera-modal">
           <h3 class="titulo-modal">Solicitud de registro vehicular</h3>
-          <button type="button" class="boton-cerrar-modal" data-modal-cerrar>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
             <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
           </button>
         </div>
-
         <div class="banner-informativo-registro">
           <img src="recursos/imagenes/informacion.svg" alt="Info" class="icono-banner-grande">
           <p class="texto-banner-unico">
-            <strong>Estado de autorización:</strong> Una vez enviada la solicitud, el vehículo quedará en estado Pendiente mientras se realiza la revisión correspondiente.
+            <span class="dato-valor"><strong>Estado de autorización:</strong></span> Una vez enviada la solicitud, el vehículo quedará en estado Pendiente mientras se realiza la revisión correspondiente.
           </p>
         </div>
-
         <form class="formulario-registro-vehiculo" id="form-registro-vehiculo" novalidate>
           <div class="cuerpo-grid-formulario">
-            
             <div class="bloque-campo-formulario">
               <label class="etiqueta-formulario">Placa vehicular</label>
               <input type="text" class="campo-texto-modal" id="placa-vehiculo" placeholder="Ej. PCN9041">
               <span class="texto-alerta-error"></span>
             </div>
-
             <div class="bloque-campo-formulario">
               <label class="etiqueta-formulario">Tipo de vehículo</label>
               <select class="campo-texto-modal" id="tipo-vehiculo">
@@ -288,44 +235,37 @@
               </select>
               <span class="texto-alerta-error"></span>
             </div>
-
             <div class="bloque-campo-formulario">
               <label class="etiqueta-formulario">Fabricante</label>
               <input type="text" class="campo-texto-modal" id="fabricante-vehiculo" placeholder="Ej. Toyota">
               <span class="texto-alerta-error"></span>
             </div>
-
             <div class="bloque-campo-formulario">
               <label class="etiqueta-formulario">Modelo</label>
               <input type="text" class="campo-texto-modal" id="modelo-vehiculo" placeholder="Ej. Raize">
               <span class="texto-alerta-error"></span>
             </div>
-
             <div class="bloque-campo-formulario">
               <label class="etiqueta-formulario">Color</label>
               <input type="text" class="campo-texto-modal" id="color-vehiculo" placeholder="Ej. Blanco">
               <span class="texto-alerta-error"></span>
             </div>
-
             <div class="bloque-campo-formulario">
               <label class="etiqueta-formulario">Año de fabricación</label>
               <input type="number" class="campo-texto-modal" id="anio-vehiculo" placeholder="Ej. 2020" min="0">
               <span class="texto-alerta-error"></span>
             </div>
-
             <div class="bloque-campo-formulario campo-ancho-completo">
               <label class="etiqueta-formulario">Observaciones</label>
               <textarea class="campo-area-texto-modal" id="observaciones-vehiculo" placeholder="Proporcione información adicional que facilite la identificación del vehículo. (Opcional)"></textarea>
               <span class="texto-alerta-error"></span>
             </div>
           </div>
-
           <div class="contenedor-acciones-extremos">
             <button type="submit" class="boton-accion-modal fondo-neutro">
               <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
               <span>Enviar solicitud</span>
             </button>
-            
             <button type="button" class="boton-accion-modal fondo-cancelar" data-modal-cerrar>
               <img src="recursos/imagenes/eliminar.svg" alt="" class="icono-boton-modal">
               <span>Cancelar</span>
@@ -335,69 +275,55 @@
       </div>
     </div>
 
-        <!-- Modal: Solicitud registrada correctamente -->
+    <!-- Modal 5: Solicitud registrada correctamente -->
     <div class="superposicion-modal" id="modal-registro-exito" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-mediano">
-        
         <div class="cabecera-modal">
           <h3 class="titulo-modal">Solicitud registrada correctamente</h3>
           <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
             <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
           </button>
         </div>
-
         <div class="cuerpo-modal-confirmacion">
           <div class="contenedor-imagen-alerta">
             <img src="recursos/imagenes/confirmacion.svg" alt="Éxito" class="icono-visual-alerta">
           </div>
-          
-          <div class="bloque-texto-informativo">
-            <p class="descripcion-alerta-modal" id="info-fecha-registro">
-            </p>
-          </div>
+          <p class="descripcion-alerta-modal" id="info-fecha-registro"></p>
         </div>
-
         <div class="contenedor-acciones-centrado">
           <button type="button" class="boton-accion-modal fondo-neutro" data-modal-cerrar>
             <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
             <span>Aceptar</span>
           </button>
         </div>
-
       </div>
     </div>
 
-        <!-- MODAL: Autorización de acceso vehicular -->
+    <!-- Modal 6: Autorización de acceso vehicular -->
     <div class="superposicion-modal" id="modal-crear-autorizacion" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-registro">
-        
         <div class="cabecera-modal">
           <h3 class="titulo-modal">Autorización de acceso vehicular</h3>
-          <button type="button" class="boton-cerrar-modal" data-modal-cerrar>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
             <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
           </button>
         </div>
-
         <div class="banner-informativo-registro">
           <img src="recursos/imagenes/informacion.svg" alt="Info" class="icono-banner-grande">
-          <p class="texto-banner-unico">
-            Los datos registrados facilitarán el proceso de identificación y control de acceso vehicular dentro de las instalaciones de la institución.
-          </p>
+          <p class="texto-banner-unico">Los datos registrados facilitarán el proceso de identificación y control de acceso vehicular dentro de las instalaciones de la institución.</p>
         </div>
-
         <form class="formulario-registro-vehiculo" id="form-crear-autorizacion" novalidate>
-          
           <div class="seccion-formulario-modal">
             <h4 class="titulo-seccion-grande">Información del visitante</h4>
             <div class="cuerpo-grid-formulario">
               <div class="bloque-campo-formulario">
                 <label class="etiqueta-formulario">Apellidos y nombres</label>
-                <input type="text" class="campo-texto-modal" placeholder="Ej. Gutiérrez Mero Luis Alfonso">
+                <input type="text" class="campo-texto-modal" id="auth-nombres" placeholder="Ej. Gutiérrez Mero Luis Alfonso">
                 <span class="texto-alerta-error"></span>
               </div>
               <div class="bloque-campo-formulario">
                 <label class="etiqueta-formulario">Tipo de identificación</label>
-                <select class="campo-texto-modal">
+                <select class="campo-texto-modal" id="auth-tipo-id">
                   <option value="" disabled selected>Elija una opción</option>
                   <option value="cedula">Cédula de identidad</option>
                   <option value="pasaporte">Pasaporte</option>
@@ -407,32 +333,32 @@
               </div>
               <div class="bloque-campo-formulario">
                 <label class="etiqueta-formulario">Número de identificación</label>
-                <input type="text" class="campo-texto-modal" placeholder="Ej. 1307892139">
+                <input type="text" class="campo-texto-modal" id="auth-numero-id" placeholder="Ej. 1307892139">
                 <span class="texto-alerta-error"></span>
               </div>
               <div class="bloque-campo-formulario">
                 <label class="etiqueta-formulario">Número de teléfono</label>
-                <input type="text" class="campo-texto-modal" placeholder="Ej. 0991237891">
+                <input type="text" class="campo-texto-modal" id="auth-telefono" placeholder="Ej. 0991237891">
                 <span class="texto-alerta-error"></span>
               </div>
             </div>
           </div>
-
+          
           <div class="seccion-formulario-modal">
             <button type="button" class="boton-desplegar-compacto" data-objetivo="seccion-vehiculo">
               <h4 class="titulo-seccion-grande">Información del vehículo</h4>
-              <img src="../recursos/imagenes/select-negro.svg" alt="v" class="icono-flecha-pequena">
+              <img src="recursos/imagenes/select.svg" alt="v" class="icono-flecha-pequena">
             </button>
-            
             <div class="contenido-desplegable" id="seccion-vehiculo">
               <div class="cuerpo-grid-formulario">
                 <div class="bloque-campo-formulario">
                   <label class="etiqueta-formulario">Placa vehicular</label>
-                  <input type="text" class="campo-texto-modal" placeholder="Ej. PCN9041">
+                  <input type="text" class="campo-texto-modal" id="auth-placa" placeholder="Ej. PCN9041">
+                  <span class="texto-alerta-error"></span>
                 </div>
                 <div class="bloque-campo-formulario">
                   <label class="etiqueta-formulario">Tipo de vehículo</label>
-                  <select class="campo-texto-modal">
+                  <select class="campo-texto-modal" id="auth-tipo-vehiculo">
                     <option value="" disabled selected>Elija una opción</option>
                     <option value="automovil">Automóvil</option>
                     <option value="motocicleta">Motocicleta</option>
@@ -442,19 +368,24 @@
                     <option value="bus">Bus / buseta</option>
                     <option value="camion">Camión</option>
                     <option value="otro">Otro</option>
+
                   </select>
+                  <span class="texto-alerta-error"></span>
                 </div>
                 <div class="bloque-campo-formulario">
                   <label class="etiqueta-formulario">Fabricante</label>
-                  <input type="text" class="campo-texto-modal" placeholder="Ej. Toyota">
+                  <input type="text" class="campo-texto-modal" id="auth-fabricante" placeholder="Ej. Toyota">
+                  <span class="texto-alerta-error"></span>
                 </div>
                 <div class="bloque-campo-formulario">
                   <label class="etiqueta-formulario">Modelo</label>
-                  <input type="text" class="campo-texto-modal" placeholder="Ej. Raize">
+                  <input type="text" class="campo-texto-modal" id="auth-modelo" placeholder="Ej. Raize">
+                  <span class="texto-alerta-error"></span>
                 </div>
                 <div class="bloque-campo-formulario">
                   <label class="etiqueta-formulario">Color</label>
-                  <input type="text" class="campo-texto-modal" placeholder="Ej. Blanco">
+                  <input type="text" class="campo-texto-modal" id="auth-color" placeholder="Ej. Blanco">
+                  <span class="texto-alerta-error"></span>
                 </div>
               </div>
             </div>
@@ -463,22 +394,23 @@
           <div class="seccion-formulario-modal">
             <button type="button" class="boton-desplegar-compacto" data-objetivo="seccion-visita">
               <h4 class="titulo-seccion-grande">Detalle de la visita</h4>
-              <img src="../recursos/imagenes/select-negro.svg" alt="v" class="icono-flecha-pequena">
+              <img src="recursos/imagenes/select.svg" alt="v" class="icono-flecha-pequena">
             </button>
-
             <div class="contenido-desplegable" id="seccion-visita">
               <div class="cuerpo-grid-formulario">
                 <div class="bloque-campo-formulario">
                   <label class="etiqueta-formulario">Fecha programada</label>
-                  <input type="date" class="campo-texto-modal">
+                  <input type="date" class="campo-texto-modal" id="auth-fecha">
+                  <span class="texto-alerta-error"></span>
                 </div>
                 <div class="bloque-campo-formulario">
                   <label class="etiqueta-formulario">Hora programada</label>
-                  <input type="time" class="campo-texto-modal">
+                  <input type="time" class="campo-texto-modal" id="auth-hora">
+                  <span class="texto-alerta-error"></span>
                 </div>
                 <div class="bloque-campo-formulario">
                   <label class="etiqueta-formulario">Motivo de la visita</label>
-                  <select class="campo-texto-modal">
+                  <select class="campo-texto-modal" id="auth-motivo">
                     <option value="" disabled selected>Elija una opción</option>
                     <option value="reunion">Reunión institucional</option>
                     <option value="tramite">Trámite administrativo</option>
@@ -488,11 +420,14 @@
                     <option value="entrega">Entrega o retiro de documentos</option>
                     <option value="soporte">Mantenimiento o soporte técnico</option>
                     <option value="otro">Otro</option>
+
                   </select>
+                  <span class="texto-alerta-error"></span>
                 </div>
                 <div class="bloque-campo-formulario campo-ancho-completo">
                   <label class="etiqueta-formulario">Área de destino</label>
-                  <input type="text" class="campo-texto-modal" placeholder="Especifique la facultad, departamento u oficina de destino.">
+                  <input type="text" class="campo-texto-modal" id="auth-destino" placeholder="Especifique la facultad, departamento u oficina de destino.">
+                  <span class="texto-alerta-error"></span>
                 </div>
               </div>
             </div>
@@ -503,7 +438,6 @@
               <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
               <span>Registrar autorización</span>
             </button>
-            
             <button type="button" class="boton-accion-modal fondo-cancelar" data-modal-cerrar>
               <img src="recursos/imagenes/eliminar.svg" alt="" class="icono-boton-modal">
               <span>Cancelar</span>
@@ -513,11 +447,13 @@
       </div>
     </div>
 
-
   </main>
 
   <script src="scripts/modal.js"></script>
-  <script src="scripts/validaciones.js"></script>
+  <script src="scripts/informacion.js"></script>
+  <script src="scripts/validaciones.js"></script> 
+  <script src="scripts/registrar-vehiculo.js"></script>
+  <script src="scripts/solicitar-autorizacion.js"></script>
   <script src="scripts/usuario-inicio.js"></script>
 </body>
 </html>

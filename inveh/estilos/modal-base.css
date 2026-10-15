@@ -1,0 +1,132 @@
+.superposicion-modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    padding: 20px;
+}
+
+.superposicion-modal.activo {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+.contenedor-modal {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    max-width: 95vw;
+    max-height: 90vh;
+    padding: 36px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    box-sizing: border-box;
+}
+
+
+.modal-ancho-ficha { width: 1050px; }
+.modal-ancho-registro { width: 840px; }
+.modal-ancho-mediano { width: 600px; }
+.modal-ancho-pequeno { width: 450px; }
+
+
+.contenedor-modal::-webkit-scrollbar { width: 8px; }
+.contenedor-modal::-webkit-scrollbar-track { background: transparent; margin: 16px; }
+.contenedor-modal::-webkit-scrollbar-thumb {
+    background-color: rgba(141, 153, 174, 0.3);
+    border-radius: 10px;
+    border: 2px solid #FFFFFF;
+}
+
+
+.cabecera-modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 36px; 
+    position: relative;
+}
+
+.titulo-modal {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--color-texto-titulo);
+    margin: 0;
+}
+
+.boton-cerrar-modal {
+    position: absolute;
+    padding: 8px 14px;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+}
+
+.icono-cerrar-modal { width: 18px; height: 18px; }
+
+
+.boton-accion-modal {
+    width: 243px; 
+    padding: 8px 14px; 
+    
+  
+    border: none;
+    border-radius: var(--radio-redondeo-boton);
+    
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    
+
+    cursor: pointer;
+    transition: background-color 0.2s, filter 0.2s;
+    box-sizing: border-box;
+}
+
+
+.boton-cerrar-modal {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px; 
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.fondo-neutro {
+    background-color: var(--boton-primario-fondo);
+    color: var(--boton-primario-texto);
+}
+
+.fondo-cancelar {
+    background-color: #F1F5F9;
+    color: var(--color-texto-cuerpo);
+}
+
+.fondo-cancelar:hover { background-color: #E2E8F0; filter: brightness(0.95); }
+
+.icono-boton-modal { width: 18px; height: 18px; }

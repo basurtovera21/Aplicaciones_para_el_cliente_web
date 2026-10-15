@@ -79,7 +79,7 @@
   color: var(--color-texto-atenuado);
 }
 
-.fila-datos-institucionales strong {
+.fila-datos-institucionales .dato-valor {
   color: var(--color-texto-cuerpo);
   font-weight: 400;
 }
