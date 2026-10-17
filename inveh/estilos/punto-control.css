@@ -1,0 +1,471 @@
+/* ===============================================================
+   VISTA DE PUNTO DE CONTROL - SISTEMA INVEH
+   =============================================================== */
+
+/* Contenedor principal con regla estricta de 36px */
+.contenedor-punto-control {
+  min-height: calc(100vh - 98px);
+  max-width: 1440px;
+  width: 98%;
+  margin: 0 auto;
+  padding: 36px 0; /* Espaciado perimetral estricto de 36px */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 36px;       /* 36px exactos entre tarjetas */
+  background-color: var(--fondo-principal);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.etiqueta-rol-cabecera {
+  font-size: 16px;
+  font-weight: 500;
+  margin-right: 12px;
+}
+
+/* Tarjeta base con diseño institucional */
+.tarjeta-control {
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-redondeo-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+  width: 100%;
+  padding: 36px; /* Espaciado interno estricto de 36px */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===============================================================
+   TARJETA 1: BUSCADOR Y CONTROL DE MOVIMIENTOS
+   =============================================================== */
+
+.fila-superior-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.bloque-identificador-punto {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Insignia circular de punto idéntica a los avatares institucionales */
+.insignia-numero-punto {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--fondo-barra-superior);
+  color: var(--color-texto-blanco);
+  font-size: 26px;
+  font-weight: 500;
+  box-shadow: 0 4px 8px rgba(141, 153, 174, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.titulo-control {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  margin: 0 0 6px 0;
+}
+
+.descripcion-control {
+  font-size: 13px;
+  color: var(--color-texto-atenuado);
+  margin: 0;
+}
+
+/* Botón Crear registro temporal con medidas institucionales */
+.boton-registro-temporal {
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+  width: 243px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.boton-registro-temporal:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+.formulario-comprobacion-control {
+  display: flex;
+  align-items: center;
+  gap: 36px; /* Separación estricta de 36px entre la barra y el botón */
+  width: 100%;
+}
+
+.campo-entrada-placa-contenedor {
+  width: 480px;  /* Modifica este valor si quieres la barra más ancha o más corta */
+  max-width: 100%;
+  flex: none;    /* Impide que se estire por toda la pantalla */
+}
+
+/* Input con altura de 50px idéntica al buscador de administración */
+.entrada-busqueda-control {
+  width: 480px;
+  height: 50px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.6px;
+  color: var(--color-texto-atenuado);
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-redondeo-boton);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.entrada-busqueda-control::placeholder {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.6px;
+  color: var(--color-texto-atenuado);
+  opacity: 1;
+}
+
+.entrada-busqueda-control:focus {
+  border-color: var(--fondo-barra-superior);
+  box-shadow: 0 0 0 2px rgba(141, 153, 174, 0.2);
+}
+
+/* Botón Comprobar idéntico a administración */
+.boton-comprobar-control {
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+  width: 243px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.boton-comprobar-control:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+.mensaje-sin-coincidencia {
+  text-align: center;
+  padding: 20px 16px;
+  color: #000000 !important; /* Texto en negro estricto */
+  font-size: 14px;
+  font-weight: 500;
+  background-color: #F8FAFC; /* Fondo suave */
+  border-radius: var(--radio-redondeo-boton);
+  margin-top: 16px;
+}
+
+/* --- TARJETA 2: SIN LÍNEAS DIVISORIAS Y COLOR CERCA DE TIPO --- */
+.cabecera-resultado-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: none; /* Se eliminó la raya divisoria */
+}
+
+.bloque-placa-id-control {
+  display: flex;
+  align-items: center;
+  gap: 36px; /* Espaciado de 36px */
+}
+
+/* Placa con medidas idénticas a usuario-inicio */
+.etiqueta-placa-vehicular {
+  background-color: #546A7B;
+  color: var(--color-texto-blanco);
+  font-size: 18px;
+  font-weight: 500;
+  width: 243px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: var(--radio-redondeo-boton);
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(84, 106, 123, 0.35);
+}
+
+.identificador-control {
+  font-size: 16px;
+  color: var(--color-texto-cuerpo);
+  margin: 0;
+}
+
+.identificador-control .dato-valor {
+  font-weight: 500;
+}
+
+/* Insignia de estado de instalaciones */
+.etiqueta-estado-instalaciones {
+  background-color: #BDD5EA55;
+  color: var(--color-texto-cuerpo);
+  font-size: 14px;
+  width: 243px;
+  height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: var(--radio-redondeo-boton);
+  white-space: nowrap;
+  box-sizing: border-box;
+  box-shadow: 0 2px 6px rgba(141, 153, 174, 0.25);
+  flex-shrink: 0;
+}
+
+/* Rejilla de detalles en 2 columnas con 36px de separación */
+.rejilla-detalles-control {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 36px;
+  margin-bottom: 24px;
+}
+
+.columna-detalle-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subtitulo-detalle-control {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  margin: 0 0 10px 0;
+}
+
+.item-detalle-control {
+  font-size: 13px;
+  color: var(--color-texto-atenuado);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.item-detalle-control .dato-valor {
+  color: var(--color-texto-cuerpo);
+  font-weight: 500;
+}
+
+.filas-dos-datos-control {
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: 36px; /* Espaciado cercano e institucional */
+}
+
+/* Pie de tarjeta: Botón Ficha, último movimiento y botón de acción */
+.pie-resultado-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  border-top: none; /* Se eliminó la raya divisoria */
+}
+
+.boton-ficha-control {
+  width: 243px;
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.boton-ficha-control:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+.texto-ultimo-movimiento {
+  font-size: 16px; /* Aumentado a 16px */
+  color: #546A7B;
+  margin: 0;
+  text-align: center;
+  font-weight: 500;
+}
+
+.movimiento-tabla-texto {
+  font-weight: 600 !important;
+  color: #000000 !important;
+}
+
+.boton-accion-movimiento {
+  width: 243px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: background-color 0.2s, filter 0.2s;
+}
+
+
+.movimiento-salida {
+  background-color: var(--color-alerta-salmon-fondo) !important;
+  color: var(--color-alerta-salmon-texto) !important;
+}
+
+.movimiento-salida:hover {
+  background-color: var(--color-alerta-salmon-hover) !important;
+}
+
+
+.movimiento-entrada {
+  background-color: var(--boton-primario-fondo) !important;
+  color: var(--boton-primario-texto) !important;
+}
+
+.movimiento-entrada:hover {
+  background-color: var(--boton-primario-hover) !important;
+}
+
+
+
+
+
+.tarjeta-panel-fijo {
+  height: 480px; /* Misma altura exacta que en administración */
+}
+
+.cabecera-panel-tabla {
+  margin-bottom: 24px;
+}
+
+.titulo-panel-control {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  margin: 0;
+}
+
+/* Contenedor con scrollbar personalizado de 8px */
+.contenedor-tabla-desplazable {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  box-sizing: border-box;
+}
+
+.contenedor-tabla-desplazable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.contenedor-tabla-desplazable::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0;
+}
+
+.contenedor-tabla-desplazable::-webkit-scrollbar-thumb {
+  background-color: rgba(141, 153, 174, 0.3);
+  border-radius: 10px;
+  border: 2px solid #FFFFFF;
+}
+
+.tabla-gestion-inveh {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+/* Cabecera píldora idéntica a administración */
+.tabla-gestion-inveh th {
+  background-color: #E2E8F0;
+  color: var(--color-texto-cuerpo);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 18px;
+  box-sizing: border-box;
+}
+
+.tabla-gestion-inveh th:first-child {
+  border-top-left-radius: var(--radio-redondeo-boton);
+  border-bottom-left-radius: var(--radio-redondeo-boton);
+}
+
+.tabla-gestion-inveh th:last-child {
+  border-top-right-radius: var(--radio-redondeo-boton);
+  border-bottom-right-radius: var(--radio-redondeo-boton);
+}
+
+/* Filas sin líneas divisorias por debajo */
+.tabla-gestion-inveh td {
+  padding: 14px 18px;
+  font-size: 12px;
+  color: var(--color-texto-cuerpo);
+  border-bottom: none;
+  box-sizing: border-box;
+}
+
+.tabla-gestion-inveh td strong {
+  font-weight: 600;
+  color: var(--color-texto-titulo);
+}
+
+.columna-centrada {
+  text-align: center !important;
+}
+
+/* Iconos universales */
+.icono-boton-accion, 
+.icono-comprobar {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}

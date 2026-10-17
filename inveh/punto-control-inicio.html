@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inveh</title>
+  <link rel="stylesheet" href="estilos/general.css">
+  <link rel="stylesheet" href="estilos/modal-base.css">
+  <link rel="stylesheet" href="estilos/modal-formularios.css"> 
+  <link rel="stylesheet" href="estilos/modal-vistas.css">
+  <link rel="stylesheet" href="estilos/punto-control.css">
+</head>
+<body>
+
+  <!-- Barra de Navegación -->
+  <header class="barra-navegacion">
+    <div class="barra-navegacion-identidad">
+      <img src="recursos/imagenes/logotipo-uleam.png" alt="Logotipo" class="barra-navegacion-identificador">
+      <span class="barra-navegacion-titulo">Inveh</span>
+    </div>
+
+    <div class="barra-navegacion-usuario">
+      <span class="etiqueta-rol-cabecera" id="header-punto-control">Punto de control N01</span>
+      <button type="button" class="boton-cerrar-sesion" id="boton-cerrar-sesion" aria-label="Cerrar sesión">
+        <img src="recursos/imagenes/cerrar-sesion.svg" alt="Salir" class="icono-imagen">
+      </button>
+    </div>
+  </header>
+
+  <main class="contenedor-punto-control">
+
+    <!-- TARJETA 1: BUSCADOR Y COMPROBACIÓN -->
+    <section class="tarjeta-control tarjeta-busqueda-control">
+      <div class="fila-superior-control">
+        <div class="bloque-identificador-punto">
+          <div class="insignia-numero-punto" id="insignia-punto">01</div>
+          <div class="textos-cabecera-control">
+            <h1 class="titulo-control">Control de movimientos vehiculares</h1>
+            <p class="descripcion-control">
+              Registre la placa o identificador del vehículo para comprobar el estado y registrar el movimiento correspondiente.
+            </p>
+          </div>
+        </div>
+
+        <button type="button" class="boton-registro-temporal" id="boton-registro-temporal">
+          <img src="recursos/imagenes/crear-autorizacion.svg" alt="" class="icono-boton-accion">
+          <span>Crear registro temporal</span>
+        </button>
+      </div>
+
+      <!-- Barra de Búsqueda -->
+      <form class="formulario-comprobacion-control" id="form-comprobar-vehiculo" novalidate>
+        <div class="campo-entrada-placa-contenedor">
+          <input 
+            type="text" 
+            id="entrada-busqueda-control" 
+            class="entrada-busqueda-control" 
+            placeholder="Registre la placa o identificador vehicular" 
+            autocomplete="off"
+          >
+        </div>
+        <button type="submit" class="boton-comprobar-control" id="btn-comprobar-vehiculo">
+          <img src="recursos/imagenes/buscar.svg" alt="" class="icono-comprobar">
+          <span>Comprobar</span>
+        </button>
+      </form>
+
+      <!-- Mensaje cuando no hay coincidencias -->
+      <p class="mensaje-sin-coincidencia" id="mensaje-sin-coincidencia" style="display: none;">
+        No se encontró ningún registro con los datos registrados
+      </p>
+    </section>
+
+    <!-- TARJETA 2: RESULTADO DE COINCIDENCIA (Oculta por defecto) -->
+    <section class="tarjeta-control tarjeta-resultado-vehiculo" id="tarjeta-resultado-coincidencia" style="display: none;">
+      <div class="cabecera-resultado-control">
+        <div class="bloque-placa-id-control">
+          <span class="etiqueta-placa-vehicular" id="res-placa">-</span>
+          <span class="identificador-control">Identificador: <span class="dato-valor" id="res-identificador">-</span></span>
+        </div>
+        <span class="etiqueta-estado-instalaciones" id="res-ubicacion">-</span>
+      </div>
+
+      <!-- Información en dos columnas -->
+      <div class="rejilla-detalles-control">
+        <!-- Columna Propietario -->
+        <div class="columna-detalle-control">
+          <h3 class="subtitulo-detalle-control" id="res-titulo-propietario">Información del propietario</h3>
+          <p class="item-detalle-control">Apellidos y nombres: <span class="dato-valor" id="res-propietario-nombre">-</span></p>
+          <p class="item-detalle-control">Número de identificación: <span class="dato-valor" id="res-propietario-cedula">-</span></p>
+        </div>
+
+        <!-- Columna Vehículo -->
+        <div class="columna-detalle-control">
+          <h3 class="subtitulo-detalle-control">Información del vehículo</h3>
+          <div class="filas-dos-datos-control">
+            <p class="item-detalle-control">Tipo de vehículo: <span class="dato-valor" id="res-tipo-vehiculo">-</span></p>
+            <p class="item-detalle-control">Color: <span class="dato-valor" id="res-color">-</span></p>
+          </div>
+          <p class="item-detalle-control">Fabricante / Modelo: <span class="dato-valor" id="res-modelo">-</span></p>
+        </div>
+      </div>
+
+      <!-- Barra de acciones inferiores con botón dinámico (Entrada / Salida) -->
+      <div class="pie-resultado-control">
+        <button type="button" class="boton-ficha-control" id="btn-ver-ficha-control">
+          <img src="recursos/imagenes/ficha-vehicular.svg" alt="" class="icono-boton-accion">
+          <span>Ficha vehicular</span>
+        </button>
+
+        <p class="texto-ultimo-movimiento" id="res-ultimo-movimiento">
+          Sin registro de movimientos previos hoy
+        </p>
+
+        <!-- Botón que alterna entre Entrada (verde/primario) y Salida (salmón) -->
+        <button type="button" class="boton-accion-movimiento" id="btn-confirmar-movimiento">
+          <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-accion" id="icono-movimiento">
+          <span id="texto-btn-movimiento">Confirmar movimiento</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- TARJETA 3: HISTORIAL DE MOVIMIENTOS NAVEGABLE -->
+    <section class="tarjeta-control tarjeta-panel-fijo">
+      <header class="cabecera-panel-tabla">
+        <h2 class="titulo-panel-control">Historial de movimientos</h2>
+      </header>
+
+      <div class="contenedor-tabla-desplazable">
+        <table class="tabla-gestion-inveh">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Placa vehicular</th>
+              <th>Propietario</th>
+              <th>Tipo de usuario</th>
+              <th class="columna-centrada">Tipo de movimiento</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo-tabla-historial">
+            <!-- Filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="superposicion-modal" id="modal-movimiento-exito" aria-hidden="true" role="dialog">
+    <div class="contenedor-modal modal-ancho-mediano">
+      <div class="cabecera-modal">
+        <h3 class="titulo-modal" id="titulo-modal-movimiento">Salida registrada correctamente</h3>
+        <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+          <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+        </button>
+      </div>
+
+      <div class="cuerpo-modal-confirmacion">
+        <div class="contenedor-imagen-alerta">
+          <img src="recursos/imagenes/confirmacion.svg" alt="Éxito" class="icono-visual-alerta">
+        </div>
+        <p class="descripcion-alerta-modal" id="info-fecha-movimiento">
+          Fecha y hora en que se registró el movimiento: -
+        </p>
+      </div>
+
+      <div class="contenedor-acciones-centrado">
+        <button type="button" class="boton-accion-modal fondo-neutro" data-modal-cerrar>
+          <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+          <span>Aceptar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+
+  <div class="superposicion-modal" id="modal-registro-temporal" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-registro">
+        
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Autorización temporal de acceso vehicular</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <!-- Banner Informativo -->
+        <div class="banner-informativo-registro">
+          <img src="recursos/imagenes/informacion.svg" alt="Info" class="icono-banner-grande">
+          <p class="texto-banner-unico">
+            Al confirmar el registro temporal, el sistema registrará la <strong>Entrada</strong> del vehículo, incluyendo la fecha y hora del movimiento.
+          </p>
+        </div>
+
+        <form class="formulario-registro-vehiculo" id="form-registro-temporal" novalidate>
+          
+          <!-- SECCIÓN 1: INFORMACIÓN DEL VISITANTE (Siempre visible) -->
+          <div class="seccion-formulario-modal">
+            <h4 class="titulo-seccion-grande">Información del visitante</h4>
+            <div class="cuerpo-grid-formulario">
+              <div class="bloque-campo-formulario">
+                <label class="etiqueta-formulario">Apellidos y nombres</label>
+                <input type="text" class="campo-texto-modal" id="temp-nombres" placeholder="Ej. Gutiérrez Mero Luis Alfonso">
+                <span class="texto-alerta-error"></span>
+              </div>
+              <div class="bloque-campo-formulario">
+                <label class="etiqueta-formulario">Tipo de identificación</label>
+                <select class="campo-texto-modal" id="temp-tipo-id">
+                  <option value="" disabled selected>Elija una opción</option>
+                  <option value="cedula">Cédula de identidad</option>
+                  <option value="pasaporte">Pasaporte</option>
+                  <option value="extranjero">Documento de identidad extranjero</option>
+                </select>
+                <span class="texto-alerta-error"></span>
+              </div>
+              <div class="bloque-campo-formulario">
+                <label class="etiqueta-formulario">Número de identificación</label>
+                <input type="text" class="campo-texto-modal" id="temp-numero-id" placeholder="Ej. 1307892139">
+                <span class="texto-alerta-error"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 2: INFORMACIÓN DEL VEHÍCULO (Desplegable) -->
+          <div class="seccion-formulario-modal">
+            <button type="button" class="boton-desplegar-compacto" data-objetivo="seccion-temp-vehiculo">
+              <h4 class="titulo-seccion-grande">Información del vehículo</h4>
+              <img src="recursos/imagenes/select.svg" alt="v" class="icono-flecha-pequena">
+            </button>
+            <div class="contenido-desplegable" id="seccion-temp-vehiculo">
+              <div class="cuerpo-grid-formulario">
+                <div class="bloque-campo-formulario">
+                  <label class="etiqueta-formulario">Placa vehicular</label>
+                  <input type="text" class="campo-texto-modal" id="temp-placa" placeholder="Ej. PCN9041">
+                  <span class="texto-alerta-error"></span>
+                </div>
+                <div class="bloque-campo-formulario">
+                  <label class="etiqueta-formulario">Tipo de vehículo</label>
+                  <select class="campo-texto-modal" id="temp-tipo-vehiculo">
+                    <option value="" disabled selected>Elija una opción</option>
+                    <option value="Automóvil">Automóvil</option>
+                    <option value="Motocicleta">Motocicleta</option>
+                    <option value="Camioneta">Camioneta</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Furgoneta">Furgoneta</option>
+                    <option value="Bus / buseta">Bus / buseta</option>
+                    <option value="Camión">Camión</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                  <span class="texto-alerta-error"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 3: DETALLE DE LA VISITA (Desplegable) -->
+          <div class="seccion-formulario-modal">
+            <button type="button" class="boton-desplegar-compacto" data-objetivo="seccion-temp-visita">
+              <h4 class="titulo-seccion-grande">Detalle de la visita</h4>
+              <img src="recursos/imagenes/select.svg" alt="v" class="icono-flecha-pequena">
+            </button>
+            <div class="contenido-desplegable" id="seccion-temp-visita">
+              <div class="cuerpo-grid-formulario">
+                <div class="bloque-campo-formulario">
+                  <label class="etiqueta-formulario">Motivo de la visita</label>
+                  <select class="campo-texto-modal" id="temp-motivo">
+                    <option value="" disabled selected>Elija una opción</option>
+                    <option value="Reunión institucional">Reunión institucional</option>
+                    <option value="Trámite administrativo">Trámite administrativo</option>
+                    <option value="Actividad académica">Actividad académica</option>
+                    <option value="Prestación de servicios">Prestación de servicios</option>
+                    <option value="Visita personal">Visita personal</option>
+                    <option value="Entrega o retiro de documentos">Entrega o retiro de documentos</option>
+                    <option value="Mantenimiento o soporte técnico">Mantenimiento o soporte técnico</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                  <span class="texto-alerta-error"></span>
+                </div>
+                <div class="bloque-campo-formulario campo-ancho-completo">
+                  <label class="etiqueta-formulario">Área de destino</label>
+                  <input type="text" class="campo-texto-modal" id="temp-destino" placeholder="Especifique la facultad, departamento u oficina de destino.">
+                  <span class="texto-alerta-error"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones inferiores -->
+          <div class="contenedor-acciones-extremos">
+            <button type="submit" class="boton-accion-modal fondo-neutro">
+              <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+              <span>Registrar autorización</span>
+            </button>
+            <button type="button" class="boton-accion-modal fondo-cancelar" data-modal-cerrar>
+              <img src="recursos/imagenes/eliminar.svg" alt="" class="icono-boton-modal">
+              <span>Cancelar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+  </div>
+
+
+  </main>
+
+  <!-- Modal Ficha Vehicular Reutilizable -->
+  <div class="superposicion-modal" id="modal-ficha-vehicular" aria-hidden="true" role="dialog">
+    <div class="contenedor-modal modal-ancho-ficha">
+      <div class="cabecera-modal">
+        <h3 class="titulo-modal">Ficha vehicular</h3>
+        <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+          <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+        </button>
+      </div>
+      <div class="cuerpo-grid-ficha">
+        <div class="columna-modal">
+          <div class="fila-centrada-modal"><span class="etiqueta-placa-ficha">-</span></div>
+          <div class="tarjeta-qr-modal"><img src="" alt="QR" class="imagen-qr-modal"></div>
+          <div class="tarjeta-informacion-modal">
+            <h4 class="subtitulo-modal">Información del vehículo</h4>
+            <div class="lista-datos-modal">
+              <p class="item-dato-modal">Tipo de vehículo: <span>-</span></p>
+              <p class="item-dato-modal">Fabricante / Modelo: <span>-</span></p>
+              <p class="item-dato-modal">Año de fabricación: <span>-</span></p>
+              <p class="item-dato-modal">Color: <span>-</span></p>
+              <p class="item-dato-modal">Observaciones: <span>-</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="columna-modal">
+          <div class="fila-centrada-modal">
+            <span class="identificador-texto-modal">Identificador: <span class="dato-valor">-</span></span>
+          </div>
+          <div class="tarjeta-informacion-modal">
+            <h4 class="subtitulo-modal">Información del registro</h4>
+            <div class="lista-datos-modal">
+              <p class="item-dato-modal">Fecha de registro: <span>-</span></p>
+              <p class="item-dato-modal">Fecha de actualización: <span>-</span></p>
+              <p class="item-dato-modal">Estado de autorización: <span>-</span></p>
+            </div>
+          </div>
+          <div class="tarjeta-informacion-modal">
+            <h4 class="subtitulo-modal">Información del propietario</h4>
+            <div class="lista-datos-modal">
+              <p class="item-dato-modal">Apellidos y nombres: <span>-</span></p>
+              <p class="item-dato-modal">Número de identificación: <span>-</span></p>
+              <p class="item-dato-modal">Correo institucional: <span>-</span></p>
+              <p class="item-dato-modal">Tipo de usuario: <span>-</span></p>
+              <p class="item-dato-modal">Facultad: <span>-</span></p>
+              <p class="item-dato-modal">Carrera: <span>-</span></p>
+            </div>
+          </div>
+          <div class="contenedor-acciones-modal">
+            <button type="button" class="boton-accion-modal fondo-neutro" data-modal-cerrar>
+                <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+                <span>Aceptar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="scripts/modal.js"></script>
+  <script src="scripts/informacion.js"></script>
+  <script src="scripts/punto-control.js"></script>
+</body>
+</html>

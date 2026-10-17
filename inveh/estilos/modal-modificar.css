@@ -1,0 +1,58 @@
+/* ===============================================================
+   MODAL: MODIFICAR INFORMACIÓN DE REGISTRO VEHICULAR
+   =============================================================== */
+
+.bloque-seccion-no-editable {
+  margin-bottom: 28px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Título de la sección */
+.bloque-seccion-no-editable .subtitulo-seccion-revision {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-texto-titulo, #1E293B);
+  text-align: center;
+  margin: 0 0 12px 0;
+}
+
+/* Identificador con altura fija y centrado idéntico a la ficha vehicular */
+.bloque-seccion-no-editable .fila-centrada-modal {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px; /* Separación con las dos hileras inferiores */
+}
+
+.bloque-seccion-no-editable .identificador-texto-modal {
+  font-size: 16px;
+  color: var(--color-texto-cuerpo, #334155);
+}
+
+.bloque-seccion-no-editable .identificador-texto-modal .dato-valor {
+  color: var(--color-texto-titulo, #1E293B);
+  font-weight: 500;
+}
+
+/* Cuadrícula de dos hileras (Izquierda y Derecha) con separación de 36px */
+.rejilla-no-editable-columnas {
+  display: grid;
+  /* 1. Cambia '1fr 1fr' por 'auto auto' (o max-content max-content) */
+  grid-template-columns: auto auto; 
+  
+  /* 2. Mantiene la regla estricta de 36px entre ellas */
+  column-gap: 36px; 
+  
+  /* 3. AGREGA ESTA LÍNEA: Centra ambas columnas en el medio del modal */
+  justify-content: center; 
+  
+  width: 100%;
+  box-sizing: border-box;
+}
+.columna-datos-no-editable {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

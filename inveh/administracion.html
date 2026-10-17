@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inveh</title>
+  <link rel="stylesheet" href="estilos/general.css">
+  <link rel="stylesheet" href="estilos/modal-base.css">
+  <link rel="stylesheet" href="estilos/modal-formularios.css">
+  <link rel="stylesheet" href="estilos/modal-vistas.css">
+  <link rel="stylesheet" href="estilos/modal-revision.css"> 
+  <link rel="stylesheet" href="estilos/modal-modificar.css">
+  <link rel="stylesheet" href="estilos/administracion.css">
+  <link rel="stylesheet" href="estilos/ficha-exportada.css">
+</head>
+<body>
+
+  <header class="barra-navegacion">
+    <div class="barra-navegacion-identidad">
+      <img src="recursos/imagenes/logotipo-uleam.png" alt="Logotipo" class="barra-navegacion-identificador">
+      <span class="barra-navegacion-titulo">Inveh</span>
+    </div>
+
+    <div class="barra-navegacion-usuario">
+      <span class="etiqueta-rol-cabecera">Administración</span>
+      <button type="button" class="boton-cerrar-sesion" id="boton-cerrar-sesion" aria-label="Cerrar sesión">
+        <img src="recursos/imagenes/cerrar-sesion.svg" alt="Salir" class="icono-imagen">
+      </button>
+    </div>
+  </header>
+
+  <main class="contenedor-administracion">
+
+    <!-- Tarjeta 1: Métricas y Resumen Ejecutivo -->
+    <section class="tarjeta-resumen-metricas">
+      <div class="bloque-identidad-admin">
+        <div class="avatar-iniciales-admin">AD</div>
+      </div>
+
+      <div class="rejilla-contadores-metricas">
+        <div class="bloque-metrica-individual">
+          <span class="numero-metrica" id="metrica-vehiculos-autorizados">0</span>
+          <span class="descripcion-metrica">Vehículos autorizados</span>
+        </div>
+
+        <div class="bloque-metrica-individual">
+          <span class="numero-metrica" id="metrica-vehiculos-instalaciones">0</span>
+          <span class="descripcion-metrica">Vehículos en instalaciones</span>
+        </div>
+
+        <div class="bloque-metrica-individual metrica-alerta">
+          <span class="numero-metrica color-alerta" id="metrica-solicitudes-pendientes">0</span>
+          <span class="descripcion-metrica">Solicitudes pendientes</span>
+        </div>
+
+        <div class="bloque-metrica-individual">
+          <span class="numero-metrica" id="metrica-visitas-hoy">0</span>
+          <span class="descripcion-metrica">Visitas autorizadas hoy</span>
+        </div>
+      </div>
+
+      <div class="bloque-accion-registro">
+        <button type="button" class="boton-registro-actividades" id="boton-registro-actividades">
+          <img src="recursos/imagenes/archivo.svg" alt="" class="icono-boton-accion">
+          <span>Registro de actividades</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="tarjeta-panel-administracion tarjeta-panel-fijo">
+      <header class="cabecera-panel-tabla">
+        <h2 class="titulo-panel-administracion">Solicitudes pendientes de revisión</h2>
+      </header>
+
+      <div class="contenedor-tabla-desplazable">
+        <table class="tabla-gestion-inveh">
+          <thead>
+            <tr>
+              <th>Fecha de solicitud</th>
+              <th>Solicitante</th>
+              <th>Placa vehicular</th>
+              <th>Tipo de vehículo</th>
+              <th class="columna-centrada">Solicitud</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo-tabla-pendientes">
+            <!-- Filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section class="tarjeta-panel-administracion tarjeta-panel-fijo">
+      <header class="cabecera-panel-tabla">
+        <h2 class="titulo-panel-administracion">Registro vehicular institucional</h2>
+      </header>
+
+      <div class="barra-filtros-vehiculares">
+        <div class="campo-busqueda-contenedor">
+          <input 
+            type="text" 
+            id="filtro-busqueda-general" 
+            class="entrada-busqueda-inveh" 
+            placeholder="Buscar por ID, placa vehicular o propietario"
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="select-filtro-contenedor">
+          <select id="filtro-tipo-usuario" class="selector-filtro-inveh">
+            <option value="">Tipo de usuario</option>
+            <option value="Estudiante">Estudiante</option>
+            <option value="Docente">Docente</option>
+            <option value="Personal administrativo">Personal administrativo</option>
+            <option value="Personal de servicio y mantenimiento">Personal de servicio y mantenimiento</option>
+            <option value="Autoridad universitaria">Autoridad universitaria</option>
+          </select>
+        </div>
+
+        <div class="select-filtro-contenedor">
+          <select id="filtro-tipo-vehiculo" class="selector-filtro-inveh">
+            <option value="">Tipo de vehículo</option>
+            <option value="Automóvil">Automóvil</option>
+            <option value="Motocicleta">Motocicleta</option>
+            <option value="Camioneta">Camioneta</option>
+            <option value="SUV">SUV</option>
+            <option value="Furgoneta">Furgoneta</option>
+            <option value="Bus / buseta">Bus / buseta</option>
+            <option value="Camión">Camión</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+
+        <button type="button" class="boton-comprobar-filtros" id="boton-ejecutar-filtro">
+          <img src="recursos/imagenes/buscar.svg" alt="" class="icono-comprobar">
+          <span>Comprobar</span>
+        </button>
+      </div>
+
+      <div class="contenedor-tabla-desplazable">
+        <table class="tabla-gestion-inveh">
+          <thead>
+            <tr>
+              <th>Identificador</th>
+              <th>Propietario</th>
+              <th>Placa vehicular</th>
+              <th>Tipo de vehículo</th>
+              <th class="columna-centrada">Ficha vehicular</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo-tabla-registro-institucional">
+            <!-- Filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- MODAL 1: REVISIÓN DE REGISTRO VEHICULAR -->
+    <div class="superposicion-modal" id="modal-revision-registro" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-registro">
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Solicitud de registro vehicular</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <div class="banner-informativo-registro">
+          <img src="recursos/imagenes/informacion.svg" alt="Info" class="icono-banner-grande">
+          <p class="texto-banner-unico">
+            Una vez aprobada la solicitud, el sistema emitirá el identificador vehicular y el código QR correspondiente. El vehículo adquirirá el estado <strong>Autorizado</strong> y podrá acceder a las instalaciones universitarias.
+          </p>
+        </div>
+
+        <div class="seccion-revision-datos">
+          <h4 class="titulo-seccion-revision">Información del solicitante</h4>
+          <div class="lista-datos-revision">
+            <p class="item-revision">Apellidos y nombres: <span class="dato-valor" id="rev-reg-nombre">-</span></p>
+            <p class="item-revision">Número de identificación: <span class="dato-valor" id="rev-reg-cedula">-</span></p>
+            <p class="item-revision">Correo institucional: <span class="dato-valor" id="rev-reg-correo">-</span></p>
+            <p class="item-revision">Tipo de usuario: <span class="dato-valor" id="rev-reg-tipo">-</span></p>
+            <p class="item-revision">Facultad: <span class="dato-valor" id="rev-reg-facultad">-</span></p>
+          </div>
+        </div>
+
+        <div class="seccion-revision-datos">
+          <h4 class="titulo-seccion-revision">Información del vehículo</h4>
+          <div class="lista-datos-revision">
+            <p class="item-revision">Placa vehicular: <span class="dato-valor" id="rev-reg-placa">-</span></p>
+            <p class="item-revision">Tipo de vehículo: <span class="dato-valor" id="rev-reg-tipo-vehiculo">-</span></p>
+            <p class="item-revision">Fabricante / Modelo: <span class="dato-valor" id="rev-reg-modelo">-</span></p>
+            <p class="item-revision">Año de fabricación: <span class="dato-valor" id="rev-reg-anio">-</span></p>
+            <p class="item-revision">Color: <span class="dato-valor" id="rev-reg-color">-</span></p>
+            <p class="item-revision">Observaciones: <span class="dato-valor" id="rev-reg-obs">-</span></p>
+          </div>
+        </div>
+
+        <div class="contenedor-acciones-revision">
+          <button type="button" class="boton-solicitud-admin fondo-aceptar-solicitud" id="btn-aprobar-registro">
+            <img src="recursos/imagenes/aceptar.svg" alt="">
+            <span>Aceptar solicitud</span>
+          </button>
+          <button type="button" class="boton-solicitud-admin fondo-rechazar-solicitud" id="btn-rechazar-registro">
+            <img src="recursos/imagenes/eliminar.svg" alt="">
+            <span>Rechazar solicitud</span>
+          </button>
+          <button type="button" class="boton-solicitud-admin fondo-cancelar-solicitud" data-modal-cerrar>
+            <img src="recursos/imagenes/eliminar.svg" alt="">
+            <span>Cancelar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: REVISIÓN DE AUTORIZACIÓN DE VISITAS -->
+    <div class="superposicion-modal" id="modal-revision-autorizacion" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-registro">
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Solicitud de autorización de acceso vehicular</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <div class="banner-informativo-registro">
+          <img src="recursos/imagenes/informacion.svg" alt="Info" class="icono-banner-grande">
+          <p class="texto-banner-unico">
+            Una vez aprobada la solicitud, el vehículo del visitante podrá acceder a las instalaciones universitarias en la fecha y hora programada.
+          </p>
+        </div>
+
+        <div class="seccion-revision-datos">
+          <h4 class="titulo-seccion-revision">Información del solicitante</h4>
+          <div class="lista-datos-revision">
+            <p class="item-revision">Apellidos y nombres: <span class="dato-valor" id="rev-aut-sol-nombre">-</span></p>
+            <p class="item-revision">Número de identificación: <span class="dato-valor" id="rev-aut-sol-cedula">-</span></p>
+            <p class="item-revision">Facultad: <span class="dato-valor" id="rev-aut-sol-facultad">-</span></p>
+            <p class="item-revision">Tipo de usuario: <span class="dato-valor" id="rev-aut-sol-tipo">-</span></p>
+          </div>
+        </div>
+
+        <div class="seccion-revision-datos">
+          <h4 class="titulo-seccion-revision">Información del visitante</h4>
+          <div class="lista-datos-revision">
+            <p class="item-revision">Apellidos y nombres: <span class="dato-valor" id="rev-aut-vis-nombre">-</span></p>
+            <p class="item-revision">Tipo de documento: <span class="dato-valor" id="rev-aut-vis-tipo-doc">-</span></p>
+            <p class="item-revision">Número de identificación: <span class="dato-valor" id="rev-aut-vis-num-doc">-</span></p>
+            <p class="item-revision">Número de teléfono: <span class="dato-valor" id="rev-aut-vis-tel">-</span></p>
+          </div>
+        </div>
+
+        <div class="seccion-revision-datos">
+          <h4 class="titulo-seccion-revision">Información del vehículo</h4>
+          <div class="lista-datos-revision">
+            <p class="item-revision">Placa vehicular: <span class="dato-valor" id="rev-aut-veh-placa">-</span></p>
+            <p class="item-revision">Tipo: <span class="dato-valor" id="rev-aut-veh-tipo">-</span></p>
+            <p class="item-revision">Fabricante / Modelo: <span class="dato-valor" id="rev-aut-veh-modelo">-</span></p>
+            <p class="item-revision">Color: <span class="dato-valor" id="rev-aut-veh-color">-</span></p>
+          </div>
+        </div>
+
+        <div class="seccion-revision-datos">
+          <h4 class="titulo-seccion-revision">Detalle de la visita</h4>
+          <div class="lista-datos-revision">
+            <p class="item-revision">Fecha programada: <span class="dato-valor" id="rev-aut-vis-fecha">-</span></p>
+            <p class="item-revision">Hora programada: <span class="dato-valor" id="rev-aut-vis-hora">-</span></p>
+            <p class="item-revision">Motivo de la visita: <span class="dato-valor" id="rev-aut-vis-motivo">-</span></p>
+            <p class="item-revision">Área de destino: <span class="dato-valor" id="rev-aut-vis-destino">-</span></p>
+          </div>
+        </div>
+
+        <div class="contenedor-acciones-revision">
+          <button type="button" class="boton-solicitud-admin fondo-aceptar-solicitud" id="btn-aprobar-autorizacion">
+            <img src="recursos/imagenes/aceptar.svg" alt="">
+            <span>Aceptar solicitud</span>
+          </button>
+          <button type="button" class="boton-solicitud-admin fondo-rechazar-solicitud" id="btn-rechazar-autorizacion">
+            <img src="recursos/imagenes/eliminar.svg" alt="">
+            <span>Rechazar solicitud</span>
+          </button>
+          <button type="button" class="boton-solicitud-admin fondo-cancelar-solicitud" data-modal-cerrar>
+            <img src="recursos/imagenes/eliminar.svg" alt="">
+            <span>Cancelar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: FICHA VEHICULAR (ADMINISTRACIÓN CON 4 BOTONES) -->
+    <div class="superposicion-modal" id="modal-ficha-vehicular" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-ficha">
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Ficha vehicular</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <div class="cuerpo-grid-ficha">
+          <div class="columna-modal">
+            <div class="fila-centrada-modal"><span class="etiqueta-placa-ficha">-</span></div>
+            <div class="tarjeta-qr-modal"><img src="" alt="QR" class="imagen-qr-modal"></div>
+            <div class="tarjeta-informacion-modal">
+              <h4 class="subtitulo-modal">Información del vehículo</h4>
+              <div class="lista-datos-modal">
+                <p class="item-dato-modal">Tipo de vehículo: <span>-</span></p>
+                <p class="item-dato-modal">Fabricante / Modelo: <span>-</span></p>
+                <p class="item-dato-modal">Año de fabricación: <span>-</span></p>
+                <p class="item-dato-modal">Color: <span>-</span></p>
+                <p class="item-dato-modal">Observaciones: <span>-</span></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="columna-modal">
+            <div class="fila-centrada-modal">
+              <span class="identificador-texto-modal">Identificador: <span class="dato-valor">-</span></span>
+            </div>
+            <div class="tarjeta-informacion-modal">
+              <h4 class="subtitulo-modal">Información del registro</h4>
+              <div class="lista-datos-modal">
+                <p class="item-dato-modal">Fecha de registro: <span>-</span></p>
+                <p class="item-dato-modal">Fecha de actualización: <span>-</span></p>
+                <p class="item-dato-modal">Estado de autorización: <span>-</span></p>
+              </div>
+            </div>
+            <div class="tarjeta-informacion-modal">
+              <h4 class="subtitulo-modal">Información del propietario</h4>
+              <div class="lista-datos-modal">
+                <p class="item-dato-modal">Apellidos y nombres: <span>-</span></p>
+                <p class="item-dato-modal">Número de identificación: <span>-</span></p>
+                <p class="item-dato-modal">Correo institucional: <span>-</span></p>
+                <p class="item-dato-modal">Tipo de usuario: <span>-</span></p>
+                <p class="item-dato-modal">Facultad: <span>-</span></p>
+                <p class="item-dato-modal">Carrera: <span>-</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="contenedor-acciones-ficha-admin">
+          <button type="button" class="boton-ficha-admin fondo-secundario-admin" id="btn-admin-modificar-vehiculo">
+            <img src="recursos/imagenes/modificar.svg" alt="" class="icono-boton-accion">
+            <span>Modificar información</span>
+          </button>
+          <button type="button" class="boton-ficha-admin fondo-secundario-admin" id="btn-admin-exportar-pdf">
+            <img src="recursos/imagenes/exportar.svg" alt="" class="icono-boton-accion">
+            <span>Exportar ficha PDF</span>
+          </button>
+          <button type="button" class="boton-ficha-admin fondo-peligro" id="btn-admin-desvincular-ficha">
+            <img src="recursos/imagenes/eliminar.svg" alt="" class="icono-boton-accion">
+            <span>Desvincular vehículo</span>
+          </button>
+          <button type="button" class="boton-ficha-admin fondo-aceptar" data-modal-cerrar>
+            <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-accion">
+            <span>Aceptar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="superposicion-modal" id="modal-modificar-vehiculo" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-registro">
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Modificar información de registro vehicular</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <div class="banner-informativo-registro">
+          <img src="recursos/imagenes/informacion.svg" alt="Info" class="icono-banner-grande">
+          <p class="texto-banner-unico">
+            <strong>Restricción de edición:</strong> Los datos asociados al propietario y las características principales del vehículo son de carácter no editable.
+          </p>
+        </div>
+
+        <div class="bloque-seccion-no-editable">
+          <h4 class="subtitulo-seccion-revision">Información no editable</h4>
+          
+          <div class="fila-centrada-modal">
+            <span class="identificador-texto-modal">Identificador: <span class="dato-valor" id="mod-estatico-identificador">-</span></span>
+          </div>
+
+          <div class="rejilla-no-editable-columnas">
+            <!-- Hilera izquierda: Placa y Tipo -->
+            <div class="columna-datos-no-editable">
+              <p class="item-revision">Placa vehicular: <span class="dato-valor" id="mod-estatico-placa">-</span></p>
+              <p class="item-revision">Tipo de vehículo: <span class="dato-valor" id="mod-estatico-tipo">-</span></p>
+            </div>
+
+            <div class="columna-datos-no-editable">
+              <p class="item-revision">Fabricante / Modelo: <span class="dato-valor" id="mod-estatico-modelo">-</span></p>
+              <p class="item-revision">Año de fabricación: <span class="dato-valor" id="mod-estatico-anio">-</span></p>
+            </div>
+          </div>
+        </div>
+
+
+        <form class="formulario-registro-vehiculo" id="form-modificar-vehiculo" novalidate>
+          <div class="cuerpo-grid-formulario">
+
+            <div class="bloque-campo-formulario">
+              <label class="etiqueta-formulario">Color</label>
+              <input type="text" class="campo-texto-modal" id="mod-color-vehiculo" placeholder="Color del vehículo" required>
+            </div>
+
+            <div class="bloque-campo-formulario">
+              <label class="etiqueta-formulario">Estado de autorización</label>
+              <select class="campo-texto-modal" id="mod-estado-vehiculo">
+                <option value="Autorizado">Autorizado</option>
+                <option value="Pendiente">Pendiente</option>
+              </select>
+            </div>
+
+
+            <div class="bloque-campo-formulario campo-ancho-completo">
+              <label class="etiqueta-formulario">Observaciones</label>
+              <textarea class="campo-area-texto-modal" id="mod-observaciones-vehiculo" placeholder="Proporcione información adicional que facilite la identificación del vehículo"></textarea>
+            </div>
+          </div>
+
+          <div class="contenedor-acciones-extremos">
+            <button type="submit" class="boton-accion-modal fondo-neutro">
+              <img src="recursos/imagenes/modificar.svg" alt="" class="icono-boton-modal">
+              <span>Confirmar cambios</span>
+            </button>
+            <button type="button" class="boton-accion-modal fondo-cancelar" data-modal-cerrar>
+              <img src="recursos/imagenes/eliminar.svg" alt="" class="icono-boton-modal">
+              <span>Cancelar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 5: CONFIRMAR DESVINCULACIÓN -->
+    <div class="superposicion-modal" id="modal-desvincular-vehiculo" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-mediano">
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Confirmar desvinculación</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+        <div class="cuerpo-modal-confirmacion">
+          <div class="contenedor-imagen-alerta">
+            <img src="recursos/imagenes/alerta.svg" alt="Alerta" class="icono-visual-alerta">
+          </div>
+          <div class="bloque-texto-informativo">
+            <p class="identificador-vehiculo-enfasis">Identificador: <span class="dato-valor">-</span></p>
+            <p class="descripcion-alerta-modal">
+              Al desvincular este vehículo, su autorización de acceso quedará invalidada y no podrá ingresar a las instalaciones.
+            </p>
+          </div>
+        </div>
+        <div class="contenedor-acciones-horizontal">
+          <button type="button" class="boton-accion-modal fondo-peligro" id="boton-proceder-desvincular">
+            <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+            <span>Sí, desvincular</span>
+          </button>
+          <button type="button" class="boton-accion-modal fondo-cancelar" data-modal-cerrar>
+            <img src="recursos/imagenes/eliminar.svg" alt="" class="icono-boton-modal">
+            <span>Cancelar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 6: DESVINCULACIÓN COMPLETADA -->
+    <div class="superposicion-modal" id="modal-desvinculacion-exito" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-mediano">
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal">Desvinculación completada</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+        <div class="cuerpo-modal-confirmacion">
+          <div class="contenedor-imagen-alerta">
+            <img src="recursos/imagenes/confirmacion.svg" alt="Éxito" class="icono-visual-alerta">
+          </div>
+          <p class="descripcion-alerta-modal">
+            La desvinculación se ha realizado satisfactoriamente. El vehículo ya no se encuentra asociado a la cuenta institucional y no dispone de autorización para acceder a las instalaciones.
+          </p>
+        </div>
+        <div class="contenedor-acciones-centrado">
+          <button type="button" class="boton-accion-modal fondo-neutro" data-modal-cerrar>
+            <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+            <span>Aceptar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 7: CONFIRMACIÓN DE ÉXITO GENERAL -->
+    <div class="superposicion-modal" id="modal-admin-exito" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-mediano">
+        <div class="cabecera-modal">
+          <h3 class="titulo-modal" id="titulo-modal-exito-admin">Registro creado correctamente</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+        <div class="cuerpo-modal-confirmacion">
+          <div class="contenedor-imagen-alerta">
+            <img src="recursos/imagenes/confirmacion.svg" alt="Éxito" class="icono-visual-alerta">
+          </div>
+          <p class="descripcion-alerta-modal" id="info-fecha-exito-admin"></p>
+        </div>
+        <div class="contenedor-acciones-centrado">
+          <button type="button" class="boton-accion-modal fondo-neutro" data-modal-cerrar>
+            <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
+            <span>Aceptar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 8: REGISTRO DE ACTIVIDADES (HISTORIAL GLOBAL) -->
+    <div class="superposicion-modal" id="modal-registro-actividades" aria-hidden="true" role="dialog">
+      <div class="contenedor-modal modal-ancho-actividades">
+        
+        <div class="cabecera-modal" style="justify-content: flex-start; padding-left: 0; margin-bottom: 12px;">
+          <h3 class="titulo-modal" style="text-align: left; margin: 0; padding-right: 48px;">Registro de actividades</h3>
+          <button type="button" class="boton-cerrar-modal" data-modal-cerrar aria-label="Cerrar modal">
+            <img src="recursos/imagenes/eliminar.svg" alt="Cerrar" class="icono-cerrar-modal">
+          </button>
+        </div>
+
+        <p class="descripcion-alerta-modal" style="text-align: left; margin: 0 0 24px 0; max-width: 100%;">
+          Consulte los movimientos vehiculares registrados en los diferentes puntos de control.
+        </p>
+
+        <!-- Barra de Filtros (Estilos y selectores arreglados) -->
+        <div class="barra-filtros-vehiculares" style="gap: 16px;">
+          <div class="campo-busqueda-contenedor" style="flex: 2;">
+            <input 
+              type="text" 
+              id="filtro-modal-act-texto" 
+              class="campo-texto-modal" 
+              placeholder="Buscar por ID o placa vehicular" 
+              autocomplete="off"
+            >
+          </div>
+          
+          <div class="select-filtro-contenedor" style="flex: 1;">
+            <input 
+              type="date" 
+              id="filtro-modal-act-fecha" 
+              class="campo-texto-modal"
+            >
+          </div>
+          
+          <div class="select-filtro-contenedor" style="flex: 1;">
+            <select id="filtro-modal-act-punto" class="campo-texto-modal">
+              <option value="">Punto de acceso</option>
+              <option value="N01">N01</option>
+              <option value="N02">N02</option>
+              <option value="N03">N03</option>
+              <option value="N04">N04</option>
+            </select>
+          </div>
+
+          <div class="select-filtro-contenedor" style="flex: 1;">
+            <select id="filtro-modal-act-mov" class="campo-texto-modal">
+              <option value="">Movimiento</option>
+              <option value="Entrada">Entrada</option>
+              <option value="Salida">Salida</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="contenedor-tabla-desplazable" style="height: 480px;">
+          <table class="tabla-gestion-inveh">
+            <thead>
+              <tr>
+                <th>Fecha y hora</th>
+                <th>Identificador</th>
+                <th>Placa vehicular</th>
+                <th>Tipo de vehículo</th>
+                <th>Punto de control</th>
+                <th>Movimiento</th>
+                <th class="columna-centrada">Ficha vehicular</th>
+              </tr>
+            </thead>
+            <tbody id="cuerpo-tabla-actividades-modal">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="area-impresion-credencial" style="display: none;" aria-hidden="true">
+    <div class="credencial-placa" id="print-placa">-</div>
+    <div class="credencial-tarjeta-qr">
+      <img src="recursos/imagenes/codigo-qr.png" alt="Código QR" class="credencial-imagen-qr" id="print-qr">
+    </div>
+    <p class="credencial-identificador">
+      Identificador: <span id="print-identificador">-</span>
+    </p>
+  </div>
+
+  <!-- Scripts -->
+  <script src="scripts/modal.js"></script>
+  <script src="scripts/informacion.js"></script>
+  <script src="scripts/administracion.js"></script>
+</body>
+</html>

@@ -57,9 +57,13 @@ formularioAutenticacion.addEventListener("submit", function(evento) {
 
 
     const usuarioEncontrado = baseDeDatos.usuarios.find(usuario => {
-        return (usuario.correo_institucional.toLowerCase() === identificadorIngresado || 
-                (usuario.identificador_usuario && usuario.identificador_usuario.toLowerCase() === identificadorIngresado)) && 
-               usuario.clave_acceso === claveIngresada;
+        const coincideCorreo = usuario.correo_institucional && 
+                               usuario.correo_institucional.toLowerCase() === identificadorIngresado;
+        
+        const coincideUsuario = usuario.identificador_usuario && 
+                                usuario.identificador_usuario.toLowerCase() === identificadorIngresado;
+
+        return (coincideCorreo || coincideUsuario) && usuario.clave_acceso === claveIngresada;
     });
 
     if (usuarioEncontrado) {
@@ -68,12 +72,40 @@ formularioAutenticacion.addEventListener("submit", function(evento) {
         if (usuarioEncontrado.rol_sistema === "usuario") {
             window.location.href = "usuario-inicio.html";
         } else if (usuarioEncontrado.rol_sistema === "guardia") {
-            window.location.href = "punto-de-acceso-inicio.html";
+            window.location.href = "punto-control-inicio.html";
         } else if (usuarioEncontrado.rol_sistema === "admin") {
-            window.location.href = "administracion-inicio.html";
+            // Nombre exacto de tu archivo
+            window.location.href = "administracion.html"; 
         }
     } else {
         mostrarError(entradaCorreoUsuario, errorCorreo, "Las credenciales ingresadas no son válidas");
         mostrarError(entradaClave, errorClave, "");
     }
+    
 });
+
+
+const botonExportar = document.getElementById("boton-exportar-bd");
+const botonCargar = document.getElementById("boton-cargar-bd");
+const selectorArchivo = document.getElementById("selector-archivo-bd");
+
+if (botonExportar) {
+    botonExportar.addEventListener("click", () => {
+        exportarBaseDatosJSON();
+    });
+}
+
+if (botonCargar && selectorArchivo) {
+
+    botonCargar.addEventListener("click", () => {
+        selectorArchivo.value = ''; // Permite volver a seleccionar el mismo archivo
+        selectorArchivo.click();
+    });
+
+    selectorArchivo.addEventListener("change", (evento) => {
+        const archivoSeleccionado = evento.target.files[0];
+        if (archivoSeleccionado) {
+            importarBaseDatosJSON(archivoSeleccionado);
+        }
+    });
+}

@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
     function obtenerSiguienteIdentificador(listaVehiculos) {
         let numeroMasAlto = 639;
 
@@ -88,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
         evento.preventDefault();
         let esValido = true;
 
-        // Validar Tipo de Vehículo
+        // 1. Validar Tipo de Vehículo
         if (!campoTipo || campoTipo.value === "") {
             activarError(campoTipo, "El registro es obligatorio");
             esValido = false;
@@ -96,11 +95,11 @@ document.addEventListener('DOMContentLoaded', function() {
             desactivarError(campoTipo);
         }
 
-
+        // 2. Validar Placa Vehicular
         if (campoTipo && campoTipo.value === "otro") {
             desactivarError(campoPlaca);
         } else {
-            const valorPlaca = campoPlaca ? campoPlaca.value.trim() : "";
+            const valorPlaca = campoPlaca ? campoPlaca.value.trim().toUpperCase() : "";
             if (valorPlaca === "") {
                 activarError(campoPlaca, "El registro es obligatorio");
                 esValido = false;
@@ -120,12 +119,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     activarError(campoPlaca, "El registro tiene un formato no válido");
                     esValido = false;
                 } else {
-                    desactivarError(campoPlaca);
+                    // VALIDACIÓN: Comprobar que la placa no exista en la base de datos
+                    const baseDeDatos = typeof obtenerBaseDatos === 'function' 
+                        ? obtenerBaseDatos() 
+                        : JSON.parse(localStorage.getItem('base_de_datos') || localStorage.getItem('inveh_db'));
+
+                    const existeEnVehiculos = baseDeDatos && Array.isArray(baseDeDatos.vehiculos)
+                        ? baseDeDatos.vehiculos.some(v => v.placa_vehicular && v.placa_vehicular.toUpperCase() === valorPlaca)
+                        : false;
+
+                    const existeEnAutorizaciones = baseDeDatos && Array.isArray(baseDeDatos.autorizaciones_visitas)
+                        ? baseDeDatos.autorizaciones_visitas.some(a => a.vehiculo && a.vehiculo.placa_vehicular && a.vehiculo.placa_vehicular.toUpperCase() === valorPlaca)
+                        : false;
+
+                    if (existeEnVehiculos || existeEnAutorizaciones) {
+                        activarError(campoPlaca, "El vehículo se encuentra registrado");
+                        esValido = false;
+                    } else {
+                        desactivarError(campoPlaca);
+                    }
                 }
             }
         }
 
-
+        // 3. Validar Fabricante, Modelo y Color
         [campoFabricante, campoModelo, campoColor].forEach(campo => {
             if (campo) {
                 const valor = campo.value.trim();
@@ -141,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-
+        // 4. Validar Año
         const valorAnio = campoAnio ? campoAnio.value.trim() : "";
         const numAnio = parseInt(valorAnio, 10);
         const anioActual = new Date().getFullYear();
@@ -156,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
             desactivarError(campoAnio);
         }
 
-
+        // 5. Validar Observaciones
         if (campoObservaciones && campoObservaciones.value.length > 250) {
             activarError(campoObservaciones, "El registro excede los caracteres permitidos (250)");
             esValido = false;
@@ -164,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
             desactivarError(campoObservaciones);
         }
 
-
+        // 6. Guardar si es válido
         if (esValido) {
             const baseDeDatos = typeof obtenerBaseDatos === 'function' 
                 ? obtenerBaseDatos() 
@@ -172,13 +189,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const usuarioActivo = JSON.parse(localStorage.getItem('sesion_activa')) || { numero_identificacion: "1316719804" };
 
-
             const misVehiculosTotales = baseDeDatos.vehiculos.filter(v => v.propietario_id === usuarioActivo.numero_identificacion);
             if (misVehiculosTotales.length >= 2) {
                 cerrarModal('modal-registro-vehiculo');
                 return;
             }
-
 
             const nuevoIdentificador = obtenerSiguienteIdentificador(baseDeDatos.vehiculos);
             const hoy = new Date();
@@ -186,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const nuevoVehiculo = {
                 propietario_id: usuarioActivo.numero_identificacion,
-                placa_vehicular: campoPlaca.value.toUpperCase(),
+                placa_vehicular: campoPlaca.value.toUpperCase().trim(),
                 identificador_sistema: nuevoIdentificador,
                 tipo_vehiculo: campoTipo.options[campoTipo.selectedIndex].text,
                 fabricante: campoFabricante.value.trim(),

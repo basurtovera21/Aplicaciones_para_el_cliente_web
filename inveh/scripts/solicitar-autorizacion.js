@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const formularioAuth = document.getElementById('form-crear-autorizacion');
     if (!formularioAuth) return;
 
-
+    // 1. VARIABLES DE LOS CAMPOS
     const nombres = document.getElementById('auth-nombres');
     const tipoId = document.getElementById('auth-tipo-id');
     const numId = document.getElementById('auth-numero-id');
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const motivo = document.getElementById('auth-motivo');
     const destino = document.getElementById('auth-destino');
 
-
+    // 2. MANEJO DE DESPLEGABLES (ACORDEÓN)
     const botonesDesplegar = document.querySelectorAll('.boton-desplegar-compacto');
     botonesDesplegar.forEach(boton => {
         boton.addEventListener('click', function() {
@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // 3. LIMPIEZA EN TIEMPO REAL
     const camposSoloLetras = [nombres, fabricante, modelo, color];
     camposSoloLetras.forEach(campo => {
         if (campo) {
@@ -46,18 +47,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-  
+    function obtenerSiguienteIdentificadorAutorizacion(listaAutorizaciones) {
+        let numeroMasAlto = 100;
+
+        if (Array.isArray(listaAutorizaciones)) {
+            listaAutorizaciones.forEach(item => {
+                if (item.identificador_solicitud && item.identificador_solicitud.startsWith('AUT-')) {
+                    const numeroExtraido = parseInt(item.identificador_solicitud.replace('AUT-', ''), 10);
+                    if (!isNaN(numeroExtraido) && numeroExtraido > numeroMasAlto) {
+                        numeroMasAlto = numeroExtraido;
+                    }
+                }
+            });
+        }
+
+        const siguienteNumero = numeroMasAlto + 1;
+        return `AUT-${String(siguienteNumero).padStart(6, '0')}`;
+    }
+
+    // 4. VALIDACIÓN Y GUARDADO AL ENVIAR
     formularioAuth.addEventListener('submit', function(evento) {
         evento.preventDefault();
         let esValido = true;
 
-
+        // Validar Nombres
         if (nombres.value.trim() === "") {
             mostrarAlertaError(nombres, "El registro es obligatorio");
             esValido = false;
         } else { ocultarAlertaError(nombres); }
 
-
+        // Validar Identificación
         if (tipoId.value === "") {
             mostrarAlertaError(tipoId, "El registro es obligatorio");
             esValido = false;
@@ -82,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-  
+        // Validar Teléfono (Opcional, pero con formato 09...)
         const valorTel = telefono.value.trim();
         if (valorTel === "") {
             ocultarAlertaError(telefono);
@@ -93,14 +112,14 @@ document.addEventListener('DOMContentLoaded', function() {
             ocultarAlertaError(telefono); 
         }
 
-
+        // Validar Tipo de Vehículo y Placa
         if (tipoVehiculo.value === "") {
             mostrarAlertaError(tipoVehiculo, "El registro es obligatorio");
             esValido = false;
         } else {
             ocultarAlertaError(tipoVehiculo);
             if (tipoVehiculo.value !== "otro") {
-                const valorPlaca = placa.value.trim();
+                const valorPlaca = placa.value.trim().toUpperCase();
                 if (valorPlaca === "") {
                     mostrarAlertaError(placa, "El registro es obligatorio");
                     esValido = false;
@@ -115,12 +134,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!placaOk) {
                         mostrarAlertaError(placa, "El registro tiene un formato no válido");
                         esValido = false;
-                    } else { ocultarAlertaError(placa); }
+                    } else {
+                        // VALIDACIÓN: Comprobar que la placa no exista en la base de datos
+                        const baseDeDatos = typeof obtenerBaseDatos === 'function' 
+                            ? obtenerBaseDatos() 
+                            : JSON.parse(localStorage.getItem('base_de_datos') || localStorage.getItem('inveh_db'));
+
+                        const existeEnVehiculos = baseDeDatos && Array.isArray(baseDeDatos.vehiculos)
+                            ? baseDeDatos.vehiculos.some(v => v.placa_vehicular && v.placa_vehicular.toUpperCase() === valorPlaca)
+                            : false;
+
+                        const existeEnAutorizaciones = baseDeDatos && Array.isArray(baseDeDatos.autorizaciones_visitas)
+                            ? baseDeDatos.autorizaciones_visitas.some(a => a.vehiculo && a.vehiculo.placa_vehicular && a.vehiculo.placa_vehicular.toUpperCase() === valorPlaca)
+                            : false;
+
+                        if (existeEnVehiculos || existeEnAutorizaciones) {
+                            mostrarAlertaError(placa, "El vehículo se encuentra registrado");
+                            esValido = false;
+                        } else {
+                            ocultarAlertaError(placa);
+                        }
+                    }
                 }
             } else { ocultarAlertaError(placa); }
         }
 
-
+        // Validar Fabricante, Modelo y Color
         [fabricante, modelo, color].forEach(campo => {
             if (campo.value.trim() === "") {
                 mostrarAlertaError(campo, "El registro es obligatorio");
@@ -131,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else { ocultarAlertaError(campo); }
         });
 
-
+        // Validar Fecha Programada
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
         const fechaElegida = new Date(fechaInput.value + "T00:00:00");
@@ -143,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
             esValido = false;
         } else { ocultarAlertaError(fechaInput); }
 
-
+        // Validar Hora Programada
         if (!horaInput.value) {
             mostrarAlertaError(horaInput, "El registro es obligatorio");
             esValido = false;
@@ -161,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else { ocultarAlertaError(horaInput); }
         }
 
-
+        // Validar Motivo y Destino
         if (motivo.value === "") {
             mostrarAlertaError(motivo, "El registro es obligatorio");
             esValido = false;
@@ -175,12 +214,65 @@ document.addEventListener('DOMContentLoaded', function() {
             esValido = false;
         } else { ocultarAlertaError(destino); }
 
-
+        // 5. Guardar en Base de Datos Local
         if (esValido) {
+            const baseDeDatos = typeof obtenerBaseDatos === 'function' 
+                ? obtenerBaseDatos() 
+                : JSON.parse(localStorage.getItem('base_de_datos') || localStorage.getItem('inveh_db'));
+
+            const usuarioActivo = JSON.parse(localStorage.getItem('sesion_activa')) || { numero_identificacion: "1316719804" };
+
+            if (!Array.isArray(baseDeDatos.autorizaciones_visitas)) {
+                baseDeDatos.autorizaciones_visitas = [];
+            }
+
+            const nuevoIdentificador = obtenerSiguienteIdentificadorAutorizacion(baseDeDatos.autorizaciones_visitas);
+            const fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+            const nuevaAutorizacion = {
+                solicitante_id: usuarioActivo.numero_identificacion,
+                identificador_solicitud: nuevoIdentificador,
+                visitante: {
+                    nombres_apellidos: nombres.value.trim(),
+                    tipo_identificacion: tipoId.options[tipoId.selectedIndex].text,
+                    numero_identificacion: numId.value.trim(),
+                    telefono: valorTel || "No registrado"
+                },
+                vehiculo: {
+                    placa_vehicular: placa.value.toUpperCase().trim(),
+                    tipo_vehiculo: tipoVehiculo.options[tipoVehiculo.selectedIndex].text,
+                    fabricante: fabricante.value.trim(),
+                    modelo: modelo.value.trim(),
+                    color: color.value.trim()
+                },
+                visita: {
+                    fecha_programada: fechaInput.value,
+                    hora_programada: horaInput.value,
+                    motivo_visita: motivo.options[motivo.selectedIndex].text,
+                    area_destino: destino.value.trim()
+                },
+                estado_solicitud: "Pendiente",
+                fecha_registro: fechaHoy,
+                fecha_actualizacion: fechaHoy
+            };
+
+            baseDeDatos.autorizaciones_visitas.push(nuevaAutorizacion);
+
+            if (typeof guardarCambios === 'function') {
+                guardarCambios(baseDeDatos);
+            } else {
+                localStorage.setItem('base_de_datos', JSON.stringify(baseDeDatos));
+                localStorage.setItem('inveh_db', JSON.stringify(baseDeDatos));
+            }
+
             const ahoraLog = new Date();
             const fechaHora = `${String(ahoraLog.getDate()).padStart(2, '0')}/${String(ahoraLog.getMonth() + 1).padStart(2, '0')}/${ahoraLog.getFullYear()} a las ${String(ahoraLog.getHours()).padStart(2, '0')}:${String(ahoraLog.getMinutes()).padStart(2, '0')}.`;
-            document.getElementById('info-fecha-registro').innerHTML = `Fecha y hora en que se registró la solicitud: ${fechaHora}`;
             
+            const contenedorInfoExito = document.getElementById('info-fecha-registro');
+            if (contenedorInfoExito) {
+                contenedorInfoExito.textContent = `Fecha y hora en que se registró la solicitud: ${fechaHora}`;
+            }
+
             cerrarModal('modal-crear-autorizacion');
             setTimeout(() => {
                 abrirModal('modal-registro-exito');

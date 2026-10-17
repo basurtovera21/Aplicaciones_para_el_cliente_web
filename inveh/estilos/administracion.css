@@ -1,0 +1,477 @@
+/* ===============================================================
+   VISTA DE ADMINISTRACIÓN - SISTEMA INVEH
+   =============================================================== */
+
+/* Contenedor principal idéntico a usuario-inicio */
+.contenedor-administracion {
+  min-height: calc(100vh - 98px);
+  max-width: 1440px;
+  width: 98%;
+  margin: 0 auto;
+  padding: 36px 0; /* Espaciado perimetral estricto de 36px */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 36px;       /* 36px de separación entre tarjetas */
+  background-color: var(--fondo-principal);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.etiqueta-rol-cabecera {
+  font-size: 16px;
+  font-weight: 500;
+  margin-right: 12px;
+}
+
+/* ===============================================================
+   TARJETA 1: RESUMEN DE MÉTRICAS (BANNER SUPERIOR)
+   =============================================================== */
+
+.tarjeta-resumen-metricas {
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-redondeo-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+  width: 100%;
+  padding: 36px; /* Espaciado estricto de 36px */
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Avatar idéntico a usuario-inicio */
+.avatar-iniciales-admin {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--fondo-barra-superior);
+  color: var(--color-texto-blanco);
+  font-size: 26px;
+  font-weight: 500;
+  box-shadow: 0 4px 8px rgba(141, 153, 174, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rejilla-contadores-metricas {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+
+.bloque-metrica-individual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.numero-metrica {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+/* Solicitudes pendientes resaltadas con la variable salmón institucional */
+.color-alerta {
+  color: var(--color-alerta-salmon-fondo) !important;
+}
+
+.descripcion-metrica {
+  font-size: 12px;
+  color: var(--color-texto-atenuado);
+  font-weight: 400;
+}
+
+/* Botón Registro de actividades con el formato institucional de botones */
+.boton-registro-actividades {
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+  width: 243px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  padding: 8px 14px; /* Padding estricto institucional */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.boton-registro-actividades:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+.icono-boton-accion {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+/* ===============================================================
+   TARJETAS 2 Y 3: PANELES CON ALTURA IDÉNTICA Y SCROLL INTERNO
+   =============================================================== */
+
+.tarjeta-panel-administracion {
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-redondeo-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+  width: 100%;
+  padding: 36px; /* Espaciado estricto institucional */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Mismo tamaño exacto para la Tarjeta 2 y la Tarjeta 3 */
+.tarjeta-panel-fijo {
+  height: 480px;
+}
+
+.cabecera-panel-tabla {
+  margin-bottom: 24px;
+}
+
+.titulo-panel-administracion {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  margin: 0;
+}
+
+/* --- Barra de Filtros y Búsqueda (Tarjeta 3) --- */
+.barra-filtros-vehiculares {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.campo-busqueda-contenedor {
+  flex: 2;
+}
+
+.select-filtro-contenedor {
+  flex: 1;
+  position: relative;
+}
+
+/* Inputs de búsqueda con el diseño exacto de los formularios */
+.entrada-busqueda-inveh,
+.selector-filtro-inveh {
+  width: 100%;
+  height: 50px; /* Igualado a 50px */
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.6px;
+  color: var(--color-texto-atenuado);
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-redondeo-boton);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.entrada-busqueda-inveh::placeholder {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.6px;
+  color: var(--color-texto-atenuado);
+  opacity: 1;
+}
+
+.entrada-busqueda-inveh:focus,
+.selector-filtro-inveh:focus {
+  border-color: var(--fondo-barra-superior);
+  box-shadow: 0 0 0 2px rgba(141, 153, 174, 0.2);
+}
+
+/* Selector con flecha personalizada idéntica a los modales */
+.selector-filtro-inveh {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  background-image: url("../recursos/imagenes/select.svg");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 18px;
+  padding-right: 48px;
+}
+
+.selector-filtro-inveh option {
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--color-texto-cuerpo);
+  background-color: #FFFFFF;
+  padding: 12px;
+}
+
+/* Botón Comprobar con altura de 50px para alinearse perfectamente */
+.boton-comprobar-filtros {
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+  width: 243px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.boton-comprobar-filtros:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+.icono-comprobar {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+/* ===============================================================
+   TABLAS Y CONTENEDOR DESPLAZABLE (SCROLL INTERNO)
+   =============================================================== */
+
+.contenedor-tabla-desplazable {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  box-sizing: border-box;
+}
+
+/* Scrollbar idéntico al de los modales institucionales */
+.contenedor-tabla-desplazable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.contenedor-tabla-desplazable::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0;
+}
+
+.contenedor-tabla-desplazable::-webkit-scrollbar-thumb {
+  background-color: rgba(141, 153, 174, 0.3);
+  border-radius: 10px;
+  border: 2px solid #FFFFFF;
+}
+
+.tabla-gestion-inveh {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+/* Cabecera de tabla estilo píldora como en Figma */
+.tabla-gestion-inveh th {
+  background-color: #E2E8F0;
+  color: var(--color-texto-cuerpo);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 18px;
+  box-sizing: border-box;
+}
+
+.tabla-gestion-inveh th:first-child {
+  border-top-left-radius: var(--radio-redondeo-boton);
+  border-bottom-left-radius: var(--radio-redondeo-boton);
+}
+
+.tabla-gestion-inveh th:last-child {
+  border-top-right-radius: var(--radio-redondeo-boton);
+  border-bottom-right-radius: var(--radio-redondeo-boton);
+}
+
+/* Filas sin líneas divisorias por debajo */
+.tabla-gestion-inveh td {
+  padding: 14px 18px;
+  font-size: 12px;
+  color: var(--color-texto-cuerpo);
+  border-bottom: none; /* Se eliminó la línea divisoria inferior */
+  box-sizing: border-box;
+}
+
+.tabla-gestion-inveh td .dato-valor {
+  color: var(--color-texto-cuerpo);
+  font-weight: 500;
+}
+
+.columna-centrada {
+  text-align: center !important;
+}
+
+/* Botones de acción dentro de las filas de la tabla */
+.boton-tabla-icono {
+  width: 42px;
+  height: 32px;
+  background-color: var(--boton-primario-fondo);
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.boton-tabla-icono:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+.boton-tabla-icono img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+/* Mensaje cuando no hay registros o coincidencias */
+.mensaje-tabla-vacia {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--color-texto-atenuado);
+  font-size: 14px;
+  background-color: #F8FAFC; /* Fondo suave institucional */
+  border-radius: var(--radio-redondeo-boton);
+}
+
+.contenedor-acciones-ficha-admin {
+  display: flex;
+  align-items: center;
+  gap: 12px;           /* Espacio entre los botones de la izquierda */
+  margin-top: 36px;    /* Espaciado institucional de 36px */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Estilo base general para los 4 botones */
+.boton-ficha-admin {
+  padding: 8px 14px;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease, filter 0.2s ease;
+}
+
+.boton-ficha-admin img,
+.boton-ficha-admin .icono-boton-accion {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+/* ---------------------------------------------------------------
+   1. LOS 3 BOTONES DE LA IZQUIERDA (ANCHO FIJO DE 200PX)
+   --------------------------------------------------------------- */
+
+#btn-admin-modificar-vehiculo,
+#btn-admin-exportar-pdf,
+#btn-admin-desvincular-ficha {
+  width: 200px; /* Ancho fijo solicitado */
+}
+
+/* --- Botón: Modificar información --- */
+#btn-admin-modificar-vehiculo {
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+}
+
+#btn-admin-modificar-vehiculo:hover {
+  background-color: var(--boton-primario-hover); /* Puedes cambiar este hover */
+}
+
+/* --- Botón: Exportar ficha PDF --- */
+#btn-admin-exportar-pdf {
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+}
+
+#btn-admin-exportar-pdf:hover {
+  background-color: var(--boton-primario-hover); /* Puedes cambiar este hover */
+}
+
+/* --- Botón: Desvincular vehículo (Alerta) --- */
+#btn-admin-desvincular-ficha {
+  background-color: var(--color-alerta-salmon-fondo);
+  color: var(--color-alerta-salmon-texto);
+}
+
+#btn-admin-desvincular-ficha:hover {
+  background-color: var(--color-alerta-salmon-hover);
+}
+
+/* ---------------------------------------------------------------
+   2. BOTÓN DE LA DERECHA: ACEPTAR (ANCHO FIJO DE 243PX)
+   --------------------------------------------------------------- */
+
+.contenedor-acciones-ficha-admin .boton-ficha-admin:last-child {
+  margin-left: auto;         /* Lo empuja al extremo derecho */
+  width: 243px;              /* Ancho institucional de 243px */
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+}
+
+.contenedor-acciones-ficha-admin .boton-ficha-admin:last-child:hover {
+  background-color: var(--boton-primario-hover); /* Puedes cambiar este hover */
+}
+
+/* --- Barra de Filtros (Registro de Actividades Modal) --- */
+.barra-filtros-actividades {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-ancho-actividades { 
+    width: 1150px; /* Más ancho para que los 4 filtros quepan perfectamente */
+}
+
+#modal-registro-actividades { z-index: 1000 !important; }
+#modal-ficha-vehicular { z-index: 1050 !important; }
+#modal-modificar-vehiculo, 
+#modal-desvincular-vehiculo,
+#modal-revision-registro,
+#modal-revision-autorizacion { z-index: 1060 !important; }
+#modal-desvinculacion-exito, 
+#modal-admin-exito { z-index: 1070 !important; }

@@ -1,0 +1,119 @@
+/* ===============================================================
+   MODALES DE REVISIÓN DE SOLICITUDES - SISTEMA INVEH
+   (Calca la estructura de formularios pero sin tarjetas)
+   =============================================================== */
+
+/* --- Secciones de Datos (Texto directo sin tarjetas) --- */
+.seccion-revision-datos {
+    margin-bottom: 28px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Subtítulo centrado idéntico a Figma */
+.titulo-seccion-revision {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-texto-titulo);
+    text-align: center;
+    margin: 0 0 16px 0;
+}
+
+/* Lista de detalles centrada como bloque, alineada a la izquierda */
+.lista-datos-revision {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 0 16px;
+}
+
+.item-revision {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-texto-atenuado);
+    margin: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.item-revision .dato-valor {
+    color: var(--color-texto-cuerpo);
+    font-weight: 500;
+}
+
+/* ===============================================================
+   ACCIONES INFERIORES (LOS 3 BOTONES DE FIGMA EN FILA)
+   =============================================================== */
+
+.contenedor-acciones-revision {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px; /* Espaciado proporcional para que quepan en 840px */
+    margin-top: 36px; /* Espaciado institucional de 36px */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Botón base que hereda las dimensiones institucionales */
+.boton-solicitud-admin {
+    flex: 1;
+    max-width: 230px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: var(--radio-redondeo-boton);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    transition: background-color 0.2s, filter 0.2s;
+}
+
+.boton-solicitud-admin img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+/* 1. Botón Aceptar Solicitud (Slate / Gris institucional Figma) */
+.fondo-aceptar-solicitud {
+    background-color: var(--boton-primario-fondo);
+    color: var(--boton-primario-texto);
+}
+
+.fondo-aceptar-solicitud:hover {
+    background-color: var(--boton-primario-hover);
+}
+
+/* 2. Botón Rechazar Solicitud (Salmón institucional) */
+.fondo-rechazar-solicitud {
+    background-color: var(--color-alerta-salmon-fondo);
+    color: var(--color-alerta-salmon-texto);
+}
+
+.fondo-rechazar-solicitud:hover {
+    background-color: var(--color-alerta-salmon-hover);
+}
+
+/* 3. Botón Cancelar (Gris suave institucional con borde) */
+.fondo-cancelar-solicitud {
+    background-color: #F1F5F9;
+    color: var(--color-texto-cuerpo);
+}
+
+.fondo-cancelar-solicitud:hover {
+    background-color: #E2E8F0; 
+    filter: brightness(0.95);
+}

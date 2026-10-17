@@ -54,6 +54,12 @@
     align-items: center;
     margin-bottom: 36px; 
     position: relative;
+    /* Baja el título 36px por debajo de la línea del botón cerrar */
+    padding-top: 36px;
+    /* Margen lateral de seguridad de 36px para evitar que textos largos toquen los bordes */
+    padding-left: 36px;
+    padding-right: 36px;
+    box-sizing: border-box;
 }
 
 .titulo-modal {
@@ -61,20 +67,27 @@
     font-weight: 500;
     color: var(--color-texto-titulo);
     margin: 0;
+    text-align: center;
 }
 
+/* El botón permanece fijado en la esquina superior derecha */
 .boton-cerrar-modal {
     position: absolute;
-    padding: 8px 14px;
     top: 0;
     right: 0;
+    padding: 8px; 
     background: none;
     border: none;
     cursor: pointer;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.icono-cerrar-modal { width: 18px; height: 18px; }
+.icono-cerrar-modal { 
+    width: 18px; 
+    height: 18px; 
+}
 
 
 .boton-accion-modal {
