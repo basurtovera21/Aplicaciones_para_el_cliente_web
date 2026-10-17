@@ -48,18 +48,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function obtenerSiguienteIdentificadorAutorizacion(listaAutorizaciones) {
-        let numeroMasAlto = 100;
+        let numeroMasAlto = 0; // Inicia en 0 para que la primera sea AUT-000001
 
-        if (Array.isArray(listaAutorizaciones)) {
-            listaAutorizaciones.forEach(item => {
-                if (item.identificador_solicitud && item.identificador_solicitud.startsWith('AUT-')) {
-                    const numeroExtraido = parseInt(item.identificador_solicitud.replace('AUT-', ''), 10);
-                    if (!isNaN(numeroExtraido) && numeroExtraido > numeroMasAlto) {
-                        numeroMasAlto = numeroExtraido;
-                    }
+        const revisarId = (id) => {
+            if (id && typeof id === 'string' && id.startsWith('AUT-')) {
+                const num = parseInt(id.replace('AUT-', ''), 10);
+                if (!isNaN(num) && num > numeroMasAlto) {
+                    numeroMasAlto = num;
                 }
-            });
-        }
+            }
+        };
+
+        const baseDeDatos = (typeof obtenerBaseDatos === 'function') 
+            ? obtenerBaseDatos() 
+            : JSON.parse(localStorage.getItem('base_de_datos') || localStorage.getItem('inveh_db') || '{}');
+
+        const autorizaciones = baseDeDatos?.autorizaciones_visitas || (Array.isArray(listaAutorizaciones) ? listaAutorizaciones : []);
+        autorizaciones.forEach(item => {
+            revisarId(item.identificador_solicitud);
+            revisarId(item.identificador_sistema);
+        });
+
+        // Revisar también en historial de movimientos para evitar duplicados
+        (baseDeDatos?.historial_movimientos || []).forEach(item => {
+            revisarId(item.identificador);
+            revisarId(item.identificador_solicitud);
+        });
 
         const siguienteNumero = numeroMasAlto + 1;
         return `AUT-${String(siguienteNumero).padStart(6, '0')}`;

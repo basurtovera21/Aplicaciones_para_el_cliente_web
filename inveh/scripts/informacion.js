@@ -69,24 +69,7 @@ const BASE_DE_DATOS_INICIAL = {
             rol_sistema: "guardia"
         }
     ],
-    vehiculos: [
-        {
-            propietario_id: "1316719804",
-            placa_vehicular: "KH463S",
-            identificador_sistema: "VEH-000639",
-            tipo_vehiculo: "Motocicleta",
-            fabricante: "Honda",
-            modelo: "Navi",
-            anio_fabricacion: "2024",
-            color: "Negro",
-            observaciones: "Sin observaciones",
-            codigo_qr_ruta: "recursos/imagenes/codigo-qr.png",
-            estado_autorizacion: "Autorizado",
-            ubicacion_actual: "Fuera de las instalaciones",
-            fecha_registro: "02/10/2026",
-            fecha_actualizacion: "03/10/2026"
-        }
-    ],
+    vehiculos: [],
     autorizaciones_visitas: [],
     historial_movimientos: []
 };
@@ -120,13 +103,23 @@ function inicializarPersistencia() {
             }
         });
 
-        // 2. Asegurar que el vehículo inicial VEH-000639 inicie fuera de las instalaciones
+        // 2. Asegurar migración de VEH-000639 a VEH-000001 si existe
         if (Array.isArray(db.vehiculos)) {
-            const vehiculoInicial = db.vehiculos.find(v => v.identificador_sistema === "VEH-000639");
-            if (vehiculoInicial && vehiculoInicial.ubicacion_actual !== "Fuera de las instalaciones") {
-                vehiculoInicial.ubicacion_actual = "Fuera de las instalaciones";
+            const vehiculoAntiguo = db.vehiculos.find(v => v.identificador_sistema === "VEH-000639");
+            if (vehiculoAntiguo) {
+                vehiculoAntiguo.identificador_sistema = "VEH-000001";
                 cambios = true;
             }
+        }
+
+        // Migrar identificadores en historial de movimientos si tenían VEH-000639
+        if (Array.isArray(db.historial_movimientos)) {
+            db.historial_movimientos.forEach(m => {
+                if (m.identificador === "VEH-000639") {
+                    m.identificador = "VEH-000001";
+                    cambios = true;
+                }
+            });
         }
 
         if (cambios) {

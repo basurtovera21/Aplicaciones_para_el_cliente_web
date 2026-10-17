@@ -8,7 +8,7 @@ function obtenerDB() {
     const datos = typeof obtenerBaseDatos === 'function' 
         ? obtenerBaseDatos() 
         : JSON.parse(localStorage.getItem('base_de_datos') || localStorage.getItem('inveh_db'));
-    return datos || { usuarios: [], vehiculos: [], autorizaciones_visitas: [] };
+    return datos || { usuarios: [], vehiculos: [], autorizaciones_visitas: [], historial_movimientos: [] };
 }
 
 function guardarDB(datosActualizados) {
@@ -34,9 +34,9 @@ function obtenerFechaHoraActual() {
     };
 }
 
-// Generador de identificador consecutivo formal (VEH-000640, VEH-000641...)
+// Generador de identificador consecutivo formal (VEH-000001, VEH-000002...)
 function generarSiguienteIdentificador(listaVehiculos) {
-    let maxNum = 639;
+    let maxNum = 0; // Inicia en 0 para que el primer vehículo sea VEH-000001
     if (Array.isArray(listaVehiculos)) {
         listaVehiculos.forEach(v => {
             if (v.identificador_sistema && v.identificador_sistema.startsWith('VEH-')) {
@@ -46,6 +46,39 @@ function generarSiguienteIdentificador(listaVehiculos) {
         });
     }
     return `VEH-${String(maxNum + 1).padStart(6, '0')}`;
+}
+
+function esFechaDeHoy(fechaStr) {
+    if (!fechaStr) return false;
+    const ahora = new Date();
+    const hoyAnio = ahora.getFullYear();
+    const hoyMes = ahora.getMonth() + 1;
+    const hoyDia = ahora.getDate();
+
+    const str = String(fechaStr).trim();
+
+    if (/^\d{4}-\d{1,2}-\d{1,2}/.test(str)) {
+        const partes = str.split('T')[0].split('-');
+        const anio = parseInt(partes[0], 10);
+        const mes = parseInt(partes[1], 10);
+        const dia = parseInt(partes[2], 10);
+        return anio === hoyAnio && mes === hoyMes && dia === hoyDia;
+    }
+
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(str)) {
+        const partes = str.split('/');
+        const dia = parseInt(partes[0], 10);
+        const mes = parseInt(partes[1], 10);
+        const anio = parseInt(partes[2], 10);
+        return anio === hoyAnio && mes === hoyMes && dia === hoyDia;
+    }
+
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+        return d.getFullYear() === hoyAnio && (d.getMonth() + 1) === hoyMes && d.getDate() === hoyDia;
+    }
+
+    return false;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -87,9 +120,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (elem3) elem3.textContent = vehiculosPendientes + visitasPendientes;
 
         // Conteo 4: Visitas autorizadas para hoy
-        const hoyISO = new Date().toISOString().split('T')[0];
         const visitasHoy = autorizaciones.filter(a => 
-            a.estado_solicitud === "Autorizado" && a.visita && a.visita.fecha_programada === hoyISO
+            a.estado_solicitud === "Autorizado" && a.visita && esFechaDeHoy(a.visita.fecha_programada)
         ).length;
         const elem4 = document.getElementById('metrica-visitas-hoy');
         if (elem4) elem4.textContent = visitasHoy;
@@ -225,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 6. FILTRADO DINÁMICO
+    // 6. FILTRADO (Se aplica únicamente al presionar el botón "Comprobar")
     function ejecutarFiltros() {
         const texto = document.getElementById('filtro-busqueda-general')?.value.trim().toLowerCase() || '';
         const tipoUsr = document.getElementById('filtro-tipo-usuario')?.value || '';
@@ -234,17 +266,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.getElementById('boton-ejecutar-filtro')?.addEventListener('click', ejecutarFiltros);
-    document.getElementById('filtro-busqueda-general')?.addEventListener('input', ejecutarFiltros);
-    document.getElementById('filtro-tipo-usuario')?.addEventListener('change', ejecutarFiltros);
-    document.getElementById('filtro-tipo-vehiculo')?.addEventListener('change', ejecutarFiltros);
+    document.getElementById('filtro-busqueda-general')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            ejecutarFiltros();
+        }
+    });
 
 
     document.getElementById('boton-registro-actividades')?.addEventListener('click', () => {
+        // Limpiar filtros al abrir para mostrar todo el historial completo de todos los puntos de control
+        const inputTexto = document.getElementById('filtro-modal-act-texto');
+        const inputFecha = document.getElementById('filtro-modal-act-fecha');
+        const inputPunto = document.getElementById('filtro-modal-act-punto');
+        const inputMov = document.getElementById('filtro-modal-act-mov');
+        
+        if (inputTexto) inputTexto.value = '';
+        if (inputFecha) inputFecha.value = '';
+        if (inputPunto) inputPunto.value = '';
+        if (inputMov) inputMov.value = '';
+
         renderizarRegistroActividadesModal();
         abrirModal('modal-registro-actividades');
     });
 
-    // 2. Función para pintar la tabla y aplicar filtros en vivo (Solo usuarios institucionales)
+    // 2. Función para pintar la tabla y aplicar filtros en vivo (Movimientos globales de todos los puntos de control)
     function renderizarRegistroActividadesModal() {
         const contenedor = document.getElementById('cuerpo-tabla-actividades-modal');
         if (!contenedor) return;
@@ -260,6 +306,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         contenedor.innerHTML = '';
 
+        if (historial.length === 0) {
+            contenedor.innerHTML = `<tr><td colspan="7" class="mensaje-tabla-vacia">No se han registrado movimientos vehiculares en ningún punto de control</td></tr>`;
+            return;
+        }
+
         // Formatear la fecha seleccionada de YYYY-MM-DD a DD/MM/YYYY para comparar con la BD
         let fechaFormateada = '';
         if (filtroFecha) {
@@ -268,25 +319,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const normalizar = (txt) => (txt || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+        const normalizarPunto = (p) => (p || '').toString().toUpperCase().replace(/PUNTO\s*DE\s*CONTROL/g, '').replace(/[^A-Z0-9]/g, '');
         const filtroNorm = normalizar(filtroTexto);
 
-        // Filtrar exclusivamente los movimientos de usuarios institucionales (excluyendo visitantes y temporales con acceso)
-        const historialUsuarios = historial.filter(item => {
-            const esVisitante = item.tipo_usuario === "Visitante" || 
-                (item.identificador && item.identificador.startsWith("AUT-")) ||
-                (item.identificador_solicitud && item.identificador_solicitud.startsWith("AUT-"));
-            return !esVisitante;
-        });
+        // Pre-procesar cada movimiento con su identificador y tipo de vehículo exacto
+        const movimientosConInfo = historial.slice().reverse().map(item => {
+            const placaBuscada = (item.placa_vehicular || '').trim().toUpperCase();
+            const idBuscado = (item.identificador || '').trim().toUpperCase();
 
-        // Pre-procesar cada movimiento con su identificador institucional y tipo de vehículo exacto
-        const movimientosConInfo = historialUsuarios.slice().reverse().map(item => {
             const vehiculoReal = (dbActual.vehiculos || []).find(v => 
-                v.placa_vehicular === item.placa_vehicular || 
-                (v.identificador_sistema && item.identificador && v.identificador_sistema === item.identificador)
+                (v.placa_vehicular && v.placa_vehicular.trim().toUpperCase() === placaBuscada) || 
+                (v.identificador_sistema && v.identificador_sistema.trim().toUpperCase() === idBuscado)
             );
             
-            const identificador = vehiculoReal ? vehiculoReal.identificador_sistema : (item.identificador || "-");
-            const tipoVehiculo = vehiculoReal ? vehiculoReal.tipo_vehiculo : (item.tipo_vehiculo || "-");
+            const identificador = vehiculoReal ? vehiculoReal.identificador_sistema : (item.identificador && item.identificador !== "-" ? item.identificador : "");
+            const tipoVehiculo = vehiculoReal ? vehiculoReal.tipo_vehiculo : (item.tipo_vehiculo && item.tipo_vehiculo !== "-" ? item.tipo_vehiculo : "");
 
             return {
                 ...item,
@@ -297,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Filtrar array con todos los criterios de búsqueda
         const resultados = movimientosConInfo.filter(item => {
-            const idTexto = item.identificadorCalculado.toLowerCase();
+            const idTexto = (item.identificadorCalculado || '').toLowerCase();
             const idNorm = normalizar(item.identificadorCalculado);
             const placaTexto = (item.placa_vehicular || '').toLowerCase();
             const placaNorm = normalizar(item.placa_vehicular);
@@ -314,9 +361,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const coincideFecha = !fechaFormateada || item.fecha === fechaFormateada;
             
-            // "Punto de control N01" -> "N01"
-            const ptoItem = item.punto_control ? item.punto_control.replace('Punto de control ', '') : 'N01';
-            const coincidePunto = !filtroPunto || ptoItem === filtroPunto;
+            // Normalizar punto de control (ej: "Punto de control N01", "N01", "01")
+            const ptoItemNorm = normalizarPunto(item.punto_control);
+            const filtroPuntoNorm = normalizarPunto(filtroPunto);
+            const coincidePunto = !filtroPunto || ptoItemNorm === filtroPuntoNorm || (!ptoItemNorm && filtroPuntoNorm === 'N01');
             
             const coincideMov = !filtroMov || item.tipo_movimiento === filtroMov;
 
@@ -324,27 +372,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         if (resultados.length === 0) {
-            contenedor.innerHTML = `<tr><td colspan="7" class="mensaje-tabla-vacia">No se encontraron movimientos de usuarios registrados con estos criterios.</td></tr>`;
+            contenedor.innerHTML = `<tr><td colspan="7" class="mensaje-tabla-vacia">No se encontraron registros de movimientos relacionados con los filtros seleccionados</td></tr>`;
             return;
         }
 
         resultados.forEach(item => {
-            const botonFichaHtml = (item.identificadorCalculado && item.identificadorCalculado !== "-")
+            const esVehiculoInstitucional = item.identificadorCalculado && 
+                (dbActual.vehiculos || []).some(v => v.identificador_sistema === item.identificadorCalculado);
+
+            const botonFichaHtml = esVehiculoInstitucional
                 ? `<button type="button" class="boton-tabla-icono" title="Ver ficha técnica" onclick="abrirFichaVehiculoAdmin('${item.identificadorCalculado}')">
                        <img src="recursos/imagenes/ficha-vehicular.svg" alt="Ficha">
                    </button>`
                 : ``;
 
-            const puntoFormateado = item.punto_control ? item.punto_control.replace('Punto de control ', '') : 'N01';
+            const puntoFormateado = normalizarPunto(item.punto_control) || 'N01';
+            const idMostrar = (item.identificadorCalculado && item.identificadorCalculado !== "-") ? item.identificadorCalculado : "";
+            const placaMostrar = (item.placa_vehicular && item.placa_vehicular !== "-") ? item.placa_vehicular : "";
+            const tipoVehiculoMostrar = (item.tipoVehiculoCalculado && item.tipoVehiculoCalculado !== "-") ? item.tipoVehiculoCalculado : "";
+            const fechaHoraMostrar = (item.fecha && item.hora) ? `${item.fecha} - ${item.hora}` : (item.fecha || "");
+
+            const spanId = idMostrar ? `<span class="dato-valor">${idMostrar}</span>` : "";
 
             const fila = `
                 <tr>
-                    <td>${item.fecha} - ${item.hora}</td>
-                    <td><span class="dato-valor">${item.identificadorCalculado}</span></td>
-                    <td><strong>${item.placa_vehicular}</strong></td>
-                    <td>${item.tipoVehiculoCalculado}</td>
+                    <td>${fechaHoraMostrar}</td>
+                    <td>${spanId}</td>
+                    <td><strong>${placaMostrar}</strong></td>
+                    <td>${tipoVehiculoMostrar}</td>
                     <td>${puntoFormateado}</td>
-                    <td><strong>${item.tipo_movimiento}</strong></td>
+                    <td><strong>${item.tipo_movimiento || ""}</strong></td>
                     <td class="columna-centrada">${botonFichaHtml}</td>
                 </tr>
             `;

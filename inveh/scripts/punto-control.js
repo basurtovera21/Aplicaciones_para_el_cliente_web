@@ -36,6 +36,58 @@ function validarCedulaControl(cedula) {
     return verificador === parseInt(cedula[9]);
 }
 
+function esFechaDeHoy(fechaStr) {
+    if (!fechaStr) return false;
+    const ahora = new Date();
+    const hoyAnio = ahora.getFullYear();
+    const hoyMes = ahora.getMonth() + 1; // 1-12
+    const hoyDia = ahora.getDate();
+
+    const str = String(fechaStr).trim();
+
+    // Formato YYYY-MM-DD
+    if (/^\d{4}-\d{1,2}-\d{1,2}/.test(str)) {
+        const partes = str.split('T')[0].split('-');
+        const anio = parseInt(partes[0], 10);
+        const mes = parseInt(partes[1], 10);
+        const dia = parseInt(partes[2], 10);
+        return anio === hoyAnio && mes === hoyMes && dia === hoyDia;
+    }
+
+    // Formato DD/MM/YYYY
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(str)) {
+        const partes = str.split('/');
+        const dia = parseInt(partes[0], 10);
+        const mes = parseInt(partes[1], 10);
+        const anio = parseInt(partes[2], 10);
+        return anio === hoyAnio && mes === hoyMes && dia === hoyDia;
+    }
+
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+        return d.getFullYear() === hoyAnio && (d.getMonth() + 1) === hoyMes && d.getDate() === hoyDia;
+    }
+
+    return false;
+}
+
+function obtenerUltimoMovimientoVehiculo(historial, vehiculo) {
+    if (!Array.isArray(historial) || !vehiculo) return null;
+    const normalizar = (txt) => (txt || '').toString().trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const placaVehNorm = normalizar(vehiculo.placa_vehicular);
+    const idVehNorm = normalizar(vehiculo.identificador_sistema || vehiculo.identificador_solicitud);
+
+    const movimientos = historial.filter(m => {
+        const mPlaca = normalizar(m.placa_vehicular);
+        const mId = normalizar(m.identificador);
+        const coincidePlaca = mPlaca && placaVehNorm && mPlaca !== 'SP' && mPlaca === placaVehNorm;
+        const coincideId = mId && idVehNorm && mId === idVehNorm;
+        return coincidePlaca || coincideId;
+    });
+
+    return movimientos.length > 0 ? movimientos[movimientos.length - 1] : null;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // 1. VERIFICAR SESIÓN DE PUNTO DE CONTROL
     const sesion = JSON.parse(localStorage.getItem('sesion_activa'));
@@ -154,7 +206,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 const coincideId = idSolNorm && idSolNorm === criterioNorm;
                 const coincidePlaca = placaVisitaNorm && placaVisitaNorm !== "SP" && placaVisitaNorm === criterioNorm;
 
-                return coincideId || coincidePlaca;
+                if (!coincideId && !coincidePlaca) return false;
+
+                // Validación estricta de fecha para visitas:
+                // Solo debe aparecer si es el día correspondiente a la fecha programada.
+                // Si el vehículo ya ingresó (está dentro), se le permite procesar su salida.
+                const fechaProg = a.visita?.fecha_programada;
+                const estaDentro = a.ubicacion_actual === "Dentro de las instalaciones";
+                if (!estaDentro && fechaProg && !esFechaDeHoy(fechaProg)) {
+                    return false;
+                }
+
+                return true;
             });
 
             if (autorizacion) {
@@ -180,6 +243,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (vehiculo) {
+            // Sincronizar ubicación_actual según el último movimiento registrado en el sistema
+            const ultimoMov = obtenerUltimoMovimientoVehiculo(db?.historial_movimientos, vehiculo);
+            if (ultimoMov) {
+                vehiculo.ubicacion_actual = (ultimoMov.tipo_movimiento === "Entrada")
+                    ? "Dentro de las instalaciones"
+                    : "Fuera de las instalaciones";
+            } else if (!vehiculo.ubicacion_actual) {
+                vehiculo.ubicacion_actual = "Fuera de las instalaciones";
+            }
+
+            // Si la ubicación en la base de datos estaba desactualizada, sincronizarla
+            let cambiosSync = false;
+            if (!vehiculo.es_visita && Array.isArray(db?.vehiculos)) {
+                const vEnDb = db.vehiculos.find(v => normalizar(v.identificador_sistema) === normalizar(vehiculo.identificador_sistema));
+                if (vEnDb && vEnDb.ubicacion_actual !== vehiculo.ubicacion_actual) {
+                    vEnDb.ubicacion_actual = vehiculo.ubicacion_actual;
+                    cambiosSync = true;
+                }
+            } else if (vehiculo.es_visita && Array.isArray(db?.autorizaciones_visitas)) {
+                const aEnDb = db.autorizaciones_visitas.find(a => normalizar(a.identificador_solicitud) === normalizar(vehiculo.identificador_solicitud));
+                if (aEnDb && aEnDb.ubicacion_actual !== vehiculo.ubicacion_actual) {
+                    aEnDb.ubicacion_actual = vehiculo.ubicacion_actual;
+                    cambiosSync = true;
+                }
+            }
+            if (cambiosSync) {
+                if (typeof guardarCambios === 'function') guardarCambios(db);
+                else localStorage.setItem('base_de_datos', JSON.stringify(db));
+            }
+
             vehiculoEncontradoActual = vehiculo;
             if (mensajeError) mensajeError.style.display = 'none';
             mostrarResultadoVehiculo(vehiculo, db);
@@ -195,9 +288,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 4. MOSTRAR TARJETA DE RESULTADO Y ALTERNAR BOTÓN
     function mostrarResultadoVehiculo(vehiculo, db) {
+        // Asegurar que vehiculo tenga la ubicación sincronizada según el último movimiento en el historial
+        const ultimoMov = obtenerUltimoMovimientoVehiculo(db?.historial_movimientos, vehiculo);
+        if (ultimoMov) {
+            vehiculo.ubicacion_actual = (ultimoMov.tipo_movimiento === "Entrada")
+                ? "Dentro de las instalaciones"
+                : "Fuera de las instalaciones";
+        } else if (!vehiculo.ubicacion_actual) {
+            vehiculo.ubicacion_actual = "Fuera de las instalaciones";
+        }
+
         document.getElementById('res-placa').textContent = vehiculo.placa_vehicular;
         document.getElementById('res-identificador').textContent = vehiculo.identificador_sistema;
-        document.getElementById('res-ubicacion').textContent = vehiculo.ubicacion_actual || "Fuera de las instalaciones";
+        document.getElementById('res-ubicacion').textContent = vehiculo.ubicacion_actual;
 
         const btnFicha = document.getElementById('btn-ver-ficha-control');
 
@@ -219,10 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('res-color').textContent = vehiculo.color;
         document.getElementById('res-modelo').textContent = `${vehiculo.fabricante || ''} ${vehiculo.modelo || ''}`.trim() || '-';
 
-        const historial = db?.historial_movimientos || [];
-        const movimientosPlaca = historial.filter(m => m.placa_vehicular.toUpperCase() === vehiculo.placa_vehicular.toUpperCase());
-        const ultimoMov = movimientosPlaca.length > 0 ? movimientosPlaca[movimientosPlaca.length - 1] : null;
-
         const textoUltimoMov = document.getElementById('res-ultimo-movimiento');
         if (textoUltimoMov) {
             if (ultimoMov) {
@@ -233,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        configurarBotonMovimiento(vehiculo.ubicacion_actual || "Fuera de las instalaciones");
+        configurarBotonMovimiento(vehiculo.ubicacion_actual);
         if (tarjetaResultado) tarjetaResultado.style.display = 'flex';
     }
 
@@ -267,10 +366,18 @@ document.addEventListener('DOMContentLoaded', function() {
         let tipoMovimiento = "";
 
         if (vehiculoEncontradoActual.es_visita) {
-            const autorizacion = (db?.autorizaciones_visitas || []).find(a => a.identificador_solicitud === vehiculoEncontradoActual.identificador_solicitud);
+            const normalizar = (txt) => (txt || '').toString().trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const idActualNorm = normalizar(vehiculoEncontradoActual.identificador_solicitud || vehiculoEncontradoActual.identificador_sistema);
+            const placaActualNorm = normalizar(vehiculoEncontradoActual.placa_vehicular);
+
+            const autorizacion = (db?.autorizaciones_visitas || []).find(a => {
+                const aIdNorm = normalizar(a.identificador_solicitud || a.identificador_sistema);
+                const aPlacaNorm = normalizar(a.vehiculo?.placa_vehicular);
+                return (aIdNorm && aIdNorm === idActualNorm) || (aPlacaNorm && aPlacaNorm !== 'SP' && aPlacaNorm === placaActualNorm);
+            });
             if (!autorizacion) return;
 
-            const ubicacionActual = autorizacion.ubicacion_actual || "Fuera de las instalaciones";
+            const ubicacionActual = autorizacion.ubicacion_actual || vehiculoEncontradoActual.ubicacion_actual || "Fuera de las instalaciones";
             const esSalida = ubicacionActual === "Dentro de las instalaciones";
             tipoMovimiento = esSalida ? "Salida" : "Entrada";
 
@@ -288,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (esSalida) {
-                db.autorizaciones_visitas = db.autorizaciones_visitas.filter(a => a.identificador_solicitud !== vehiculoEncontradoActual.identificador_solicitud);
+                db.autorizaciones_visitas = db.autorizaciones_visitas.filter(a => normalizar(a.identificador_solicitud) !== normalizar(autorizacion.identificador_solicitud));
                 tarjetaResultado.style.display = 'none';
                 if (entradaBusqueda) entradaBusqueda.value = '';
                 vehiculoEncontradoActual = null;
@@ -297,11 +404,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 vehiculoEncontradoActual.ubicacion_actual = autorizacion.ubicacion_actual;
             }
         } else {
-            const vehiculo = (db?.vehiculos || []).find(v => v.identificador_sistema === vehiculoEncontradoActual.identificador_sistema);
-            const propietario = (db?.usuarios || []).find(u => u.numero_identificacion === vehiculo.propietario_id);
+            const normalizar = (txt) => (txt || '').toString().trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const idActualNorm = normalizar(vehiculoEncontradoActual.identificador_sistema);
+            const placaActualNorm = normalizar(vehiculoEncontradoActual.placa_vehicular);
+
+            const vehiculo = (db?.vehiculos || []).find(v => {
+                const vIdNorm = normalizar(v.identificador_sistema);
+                const vPlacaNorm = normalizar(v.placa_vehicular);
+                return (vIdNorm && vIdNorm === idActualNorm) || (vPlacaNorm && vPlacaNorm !== 'SP' && vPlacaNorm === placaActualNorm);
+            });
             if (!vehiculo) return;
 
-            const esSalida = vehiculo.ubicacion_actual === "Dentro de las instalaciones";
+            const propietario = (db?.usuarios || []).find(u => u.numero_identificacion === vehiculo.propietario_id);
+
+            const ubicacionActual = vehiculo.ubicacion_actual || vehiculoEncontradoActual.ubicacion_actual || "Fuera de las instalaciones";
+            const esSalida = ubicacionActual === "Dentro de las instalaciones";
             tipoMovimiento = esSalida ? "Salida" : "Entrada";
 
             vehiculo.ubicacion_actual = esSalida ? "Fuera de las instalaciones" : "Dentro de las instalaciones";
@@ -437,17 +554,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function obtenerSiguienteIdentificadorAutorizacion(listaAutorizaciones) {
-        let numeroMasAlto = 100; // Base inicial
-        if (Array.isArray(listaAutorizaciones)) {
-            listaAutorizaciones.forEach(item => {
-                if (item.identificador_solicitud && item.identificador_solicitud.startsWith('AUT-')) {
-                    const numeroExtraido = parseInt(item.identificador_solicitud.replace('AUT-', ''), 10);
-                    if (!isNaN(numeroExtraido) && numeroExtraido > numeroMasAlto) {
-                        numeroMasAlto = numeroExtraido;
-                    }
+        let numeroMasAlto = 0; // Inicia en 0 para que la primera sea AUT-000001
+
+        const revisarId = (id) => {
+            if (id && typeof id === 'string' && id.startsWith('AUT-')) {
+                const num = parseInt(id.replace('AUT-', ''), 10);
+                if (!isNaN(num) && num > numeroMasAlto) {
+                    numeroMasAlto = num;
                 }
-            });
-        }
+            }
+        };
+
+        const db = typeof obtenerBaseDatos === 'function' ? obtenerBaseDatos() : JSON.parse(localStorage.getItem('base_de_datos') || '{}');
+
+        // 1. Revisar en autorizaciones de visitas existentes
+        const autorizaciones = db?.autorizaciones_visitas || (Array.isArray(listaAutorizaciones) ? listaAutorizaciones : []);
+        autorizaciones.forEach(item => {
+            revisarId(item.identificador_solicitud);
+            revisarId(item.identificador_sistema);
+        });
+
+        // 2. Revisar en historial de movimientos (evita que se repita entre diferentes puntos de control o si el vehículo salió)
+        (db?.historial_movimientos || []).forEach(item => {
+            revisarId(item.identificador);
+            revisarId(item.identificador_solicitud);
+        });
+
         return `AUT-${String(numeroMasAlto + 1).padStart(6, '0')}`;
     }
 

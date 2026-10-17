@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function obtenerSiguienteIdentificador(listaVehiculos) {
-        let numeroMasAlto = 639;
+        let numeroMasAlto = 0; // Inicia en 0 para que el primer vehículo generado sea VEH-000001
 
         if (Array.isArray(listaVehiculos)) {
             listaVehiculos.forEach(v => {
