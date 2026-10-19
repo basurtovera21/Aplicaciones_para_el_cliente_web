@@ -1,14 +1,13 @@
-/* ===============================================================
-   MODAL: MODIFICAR INFORMACIÓN DE REGISTRO VEHICULAR
-   =============================================================== */
+/* Modal de modificación de registro vehicular */
 
+/* Contenedor de información fija y solo lectura */
 .bloque-seccion-no-editable {
   margin-bottom: 28px;
   width: 100%;
   box-sizing: border-box;
 }
 
-/* Título de la sección */
+/* Subtítulo central de la sección no editable */
 .bloque-seccion-no-editable .subtitulo-seccion-revision {
   font-size: 16px;
   font-weight: 600;
@@ -17,15 +16,16 @@
   margin: 0 0 12px 0;
 }
 
-/* Identificador con altura fija y centrado idéntico a la ficha vehicular */
+/* Fila central destacada para mostrar el identificador o código vehicular */
 .bloque-seccion-no-editable .fila-centrada-modal {
   height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px; /* Separación con las dos hileras inferiores */
+  margin-bottom: 20px;
 }
 
+/* Tipografía y jerarquía visual del código identificador */
 .bloque-seccion-no-editable .identificador-texto-modal {
   font-size: 16px;
   color: var(--color-texto-cuerpo, #334155);
@@ -36,21 +36,18 @@
   font-weight: 500;
 }
 
-/* Cuadrícula de dos hileras (Izquierda y Derecha) con separación de 36px */
+/* Cuadrícula de datos no editables en dos columnas */
 .rejilla-no-editable-columnas {
   display: grid;
-  /* 1. Cambia '1fr 1fr' por 'auto auto' (o max-content max-content) */
+  /* Autoajuste al contenido de cada columna manteniendo simetría centrada */
   grid-template-columns: auto auto; 
-  
-  /* 2. Mantiene la regla estricta de 36px entre ellas */
   column-gap: 36px; 
-  
-  /* 3. AGREGA ESTA LÍNEA: Centra ambas columnas en el medio del modal */
   justify-content: center; 
-  
   width: 100%;
   box-sizing: border-box;
 }
+
+/* Columna vertical para agrupar las filas de datos informativos */
 .columna-datos-no-editable {
   display: flex;
   flex-direction: column;

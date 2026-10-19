@@ -1,245 +1,231 @@
+// document.addEventListener: Escucha el evento DOMContentLoaded para ejecutar la lógica tras cargar el árbol DOM.
 document.addEventListener('DOMContentLoaded', function() {
-    const formulario = document.getElementById('form-registro-vehiculo');
-    if (!formulario) return;
-
-    const campoPlaca = document.getElementById('placa-vehiculo');
-    const campoTipo = document.getElementById('tipo-vehiculo');
-    const campoFabricante = document.getElementById('fabricante-vehiculo');
-    const campoModelo = document.getElementById('modelo-vehiculo');
-    const campoColor = document.getElementById('color-vehiculo');
-    const campoAnio = document.getElementById('anio-vehiculo');
-    const campoObservaciones = document.getElementById('observaciones-vehiculo');
-
-    function activarError(campo, mensaje) {
-        if (typeof mostrarAlertaError === 'function') {
-            mostrarAlertaError(campo, mensaje);
-        } else {
-            const contenedor = campo.closest('.bloque-campo-formulario');
-            const alerta = contenedor ? contenedor.querySelector('.texto-alerta-error') : null;
-            if (alerta) {
-                alerta.textContent = mensaje;
-                alerta.style.display = 'block';
-                campo.style.borderColor = 'var(--color-alerta-salmon-fondo)';
-            }
-        }
+    // document.getElementById: Obtiene la referencia al elemento del formulario de registro vehicular.
+    const formularioRegistroVehiculo = document.getElementById('form-registro-vehiculo');
+    if (!formularioRegistroVehiculo) {
+        return;
     }
 
-    function desactivarError(campo) {
-        if (typeof ocultarAlertaError === 'function') {
-            ocultarAlertaError(campo);
-        } else {
-            const contenedor = campo.closest('.bloque-campo-formulario');
-            const alerta = contenedor ? contenedor.querySelector('.texto-alerta-error') : null;
-            if (alerta) {
-                alerta.style.display = 'none';
-                campo.style.borderColor = 'var(--borde-suave)';
-            }
-        }
-    }
+    // Referencias a los campos de entrada de datos del formulario en el DOM.
+    const campoPlacaVehicular = document.getElementById('placa-vehiculo');
+    const campoTipoVehiculo = document.getElementById('tipo-vehiculo');
+    const campoFabricanteVehiculo = document.getElementById('fabricante-vehiculo');
+    const campoModeloVehiculo = document.getElementById('modelo-vehiculo');
+    const campoColorVehiculo = document.getElementById('color-vehiculo');
+    const campoAnioFabricacion = document.getElementById('anio-vehiculo');
+    const campoObservacionesVehiculo = document.getElementById('observaciones-vehiculo');
 
-    if (campoPlaca) {
-        campoPlaca.addEventListener('input', () => {
-            campoPlaca.value = campoPlaca.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            desactivarError(campoPlaca);
+    // Normaliza la placa vehicular en mayúsculas y caracteres alfanuméricos en tiempo real.
+    if (campoPlacaVehicular) {
+        campoPlacaVehicular.addEventListener('input', function() {
+            // String.prototype.toUpperCase y replace: Convierte a mayúsculas y remueve caracteres no alfanuméricos.
+            campoPlacaVehicular.value = campoPlacaVehicular.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            // Utiliza la función compartida de scripts/validaciones.js.
+            ocultarAlertaError(campoPlacaVehicular);
         });
     }
 
-    if (campoTipo) {
-        campoTipo.addEventListener('change', () => {
-            desactivarError(campoTipo);
+    // Limpia la advertencia de error al seleccionar una opción de tipo de vehículo.
+    if (campoTipoVehiculo) {
+        campoTipoVehiculo.addEventListener('change', function() {
+            ocultarAlertaError(campoTipoVehiculo);
         });
     }
 
-    [campoFabricante, campoModelo, campoColor].forEach(campo => {
-        if (campo) {
-            campo.addEventListener('input', () => {
-                campo.value = campo.value.replace(/[0-9]/g, '');
-                desactivarError(campo);
+    // Array.prototype.forEach: Registra escuchadores para limpiar dígitos numéricos en campos de texto descriptivo.
+    const camposDeTextoSinDigitos = [campoFabricanteVehiculo, campoModeloVehiculo, campoColorVehiculo];
+    camposDeTextoSinDigitos.forEach(function(campoTexto) {
+        if (campoTexto) {
+            campoTexto.addEventListener('input', function() {
+                // String.prototype.replace: Suprime caracteres numéricos ingresados en nombres descriptivos.
+                campoTexto.value = campoTexto.value.replace(/[0-9]/g, '');
+                ocultarAlertaError(campoTexto);
             });
         }
     });
 
-    if (campoAnio) {
-        campoAnio.addEventListener('input', () => {
-            desactivarError(campoAnio);
+    // Limpia la advertencia de error al ingresar el año de fabricación.
+    if (campoAnioFabricacion) {
+        campoAnioFabricacion.addEventListener('input', function() {
+            ocultarAlertaError(campoAnioFabricacion);
         });
     }
 
-    function obtenerSiguienteIdentificador(listaVehiculos) {
-        let numeroMasAlto = 0; // Inicia en 0 para que el primer vehículo generado sea VEH-000001
-
-        if (Array.isArray(listaVehiculos)) {
-            listaVehiculos.forEach(v => {
-                if (v.identificador_sistema && v.identificador_sistema.startsWith('VEH-')) {
-                    const numeroExtraido = parseInt(v.identificador_sistema.replace('VEH-', ''), 10);
-                    if (!isNaN(numeroExtraido) && numeroExtraido > numeroMasAlto) {
-                        numeroMasAlto = numeroExtraido;
-                    }
-                }
-            });
-        }
-
-        const siguienteNumero = numeroMasAlto + 1;
-        return `VEH-${String(siguienteNumero).padStart(6, '0')}`;
-    }
-
-    formulario.addEventListener('submit', function(evento) {
+    // Procesa el envío del formulario y efectúa la validación integral de campos.
+    formularioRegistroVehiculo.addEventListener('submit', function(evento) {
+        // Event.preventDefault: Evita la recarga automática predeterminada de la página.
         evento.preventDefault();
-        let esValido = true;
+        let formularioEsValido = true;
 
-        // 1. Validar Tipo de Vehículo
-        if (!campoTipo || campoTipo.value === "") {
-            activarError(campoTipo, "El registro es obligatorio");
-            esValido = false;
+        // 1. Validación de obligatoriedad del tipo de vehículo utilizando funciones compartidas de scripts/validaciones.js.
+        if (!campoTipoVehiculo || campoTipoVehiculo.value === "") {
+            mostrarAlertaError(campoTipoVehiculo, "El registro es obligatorio");
+            formularioEsValido = false;
         } else {
-            desactivarError(campoTipo);
+            ocultarAlertaError(campoTipoVehiculo);
         }
 
-        // 2. Validar Placa Vehicular
-        if (campoTipo && campoTipo.value === "otro") {
-            desactivarError(campoPlaca);
+        // 2. Validación de formato y unicidad de la placa vehicular.
+        if (campoTipoVehiculo && campoTipoVehiculo.value === "otro") {
+            ocultarAlertaError(campoPlacaVehicular);
         } else {
-            const valorPlaca = campoPlaca ? campoPlaca.value.trim().toUpperCase() : "";
-            if (valorPlaca === "") {
-                activarError(campoPlaca, "El registro es obligatorio");
-                esValido = false;
+            const valorPlacaVehicular = campoPlacaVehicular ? campoPlacaVehicular.value.trim().toUpperCase() : "";
+            if (valorPlacaVehicular === "") {
+                mostrarAlertaError(campoPlacaVehicular, "El registro es obligatorio");
+                formularioEsValido = false;
             } else {
-                let formatoCorrecto = false;
-                const tiposEstandar = ["automovil", "camioneta", "suv", "furgoneta", "bus", "camion"];
+                let tieneFormatoValido = false;
+                const tiposVehiculoEstandar = ["automovil", "camioneta", "suv", "furgoneta", "bus", "camion"];
                 
-                if (campoTipo && tiposEstandar.includes(campoTipo.value)) {
-                    formatoCorrecto = /^[A-Z]{3}[0-9]{4}$/.test(valorPlaca);
-                } else if (campoTipo && campoTipo.value === "motocicleta") {
-                    formatoCorrecto = /^[A-Z]{2}[0-9]{3}[A-Z]{1}$/.test(valorPlaca);
+                // RegExp.prototype.test: Evalúa expresiones regulares según la tipología vehicular seleccionada.
+                if (campoTipoVehiculo && tiposVehiculoEstandar.includes(campoTipoVehiculo.value)) {
+                    tieneFormatoValido = /^[A-Z]{3}[0-9]{4}$/.test(valorPlacaVehicular);
+                } else if (campoTipoVehiculo && campoTipoVehiculo.value === "motocicleta") {
+                    tieneFormatoValido = /^[A-Z]{2}[0-9]{3}[A-Z]{1}$/.test(valorPlacaVehicular);
                 } else {
-                    formatoCorrecto = valorPlaca.length >= 6 && valorPlaca.length <= 7;
+                    tieneFormatoValido = valorPlacaVehicular.length >= 6 && valorPlacaVehicular.length <= 7;
                 }
 
-                if (!formatoCorrecto) {
-                    activarError(campoPlaca, "El registro tiene un formato no válido");
-                    esValido = false;
+                if (!tieneFormatoValido) {
+                    mostrarAlertaError(campoPlacaVehicular, "El registro tiene un formato no válido");
+                    formularioEsValido = false;
                 } else {
-                    // VALIDACIÓN: Comprobar que la placa no exista en la base de datos
-                    const baseDeDatos = typeof obtenerBaseDatos === 'function' 
-                        ? obtenerBaseDatos() 
-                        : JSON.parse(localStorage.getItem('base_de_datos') || localStorage.getItem('inveh_db'));
+                    // Obtiene la base de datos para verificar que la placa no esté previamente registrada.
+                    const baseDeDatos = obtenerBaseDatos();
 
+                    // Array.prototype.some: Comprueba la existencia previa de la placa en la lista de vehículos registrados.
                     const existeEnVehiculos = baseDeDatos && Array.isArray(baseDeDatos.vehiculos)
-                        ? baseDeDatos.vehiculos.some(v => v.placa_vehicular && v.placa_vehicular.toUpperCase() === valorPlaca)
+                        ? baseDeDatos.vehiculos.some(function(vehiculo) {
+                            return vehiculo.placa_vehicular && vehiculo.placa_vehicular.toUpperCase() === valorPlacaVehicular;
+                        })
                         : false;
 
+                    // Array.prototype.some: Comprueba la existencia previa de la placa en las autorizaciones de visitas.
                     const existeEnAutorizaciones = baseDeDatos && Array.isArray(baseDeDatos.autorizaciones_visitas)
-                        ? baseDeDatos.autorizaciones_visitas.some(a => a.vehiculo && a.vehiculo.placa_vehicular && a.vehiculo.placa_vehicular.toUpperCase() === valorPlaca)
+                        ? baseDeDatos.autorizaciones_visitas.some(function(autorizacion) {
+                            return autorizacion.vehiculo && autorizacion.vehiculo.placa_vehicular && autorizacion.vehiculo.placa_vehicular.toUpperCase() === valorPlacaVehicular;
+                        })
                         : false;
 
                     if (existeEnVehiculos || existeEnAutorizaciones) {
-                        activarError(campoPlaca, "El vehículo se encuentra registrado");
-                        esValido = false;
+                        mostrarAlertaError(campoPlacaVehicular, "El vehículo se encuentra registrado");
+                        formularioEsValido = false;
                     } else {
-                        desactivarError(campoPlaca);
+                        ocultarAlertaError(campoPlacaVehicular);
                     }
                 }
             }
         }
 
-        // 3. Validar Fabricante, Modelo y Color
-        [campoFabricante, campoModelo, campoColor].forEach(campo => {
-            if (campo) {
-                const valor = campo.value.trim();
-                if (valor === "") {
-                    activarError(campo, "El registro es obligatorio");
-                    esValido = false;
-                } else if (valor.length < 2) {
-                    activarError(campo, "El registro tiene un formato no válido");
-                    esValido = false;
+        // 3. Validación de campos descriptivos (Fabricante, Modelo y Color).
+        const camposDescriptivos = [campoFabricanteVehiculo, campoModeloVehiculo, campoColorVehiculo];
+        camposDescriptivos.forEach(function(campoTexto) {
+            if (campoTexto) {
+                const valorTexto = campoTexto.value.trim();
+                if (valorTexto === "") {
+                    mostrarAlertaError(campoTexto, "El registro es obligatorio");
+                    formularioEsValido = false;
+                } else if (valorTexto.length < 2) {
+                    mostrarAlertaError(campoTexto, "El registro tiene un formato no válido");
+                    formularioEsValido = false;
                 } else {
-                    desactivarError(campo);
+                    ocultarAlertaError(campoTexto);
                 }
             }
         });
 
-        // 4. Validar Año
-        const valorAnio = campoAnio ? campoAnio.value.trim() : "";
-        const numAnio = parseInt(valorAnio, 10);
+        // 4. Validación del año de fabricación del vehículo.
+        const valorAnioTexto = campoAnioFabricacion ? campoAnioFabricacion.value.trim() : "";
+        const numeroAnio = parseInt(valorAnioTexto, 10);
+        // Date.prototype.getFullYear: Obtiene el año actual del reloj del sistema.
         const anioActual = new Date().getFullYear();
 
-        if (valorAnio === "") {
-            activarError(campoAnio, "El registro es obligatorio");
-            esValido = false;
-        } else if (isNaN(numAnio) || numAnio < 1950 || numAnio > (anioActual + 1)) {
-            activarError(campoAnio, "El registro tiene un formato no válido");
-            esValido = false;
+        if (valorAnioTexto === "") {
+            mostrarAlertaError(campoAnioFabricacion, "El registro es obligatorio");
+            formularioEsValido = false;
+        } else if (isNaN(numeroAnio) || numeroAnio < 1950 || numeroAnio > (anioActual + 1)) {
+            mostrarAlertaError(campoAnioFabricacion, "El registro tiene un formato no válido");
+            formularioEsValido = false;
         } else {
-            desactivarError(campoAnio);
+            ocultarAlertaError(campoAnioFabricacion);
         }
 
-        // 5. Validar Observaciones
-        if (campoObservaciones && campoObservaciones.value.length > 250) {
-            activarError(campoObservaciones, "El registro excede los caracteres permitidos (250)");
-            esValido = false;
-        } else if (campoObservaciones) {
-            desactivarError(campoObservaciones);
+        // 5. Validación de longitud máxima del campo de observaciones.
+        if (campoObservacionesVehiculo && campoObservacionesVehiculo.value.length > 250) {
+            mostrarAlertaError(campoObservacionesVehiculo, "El registro excede los caracteres permitidos (250)");
+            formularioEsValido = false;
+        } else if (campoObservacionesVehiculo) {
+            ocultarAlertaError(campoObservacionesVehiculo);
         }
 
-        // 6. Guardar si es válido
-        if (esValido) {
-            const baseDeDatos = typeof obtenerBaseDatos === 'function' 
-                ? obtenerBaseDatos() 
-                : JSON.parse(localStorage.getItem('base_de_datos') || localStorage.getItem('inveh_db'));
+        // 6. Registro y almacenamiento persistente si todas las validaciones fueron superadas.
+        if (formularioEsValido) {
+            const baseDeDatos = obtenerBaseDatos();
 
-            const usuarioActivo = JSON.parse(localStorage.getItem('sesion_activa')) || { numero_identificacion: "1316719804" };
+            // Recupera la sesión activa actual del usuario autenticado.
+            const usuarioActivo = JSON.parse(localStorage.getItem('sesion_activa'));
+            if (!usuarioActivo) {
+                return;
+            }
 
-            const misVehiculosTotales = baseDeDatos.vehiculos.filter(v => v.propietario_id === usuarioActivo.numero_identificacion);
-            if (misVehiculosTotales.length >= 2) {
+            // Array.prototype.filter: Verifica que el usuario no supere el límite permitido de dos vehículos.
+            const vehiculosRegistradosPorUsuario = baseDeDatos.vehiculos.filter(function(vehiculo) {
+                return vehiculo.propietario_id === usuarioActivo.numero_identificacion;
+            });
+            if (vehiculosRegistradosPorUsuario.length >= 2) {
                 cerrarModal('modal-registro-vehiculo');
                 return;
             }
 
-            const nuevoIdentificador = obtenerSiguienteIdentificador(baseDeDatos.vehiculos);
-            const hoy = new Date();
-            const fechaHoy = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
+            // Reutiliza la función compartida generarSiguienteIdentificadorVehicular de scripts/informacion.js.
+            const nuevoIdentificadorVehiculo = generarSiguienteIdentificadorVehicular(baseDeDatos.vehiculos);
+            // Reutiliza la función compartida obtenerFechaHoraActual de scripts/informacion.js.
+            const tiempoActual = obtenerFechaHoraActual();
+            const cadenaFechaActual = tiempoActual.fecha;
 
+            // Objeto con la estructura completa del vehículo a registrar.
             const nuevoVehiculo = {
                 propietario_id: usuarioActivo.numero_identificacion,
-                placa_vehicular: campoPlaca.value.toUpperCase().trim(),
-                identificador_sistema: nuevoIdentificador,
-                tipo_vehiculo: campoTipo.options[campoTipo.selectedIndex].text,
-                fabricante: campoFabricante.value.trim(),
-                modelo: campoModelo.value.trim(),
-                anio_fabricacion: campoAnio.value,
-                color: campoColor.value.trim(),
-                observaciones: (campoObservaciones && campoObservaciones.value.trim()) ? campoObservaciones.value.trim() : "Sin observaciones",
+                placa_vehicular: campoPlacaVehicular.value.toUpperCase().trim(),
+                identificador_sistema: nuevoIdentificadorVehiculo,
+                tipo_vehiculo: campoTipoVehiculo.options[campoTipoVehiculo.selectedIndex].text,
+                fabricante: campoFabricanteVehiculo.value.trim(),
+                modelo: campoModeloVehiculo.value.trim(),
+                anio_fabricacion: campoAnioFabricacion.value,
+                color: campoColorVehiculo.value.trim(),
+                observaciones: (campoObservacionesVehiculo && campoObservacionesVehiculo.value.trim()) ? campoObservacionesVehiculo.value.trim() : "Sin observaciones",
                 codigo_qr_ruta: "",
                 estado_autorizacion: "Pendiente",
                 ubicacion_actual: "Fuera de las instalaciones",
-                fecha_registro: fechaHoy,
-                fecha_actualizacion: fechaHoy
+                fecha_registro: cadenaFechaActual,
+                fecha_actualizacion: cadenaFechaActual
             };
 
+            // Array.prototype.push: Agrega el nuevo registro a la colección de vehículos en memoria.
             if (baseDeDatos && Array.isArray(baseDeDatos.vehiculos)) {
                 baseDeDatos.vehiculos.push(nuevoVehiculo);
-                if (typeof guardarCambios === 'function') {
-                    guardarCambios(baseDeDatos);
-                } else {
-                    localStorage.setItem('base_de_datos', JSON.stringify(baseDeDatos));
-                    localStorage.setItem('inveh_db', JSON.stringify(baseDeDatos));
-                }
+                // Persiste los cambios mediante la función reutilizable guardarCambios.
+                guardarCambios(baseDeDatos);
             }
 
-            const fechaHora = `${fechaHoy} a las ${String(hoy.getHours()).padStart(2, '0')}:${String(hoy.getMinutes()).padStart(2, '0')}.`;
-            const contenedorInfoExito = document.getElementById('info-fecha-registro');
-            if (contenedorInfoExito) {
-                contenedorInfoExito.textContent = `Fecha y hora en que se registró la solicitud: ${fechaHora}`;
+            const etiquetaFechaRegistroExito = document.getElementById('info-fecha-registro');
+            if (etiquetaFechaRegistroExito) {
+                etiquetaFechaRegistroExito.textContent = `Fecha y hora en que se registró la solicitud: ${tiempoActual.textoCompleto}`;
             }
 
+            // Cierra el modal de formulario de registro vehicular.
             cerrarModal('modal-registro-vehiculo');
-            setTimeout(() => {
-                abrirModal('modal-registro-exito');
-                formulario.reset();
 
+            // setTimeout: Despliega el modal de confirmación tras un intervalo controlado de transición visual.
+            setTimeout(function() {
+                abrirModal('modal-registro-exito');
+                // HTMLFormElement.reset: Restablece todos los campos del formulario a sus valores originales.
+                formularioRegistroVehiculo.reset();
+
+                // Registra el evento de recarga en los botones de cierre del modal de confirmación.
                 const botonesCerrarExito = document.querySelectorAll('#modal-registro-exito [data-modal-cerrar]');
-                botonesCerrarExito.forEach(btn => {
-                    btn.addEventListener('click', () => {
+                botonesCerrarExito.forEach(function(botonCerrar) {
+                    botonCerrar.addEventListener('click', function() {
                         location.reload();
                     }, { once: true });
                 });

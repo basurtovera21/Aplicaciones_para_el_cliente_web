@@ -1,31 +1,43 @@
+/* Variables globales y tokens de diseño */
+
+/* Paleta de colores, tipografías, bordes y sombras compartidas en toda la aplicación */
 :root {
+  /* Fondos generales */
   --fondo-principal: #FFFFFF;
   --fondo-tarjeta: #FFFFFF;
   --fondo-barra-superior: #8D99AE;
 
+  /* Jerarquía de color tipográfica */
   --color-texto-titulo: #000000;
   --color-texto-cuerpo: #292929;
   --color-texto-atenuado: #8D99AE;
   --color-texto-blanco: #FFFFFF;
 
+  /* Estados de botones primarios */
   --boton-primario-fondo: #8D99AE;
   --boton-primario-hover: #7B899D;
   --boton-primario-texto: #000000;
 
+  /* Estados de botones neutros */
   --boton-neutro-fondo: #FFFFFF;
   --boton-neutro-hover: #CBD5E1;
   --boton-neutro-texto: #000000;
 
+  /* Alertas visuales y estados de peligro (salmón) */
   --color-alerta-salmon-fondo: #F3A0A2;
   --color-alerta-salmon-hover: #FC9898;
   --color-alerta-salmon-texto: #000000;
 
+  /* Dimensiones, radios de redondeo y sombras */
   --borde-suave: #8D99AE;
   --radio-redondeo-tarjeta: 16px;
   --radio-redondeo-boton: 16px;
   --sombra-tarjeta: 0px 4px 4px rgba(141, 153, 174, 0.25);
 }
 
+/* Reseteo base y tipografía global */
+
+/* Normalización de modelo de caja y familia tipográfica institucional */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -34,6 +46,7 @@
   letter-spacing: 0.6px;
 }
 
+/* Estructura base del lienzo de la página */
 body {
   background-color: var(--fondo-principal);
   color: var(--color-texto-cuerpo);
@@ -41,6 +54,9 @@ body {
   line-height: 1.5;
 }
 
+/* Íconos y componentes visuales compartidos */
+
+/* Ícono estándar para botones e indicadores */
 .icono-imagen {
   width: 20px;
   height: 20px;
@@ -48,6 +64,7 @@ body {
   vertical-align: middle;
 }
 
+/* Ícono de gran formato para modales informativos y de éxito */
 .icono-imagen-grande {
   width: 64px;
   height: 64px;
@@ -56,6 +73,9 @@ body {
   margin: 0 auto 16px;
 }
 
+/* Barra de navegación institucional */
+
+/* Contenedor principal de la cabecera superior persistente */
 .barra-navegacion {
   background-color: var(--fondo-barra-superior);
   color: var(--color-texto-titulo);
@@ -69,12 +89,14 @@ body {
   z-index: 10;
 }
 
+/* Logotipo e identidad institucional a la izquierda */
 .barra-navegacion-identidad {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
+/* Isotipo circular institucional */
 .barra-navegacion-identificador {
   width: 60px;
   height: 60px;
@@ -82,10 +104,12 @@ body {
   object-fit: cover;
 }
 
+/* Título de la aplicación (INVEH) */
 .barra-navegacion-titulo {
   font-size: 32px;
 }
 
+/* Área de información del usuario en sesión activa a la derecha */
 .barra-navegacion-usuario {
   display: flex;
   align-items: center;
@@ -93,6 +117,7 @@ body {
   font-size: 16px;
 }
 
+/* Botón interactivo para cerrar la sesión activa */
 .boton-cerrar-sesion {
   background: none;
   border: none;

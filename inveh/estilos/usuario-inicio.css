@@ -1,3 +1,6 @@
+/* Estilos de la pantalla principal de usuario */
+
+/* Contenedor principal con limitación de ancho y distribución en columna */
 .contenedor-usuario-inicio {
   min-height: calc(100vh - 98px);
   max-width: 1440px;
@@ -12,6 +15,9 @@
   overflow: hidden;
 }
 
+/* Tarjeta 1: Resumen y perfil del usuario */
+
+/* Tarjeta superior que contiene los datos del usuario y contador vehicular */
 .tarjeta-resumen-usuario {
   background-color: var(--fondo-tarjeta);
   border: 1px solid var(--borde-suave);
@@ -22,12 +28,14 @@
   box-sizing: border-box;
 }
 
+/* Contenedor del avatar y los datos personales */
 .bloque-perfil-informacion {
   display: flex;
   align-items: center;
   gap: 24px;
 }
 
+/* Avatar circular con las iniciales calculadas del usuario */
 .avatar-iniciales-usuario {
   width: 60px;
   height: 60px;
@@ -43,6 +51,7 @@
   flex-shrink: 0;
 }
 
+/* Columna de detalles textuales del usuario */
 .detalles-personales-usuario {
   display: flex;
   flex-direction: column;
@@ -50,18 +59,21 @@
   gap: 12px;
 }
 
+/* Cabecera del perfil: nombre y badge contador */
 .fila-superior-perfil {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+/* Nombre completo y rol del usuario */
 .nombre-rol-usuario {
   font-size: 24px;
   font-weight: 500;
   color: var(--color-texto-titulo);
 }
 
+/* Indicador tipo píldora que muestra la cantidad de vehículos autorizados frente al cupo */
 .indicador-contador-vehiculos {
   background-color: #E2E8F0;
   color: var(--color-texto-cuerpo);
@@ -72,6 +84,7 @@
   box-shadow: 0 3px 6px rgba(141, 153, 174, 0.3);
 }
 
+/* Fila inferior con identificador, correo y facultad */
 .fila-datos-institucionales {
   display: flex;
   gap: 36px;
@@ -84,12 +97,16 @@
   font-weight: 400;
 }
 
+/* Acción: Registrar o requerir vehículo adicional */
+
+/* Contenedor alineado a la derecha para el botón de registro vehicular */
 .fila-accion-vehiculo-adicional {
   display: flex;
   justify-content: flex-end;
   width: 100%;
 }
 
+/* Botón interactivo para desplegar el modal de solicitud de vehículo */
 .boton-requerir-vehiculo {
   background-color: var(--boton-primario-fondo);
   color: var(--boton-primario-texto);
@@ -109,6 +126,9 @@
   background-color: var(--boton-primario-hover);
 }
 
+/* Rejilla y tarjetas de vehículos registrados */
+
+/* Contenedor horizontal de tarjetas vehiculares del usuario */
 .rejilla-vehiculos-usuario {
   display: flex;
   gap: 36px;
@@ -116,10 +136,12 @@
   justify-content: flex-start;
 }
 
+/* Si no hay tarjetas registradas, se oculta el contenedor para preservar el espaciado vertical */
 .rejilla-vehiculos-usuario:empty {
   display: none;
 }
 
+/* Tarjeta individual de especificaciones vehiculares */
 .tarjeta-vehiculo-registrado {
   background-color: var(--fondo-tarjeta);
   border: 1px solid var(--borde-suave);
@@ -134,6 +156,7 @@
   flex-shrink: 0;
 }
 
+/* Fila superior de la tarjeta con placa y estado en instalaciones */
 .fila-cabecera-vehiculo {
   display: flex;
   gap: 36px;
@@ -142,6 +165,7 @@
   width: 100%;
 }
 
+/* Píldora destacada de la placa vehicular */
 .etiqueta-placa-vehicular {
   background-color: #546A7B;
   color: var(--color-texto-blanco);
@@ -158,6 +182,7 @@
   box-shadow: 0 2px 6px rgba(84, 106, 123, 0.35);
 }
 
+/* Píldora de estado de ubicación física (dentro o Fuera de las instalaciones) */
 .etiqueta-estado-instalaciones {
   background-color: #BDD5EA55;
   color: var(--color-texto-cuerpo);
@@ -176,6 +201,7 @@
   flex-shrink: 0;
 }
 
+/* Identificador secuencial institucional en el sistema */
 .bloque-identificador-sistema {
   text-align: center;
   font-size: 16px;
@@ -187,6 +213,7 @@
   font-weight: 500;
 }
 
+/* Columnas con datos técnicos: tipo, color, fabricante y modelo */
 .rejilla-especificaciones-vehiculo {
   display: flex;
   justify-content: space-between;
@@ -201,6 +228,9 @@
   color: var(--color-texto-cuerpo);
 }
 
+/* Botones de acción vehicular */
+
+/* Fila de botones para ver la ficha técnica o desvincular el vehículo */
 .fila-botones-accion-vehiculo {
   display: flex;
   gap: 36px;
@@ -209,6 +239,7 @@
   width: 100%;
 }
 
+/* Botón para desplegar la ficha vehicular completa */
 .boton-ficha-vehicular {
   width: 243px;
   background-color: var(--boton-primario-fondo);
@@ -232,6 +263,7 @@
   background-color: var(--boton-primario-hover);
 }
 
+/* Botón en paleta salmón para desvincular el vehículo con confirmación */
 .boton-desvincular-vehiculo {
   width: 243px;
   background-color: var(--color-alerta-salmon-fondo);
@@ -255,6 +287,9 @@
   background-color: var(--color-alerta-salmon-hover);
 }
 
+/* Tarjeta 2: Autorización de visitas */
+
+/* Tarjeta horizontal inferior para la solicitud de permisos de visitas */
 .tarjeta-autorizacion-visitas {
   background-color: var(--fondo-tarjeta);
   border: 1px solid var(--borde-suave);
@@ -281,6 +316,7 @@
   margin: 0;
 }
 
+/* Botón interactivo para abrir el formulario de solicitud de visitas */
 .boton-crear-autorizacion {
   background-color: var(--boton-primario-fondo);
   color: var(--boton-primario-texto);
@@ -303,6 +339,7 @@
   background-color: var(--boton-primario-hover);
 }
 
+/* Ícono vectorial incluido en botones */
 .icono-imagen-boton {
   width: 18px;
   height: 18px;

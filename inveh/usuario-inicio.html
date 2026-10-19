@@ -12,7 +12,7 @@
 </head>
 <body>
 
-  <!-- Cabecera institucional -->
+  <!-- Barra de navegación institucional -->
   <header class="barra-navegacion">
     <div class="barra-navegacion-identidad">
       <img src="recursos/imagenes/logotipo-uleam.png" alt="logotipo" class="barra-navegacion-identificador">
@@ -29,7 +29,7 @@
 
   <main class="contenedor-usuario-inicio">
 
-    <!-- Usuario -->
+    <!-- Tarjeta resumen: perfil e información del usuario institucional -->
     <section class="tarjeta-resumen-usuario">
       <div class="bloque-perfil-informacion">
         <div class="avatar-iniciales-usuario">-</div>
@@ -49,7 +49,7 @@
       </div>
     </section>
 
-    <!-- Botón: Registrar vehículo -->
+    <!-- Botón para requerir el registro de un vehículo adicional -->
     <div class="fila-accion-vehiculo-adicional">
       <button type="button" class="boton-requerir-vehiculo" id="boton-abrir-registro-vehiculo">
         <img src="recursos/imagenes/mas.svg" alt="+" class="icono-imagen-boton">
@@ -57,10 +57,10 @@
       </button>
     </div>
 
-    <!-- Vehículos -->
+    <!-- Rejilla contenedora de tarjetas vehiculares registradas dinámicamente -->
     <div class="rejilla-vehiculos-usuario"></div>
 
-    <!-- Autorización de visitas -->
+    <!-- Tarjeta informativa para solicitar autorización de visitas -->
     <section class="tarjeta-autorizacion-visitas">
       <div class="textos-autorizacion-visitas">
         <h3 class="titulo-seccion-visitas">Autorización de visitas</h3>
@@ -75,7 +75,7 @@
     </section>
 
 
-    <!-- Modal 1: Ficha Vehicular -->
+    <!-- Modal 1: Ficha técnica vehicular con credencial digital y código QR -->
     <div class="superposicion-modal" id="modal-ficha-vehicular" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-ficha">
         <div class="cabecera-modal">
@@ -139,7 +139,7 @@
       </div>
     </div>
 
-    <!-- Modal 2: Confirmar desvinculación -->
+    <!-- Modal 2: Confirmación de desvinculación vehicular -->
     <div class="superposicion-modal" id="modal-desvincular-vehiculo" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-mediano">
         <div class="cabecera-modal">
@@ -172,7 +172,7 @@
       </div>
     </div>
 
-    <!-- Modal 3: Desvinculación completada -->
+    <!-- Modal 3: Notificación de desvinculación completada -->
     <div class="superposicion-modal" id="modal-desvinculacion-exito" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-mediano">
         <div class="cabecera-modal">
@@ -198,7 +198,7 @@
       </div>
     </div>
 
-    <!-- Modal 4: Solicitud de registro vehicular -->
+    <!-- Modal 4: Formulario de solicitud de registro vehicular -->
     <div class="superposicion-modal" id="modal-registro-vehiculo" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-registro">
         <div class="cabecera-modal">
@@ -275,7 +275,7 @@
       </div>
     </div>
 
-    <!-- Modal 5: Solicitud registrada correctamente -->
+    <!-- Modal 5: Notificación de solicitud registrada correctamente -->
     <div class="superposicion-modal" id="modal-registro-exito" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-mediano">
         <div class="cabecera-modal">
@@ -299,7 +299,7 @@
       </div>
     </div>
 
-    <!-- Modal 6: Autorización de acceso vehicular -->
+    <!-- Modal 6: Formulario de solicitud de autorización de acceso para visitas -->
     <div class="superposicion-modal" id="modal-crear-autorizacion" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-registro">
         <div class="cabecera-modal">
@@ -313,6 +313,7 @@
           <p class="texto-banner-unico">Los datos registrados facilitarán el proceso de identificación y control de acceso vehicular dentro de las instalaciones de la institución.</p>
         </div>
         <form class="formulario-registro-vehiculo" id="form-crear-autorizacion" novalidate>
+          <!-- Sección 1: Información del visitante -->
           <div class="seccion-formulario-modal">
             <h4 class="titulo-seccion-grande">Información del visitante</h4>
             <div class="cuerpo-grid-formulario">
@@ -344,6 +345,7 @@
             </div>
           </div>
           
+          <!-- Sección 2: Información del vehículo visitante -->
           <div class="seccion-formulario-modal">
             <button type="button" class="boton-desplegar-compacto" data-objetivo="seccion-vehiculo">
               <h4 class="titulo-seccion-grande">Información del vehículo</h4>
@@ -391,6 +393,7 @@
             </div>
           </div>
 
+          <!-- Sección 3: Detalle de la visita programada -->
           <div class="seccion-formulario-modal">
             <button type="button" class="boton-desplegar-compacto" data-objetivo="seccion-visita">
               <h4 class="titulo-seccion-grande">Detalle de la visita</h4>
@@ -449,6 +452,7 @@
 
   </main>
 
+  <!-- Inclusión de scripts del sistema -->
   <script src="scripts/modal.js"></script>
   <script src="scripts/informacion.js"></script>
   <script src="scripts/validaciones.js"></script> 

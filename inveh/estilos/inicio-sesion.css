@@ -1,13 +1,17 @@
+/* Estilos de la pantalla de inicio de sesión */
+
+/* Contenedor principal centrado vertical y horizontalmente */
 .pantalla-inicio-sesion-contenedor {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: calc(100vh - 98px);
+  min-height: calc(100vh - 98px); /* Descuenta la altura de la barra superior */
   padding: 16px;
   background-color: var(--fondo-principal);
   overflow: hidden;
 }
 
+/* Título superior de la sección de autenticación */
 .titulo-accion-inicio-sesion {
   font-size: 24px;
   font-weight: 500;
@@ -16,6 +20,9 @@
   margin-bottom: 24px;
 }
 
+/* Tarjeta y cuerpo del formulario */
+
+/* Tarjeta contenedora con dimensiones fijas y bordes redondeados */
 .tarjeta-formulario-inicio-sesion {
   background-color: var(--fondo-tarjeta);
   border-radius: var(--radio-redondeo-tarjeta);
@@ -29,6 +36,7 @@
   box-sizing: border-box;
 }
 
+/* Subtítulo o texto instructivo para el usuario */
 .indicacion-texto-inicio-sesion {
   font-size: 15px;
   color: var(--color-texto-atenuado);
@@ -36,13 +44,16 @@
   margin-bottom: 40px;
 }
 
+/* Distribución flex del formulario interno */
 .cuerpo-formulario-inicio-sesion {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
+/* Campos de entrada con ícono y mensajes de error */
 
+/* Agrupador relativo para posicionamiento de etiquetas, íconos y alertas */
 .bloque-campo-inicio-sesion {
   position: relative;
   display: flex;
@@ -50,24 +61,28 @@
   margin-bottom: 30px;
 }
 
+/* Etiqueta superior del campo */
 .etiqueta-formulario-inicio-sesion {
   font-size: 16px;
   color: var(--color-texto-cuerpo);
   margin-bottom: 8px;
 }
 
+/* Contenedor relativo para alojar el input y los íconos internos */
 .caja-entrada-con-icono {
   position: relative;
   display: flex;
   align-items: center;
 }
 
+/* Ícono lateral izquierdo del campo */
 .icono-entrada-izquierda {
   position: absolute;
   left: 14px;
   pointer-events: none;
 }
 
+/* Campo de texto con sangría izquierda reservada para el ícono */
 .campo-texto-inicio-sesion {
   width: 100%;
   height: 50px;
@@ -93,11 +108,13 @@
   opacity: 1;
 }
 
+/* Resaltado de foco con halo suave */
 .campo-texto-inicio-sesion:focus {
   border-color: var(--fondo-barra-superior);
   box-shadow: 0 0 0 2px rgba(141, 153, 174, 0.2);
 }
 
+/* Botón interactivo para alternar la visibilidad de la contraseña */
 .boton-mostrar-clave {
   position: absolute;
   left: 14px;
@@ -111,6 +128,7 @@
   z-index: 2;
 }
 
+/* Mensaje de validación posicionado de forma absoluta debajo del campo */
 .texto-alerta-error {
   position: absolute;
   bottom: -25px;
@@ -127,7 +145,9 @@
   white-space: nowrap;
 }
 
+/* Botón principal de acceso */
 
+/* Botón de envío alineado al final mediante margin-top: auto */
 .boton-acceder {
   width: 100%;
   height: 50px;
@@ -147,6 +167,9 @@
   background-color: var(--boton-primario-hover);
 }
 
+/* Botones flotantes de gestión de base de datos */
+
+/* Contenedor flotante en la esquina inferior derecha */
 .contenedor-acciones-bd {
   position: fixed;
   bottom: 36px;
@@ -157,6 +180,7 @@
   flex-wrap: wrap;
 }
 
+/* Botones para exportar e importar archivo JSON de respaldo */
 .boton-gestion-bd {
   min-width: 170px;
   padding: 8px 18px;

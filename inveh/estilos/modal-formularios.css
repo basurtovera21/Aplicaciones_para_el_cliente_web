@@ -1,3 +1,6 @@
+/* Estilos de formularios dentro de modales (Registro y visitas) */
+
+/* Banner superior con información sobre el estado de autorización */
 .banner-informativo-registro {
     display: flex;
     align-items: center;
@@ -10,11 +13,26 @@
     box-shadow: var(--sombra-tarjeta);
 }
 
-.icono-banner-grande { width: 100px; height: 100px; flex-shrink: 0; }
-.texto-banner-unico { font-size: 16px; line-height: 1.6; color: var(--color-texto-cuerpo); margin: 0; }
-.texto-banner-unico strong { color: var(--color-texto-titulo); }
+.icono-banner-grande { 
+    width: 100px; 
+    height: 100px; 
+    flex-shrink: 0; 
+}
 
+.texto-banner-unico { 
+    font-size: 16px; 
+    line-height: 1.6; 
+    color: var(--color-texto-cuerpo); 
+    margin: 0; 
+}
 
+.texto-banner-unico strong { 
+    color: var(--color-texto-titulo); 
+}
+
+/* Rejilla de distribución del formulario */
+
+/* Disposición en dos columnas */
 .cuerpo-grid-formulario {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -22,6 +40,7 @@
     margin-bottom: 12px;
 }
 
+/* Contenedor relativo de cada campo de formulario */
 .bloque-campo-formulario {
     position: relative;
     display: flex;
@@ -29,9 +48,20 @@
     margin-bottom: 30px;
 }
 
-.campo-ancho-completo { grid-column: span 2; }
-.etiqueta-formulario { font-size: 16px; color: var(--color-texto-cuerpo); margin-bottom: 8px; }
+/* Modificador para campos que ocupan las dos columnas (ancho completo) */
+.campo-ancho-completo { 
+    grid-column: span 2; 
+}
 
+.etiqueta-formulario { 
+    font-size: 16px; 
+    color: var(--color-texto-cuerpo); 
+    margin-bottom: 8px; 
+}
+
+/* Campos de entrada, áreas de texto y selects */
+
+/* Campos de entrada y transición suave */
 .campo-texto-modal, 
 .campo-area-texto-modal {
     width: 100%;
@@ -70,36 +100,112 @@ input[type="time"] {
     position: relative;
 }
 
-select.campo-texto-modal { appearance: none; background-image: url("../recursos/imagenes/select.svg"); padding-right: 48px; }
-input[type="date"].campo-texto-modal { background-image: url("../recursos/imagenes/calendario.svg"); position: relative; }
-input[type="time"].campo-texto-modal { background-image: url("../recursos/imagenes/reloj.svg"); position: relative; }
+/* Íconos vectoriales de apoyo embebidos en el fondo de los campos */
+select.campo-texto-modal { 
+    appearance: none; 
+    background-image: url("../recursos/imagenes/select.svg"); 
+    padding-right: 48px; 
+}
 
-/* OCULTAR ICONOS NATIVOS PERO HACER TODO EL CAMPO CLICKABLE */
+input[type="date"].campo-texto-modal { 
+    background-image: url("../recursos/imagenes/calendario.svg"); 
+    position: relative; 
+}
+
+input[type="time"].campo-texto-modal { 
+    background-image: url("../recursos/imagenes/reloj.svg"); 
+    position: relative; 
+}
+
+/* Selector nativo transparente sobre todo el campo para permitir clic en cualquier punto */
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
     position: absolute; 
     right: 0; 
     top: 0;
-    width: 100%; /* Cambiado al 100% para que todo el campo abra el calendario */
+    width: 100%; /* Ocupa el 100% para que el clic abra el picker */
     height: 100%; 
     cursor: pointer; 
     opacity: 0;
 }
 
-.campo-area-texto-modal { height: 120px; padding: 16px; resize: none; }
-.texto-alerta-error { position: absolute; bottom: -22px; left: 0; font-size: 16px; letter-spacing: 0.6px; color: var(--color-alerta-salmon-fondo); display: none; white-space: nowrap; }
-
-.contenedor-acciones-extremos { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 12px; }
-
-
-.boton-desplegar-compacto {
-    display: inline-flex; align-items: center; gap: 12px; padding: 0; background: none; border: none; cursor: pointer; font-family: inherit; margin-bottom: 24px;
+/* Área de texto para observaciones */
+.campo-area-texto-modal { 
+    height: 120px; 
+    padding: 16px; 
+    resize: none; 
 }
 
-.icono-flecha-pequena { width: 18px; height: 18px; opacity: 0.8; object-fit: contain; }
-.boton-desplegar-compacto.activo .icono-flecha-pequena { transform: rotate(180deg); }
-.titulo-seccion-grande { font-size: 18px; font-weight: 500; color: var(--color-texto-titulo); margin: 0; }
-.seccion-formulario-modal { margin-bottom: 36px; }
-.seccion-formulario-modal > .titulo-seccion-grande { margin-bottom: 24px; display: block; }
-.contenido-desplegable { display: none; }
-.contenido-desplegable.visible { display: block; }
+/* Mensaje flotante de validación debajo del campo */
+.texto-alerta-error { 
+    position: absolute; 
+    bottom: -22px; 
+    left: 0; 
+    font-size: 16px; 
+    letter-spacing: 0.6px; 
+    color: var(--color-alerta-salmon-fondo); 
+    display: none; 
+    white-space: nowrap; 
+}
+
+/* Botonera de acciones extremas (Registrar a la izquierda, Cancelar a la derecha) */
+.contenedor-acciones-extremos { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    width: 100%; 
+    margin-top: 12px; 
+}
+
+/* Secciones desplegables (Acordeón compacto) */
+
+/* Botón de cabecera de acordeón para alternar visibilidad */
+.boton-desplegar-compacto {
+    display: inline-flex; 
+    align-items: center; 
+    gap: 12px; 
+    padding: 0; 
+    background: none; 
+    border: none; 
+    cursor: pointer; 
+    font-family: inherit; 
+    margin-bottom: 24px;
+    transition: opacity 0.2s ease;
+}
+
+.boton-desplegar-compacto:hover {
+    opacity: 0.8;
+}
+
+.icono-flecha-pequena { 
+    width: 18px; 
+    height: 18px; 
+    opacity: 0.8; 
+    object-fit: contain; 
+    transition: opacity 0.2s ease;
+}
+
+.titulo-seccion-grande { 
+    font-size: 18px; 
+    font-weight: 500; 
+    color: var(--color-texto-titulo); 
+    margin: 0; 
+}
+
+.seccion-formulario-modal { 
+    margin-bottom: 36px; 
+}
+
+.seccion-formulario-modal > .titulo-seccion-grande { 
+    margin-bottom: 24px; 
+    display: block; 
+}
+
+/* Contenido colapsable */
+.contenido-desplegable { 
+    display: none; 
+}
+
+.contenido-desplegable.visible { 
+    display: block; 
+}

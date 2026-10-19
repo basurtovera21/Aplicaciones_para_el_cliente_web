@@ -1,8 +1,11 @@
+/* Estilos base para ventanas modales */
+
+/* Capa de fondo oscurecida con efecto translúcido que cubre todo el viewport */
 .superposicion-modal {
     position: fixed;
     inset: 0;
     background-color: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px); /* Difuminado de fondo para realzar el modal */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -13,12 +16,15 @@
     padding: 20px;
 }
 
+/* Estado activo para hacer visible la superposición modal */
 .superposicion-modal.activo {
     opacity: 1;
     visibility: visible;
 }
 
+/* Contenedor del diálogo modal */
 
+/* Caja blanca central con bordes redondeados y sombra de elevación */
 .contenedor-modal {
     background-color: #FFFFFF;
     border-radius: 16px;
@@ -32,13 +38,14 @@
     box-sizing: border-box;
 }
 
+/* Variantes de ancho del modal */
 
-.modal-ancho-ficha { width: 1050px; }
-.modal-ancho-registro { width: 840px; }
-.modal-ancho-mediano { width: 600px; }
-.modal-ancho-pequeno { width: 450px; }
+.modal-ancho-ficha { width: 1050px; }      /* Ficha técnica vehicular completa */
+.modal-ancho-registro { width: 840px; }    /* Formularios de registro y solicitudes */
+.modal-ancho-mediano { width: 600px; }     /* Diálogos de confirmación o información */
+.modal-ancho-pequeno { width: 450px; }     /* Modales compactos de éxito o alerta */
 
-
+/* Barra de desplazamiento vertical del contenedor modal */
 .contenedor-modal::-webkit-scrollbar { width: 8px; }
 .contenedor-modal::-webkit-scrollbar-track { background: transparent; margin: 16px; }
 .contenedor-modal::-webkit-scrollbar-thumb {
@@ -47,16 +54,16 @@
     border: 2px solid #FFFFFF;
 }
 
+/* Cabecera y título del modal */
 
+/* Cabecera centrada con margen superior para el botón de cierre */
 .cabecera-modal {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 36px; 
     position: relative;
-    /* Baja el título 36px por debajo de la línea del botón cerrar */
-    padding-top: 36px;
-    /* Margen lateral de seguridad de 36px para evitar que textos largos toquen los bordes */
+    padding-top: 36px; /* Desplaza el título por debajo del botón cerrar */
     padding-left: 36px;
     padding-right: 36px;
     box-sizing: border-box;
@@ -70,7 +77,7 @@
     text-align: center;
 }
 
-/* El botón permanece fijado en la esquina superior derecha */
+/* Botón de cierre (X) fijado en la esquina superior derecha */
 .boton-cerrar-modal {
     position: absolute;
     top: 0;
@@ -89,57 +96,44 @@
     height: 18px; 
 }
 
+/* Botones de acción dentro de modales */
 
+/* Botón estandarizado de acción modal */
 .boton-accion-modal {
     width: 243px; 
     padding: 8px 14px; 
-    
-  
     border: none;
     border-radius: var(--radio-redondeo-boton);
-    
-
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    
-
     font-family: inherit;
     font-size: 14px;
     font-weight: 500;
-    
-
     cursor: pointer;
     transition: background-color 0.2s, filter 0.2s;
     box-sizing: border-box;
 }
 
-
-.boton-cerrar-modal {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 8px; 
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
+/* Variante de fondo neutro o primario */
 .fondo-neutro {
     background-color: var(--boton-primario-fondo);
     color: var(--boton-primario-texto);
 }
 
+/* Variante de fondo secundario para botones de cancelar o cerrar */
 .fondo-cancelar {
     background-color: #F1F5F9;
     color: var(--color-texto-cuerpo);
 }
 
-.fondo-cancelar:hover { background-color: #E2E8F0; filter: brightness(0.95); }
+.fondo-cancelar:hover { 
+    background-color: #E2E8F0; 
+    filter: brightness(0.95); 
+}
 
-.icono-boton-modal { width: 18px; height: 18px; }
+.icono-boton-modal { 
+    width: 18px; 
+    height: 18px; 
+}

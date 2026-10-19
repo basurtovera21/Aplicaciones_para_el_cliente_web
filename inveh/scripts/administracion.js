@@ -1,783 +1,847 @@
-let vehiculoActualEnFicha = null;
-let vehiculoParaDesvincularAdmin = null;
+// Variables globales para la gestión de estados en modales administrativos.
+let identificadorVehiculoActualEnFicha = null;
+let identificadorVehiculoParaDesvincular = null;
 let placaVehiculoEnRevision = null;
-let idAutorizacionEnRevision = null;
+let identificadorAutorizacionEnRevision = null;
 
-// Funciones seguras para lectura y escritura de la base de datos
-function obtenerDB() {
-    const datos = typeof obtenerBaseDatos === 'function' 
-        ? obtenerBaseDatos() 
-        : JSON.parse(localStorage.getItem('base_de_datos') || localStorage.getItem('inveh_db'));
-    return datos || { usuarios: [], vehiculos: [], autorizaciones_visitas: [], historial_movimientos: [] };
-}
-
-function guardarDB(datosActualizados) {
-    if (typeof guardarCambios === 'function') {
-        guardarCambios(datosActualizados);
-    } else {
-        localStorage.setItem('base_de_datos', JSON.stringify(datosActualizados));
-        localStorage.setItem('inveh_db', JSON.stringify(datosActualizados));
-    }
-}
-
-// Formato de fecha DD/MM/YYYY y hora HH:MM
-function obtenerFechaHoraActual() {
-    const ahora = new Date();
-    const dia = String(ahora.getDate()).padStart(2, '0');
-    const mes = String(ahora.getMonth() + 1).padStart(2, '0');
-    const anio = ahora.getFullYear();
-    const horas = String(ahora.getHours()).padStart(2, '0');
-    const minutos = String(ahora.getMinutes()).padStart(2, '0');
-    return {
-        fecha: `${dia}/${mes}/${anio}`,
-        textoCompleto: `${dia}/${mes}/${anio} a las ${horas}:${minutos}.`
-    };
-}
-
-// Generador de identificador consecutivo formal (VEH-000001, VEH-000002...)
-function generarSiguienteIdentificador(listaVehiculos) {
-    let maxNum = 0; // Inicia en 0 para que el primer vehículo sea VEH-000001
-    if (Array.isArray(listaVehiculos)) {
-        listaVehiculos.forEach(v => {
-            if (v.identificador_sistema && v.identificador_sistema.startsWith('VEH-')) {
-                const num = parseInt(v.identificador_sistema.replace('VEH-', ''), 10);
-                if (!isNaN(num) && num > maxNum) maxNum = num;
-            }
-        });
-    }
-    return `VEH-${String(maxNum + 1).padStart(6, '0')}`;
-}
-
-function esFechaDeHoy(fechaStr) {
-    if (!fechaStr) return false;
-    const ahora = new Date();
-    const hoyAnio = ahora.getFullYear();
-    const hoyMes = ahora.getMonth() + 1;
-    const hoyDia = ahora.getDate();
-
-    const str = String(fechaStr).trim();
-
-    if (/^\d{4}-\d{1,2}-\d{1,2}/.test(str)) {
-        const partes = str.split('T')[0].split('-');
-        const anio = parseInt(partes[0], 10);
-        const mes = parseInt(partes[1], 10);
-        const dia = parseInt(partes[2], 10);
-        return anio === hoyAnio && mes === hoyMes && dia === hoyDia;
-    }
-
-    if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(str)) {
-        const partes = str.split('/');
-        const dia = parseInt(partes[0], 10);
-        const mes = parseInt(partes[1], 10);
-        const anio = parseInt(partes[2], 10);
-        return anio === hoyAnio && mes === hoyMes && dia === hoyDia;
-    }
-
-    const d = new Date(str);
-    if (!isNaN(d.getTime())) {
-        return d.getFullYear() === hoyAnio && (d.getMonth() + 1) === hoyMes && d.getDate() === hoyDia;
-    }
-
-    return false;
-}
-
+// document.addEventListener: Registra la inicialización general de la consola administrativa al cargarse el DOM.
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. VERIFICAR SESIÓN DE ADMINISTRADOR
-    const sesion = JSON.parse(localStorage.getItem('sesion_activa'));
-    if (!sesion || sesion.rol_sistema !== 'admin') {
+    // 1. Verificación de privilegios de usuario administrador.
+    const sesionActiva = JSON.parse(localStorage.getItem('sesion_activa'));
+    if (!sesionActiva || sesionActiva.rol_sistema !== 'admin') {
         window.location.href = 'inicio-sesion.html';
         return;
     }
 
-    // 2. CERRAR SESIÓN
-    document.getElementById('boton-cerrar-sesion')?.addEventListener('click', () => {
-        localStorage.removeItem('sesion_activa');
-        window.location.href = 'inicio-sesion.html';
-    });
-
-    // 3. CALCULAR Y PINTAR MÉTRICAS EN VIVO
-    function actualizarMetricas() {
-        const db = obtenerDB();
-        const vehiculos = db.vehiculos || [];
-        const autorizaciones = db.autorizaciones_visitas || [];
-
-        // Conteo 1: Vehículos autorizados
-        const totalAutorizados = vehiculos.filter(v => v.estado_autorizacion === "Autorizado").length;
-        const elem1 = document.getElementById('metrica-vehiculos-autorizados');
-        if (elem1) elem1.textContent = totalAutorizados;
-
-        // Conteo 2: Vehículos dentro de las instalaciones
-        const totalEnInstalaciones = vehiculos.filter(v => 
-            v.estado_autorizacion === "Autorizado" && v.ubicacion_actual === "Dentro de las instalaciones"
-        ).length;
-        const elem2 = document.getElementById('metrica-vehiculos-instalaciones');
-        if (elem2) elem2.textContent = totalEnInstalaciones;
-
-        // Conteo 3: Solicitudes pendientes totales
-        const vehiculosPendientes = vehiculos.filter(v => v.estado_autorizacion === "Pendiente").length;
-        const visitasPendientes = autorizaciones.filter(a => a.estado_solicitud === "Pendiente").length;
-        const elem3 = document.getElementById('metrica-solicitudes-pendientes');
-        if (elem3) elem3.textContent = vehiculosPendientes + visitasPendientes;
-
-        // Conteo 4: Visitas autorizadas para hoy
-        const visitasHoy = autorizaciones.filter(a => 
-            a.estado_solicitud === "Autorizado" && a.visita && esFechaDeHoy(a.visita.fecha_programada)
-        ).length;
-        const elem4 = document.getElementById('metrica-visitas-hoy');
-        if (elem4) elem4.textContent = visitasHoy;
+    // 2. Registro del botón de cierre de sesión institucional.
+    const botonCerrarSesion = document.getElementById('boton-cerrar-sesion');
+    if (botonCerrarSesion) {
+        botonCerrarSesion.addEventListener('click', function() {
+            localStorage.removeItem('sesion_activa');
+            window.location.href = 'inicio-sesion.html';
+        });
     }
 
-    // 4. RENDERIZAR TABLA DE SOLICITUDES PENDIENTES (TARJETA 2)
+    // 3. Cálculo y actualización de indicadores numéricos en las tarjetas superiores.
+    function actualizarMetricas() {
+        const baseDeDatos = obtenerBaseDatos();
+        const coleccionVehiculos = baseDeDatos.vehiculos || [];
+        const coleccionAutorizaciones = baseDeDatos.autorizaciones_visitas || [];
+
+        // Métrica 1: Cantidad total de vehículos autorizados en el sistema.
+        const totalAutorizados = coleccionVehiculos.filter(function(vehiculo) {
+            return vehiculo.estado_autorizacion === "Autorizado";
+        }).length;
+        const etiquetaMetricaAutorizados = document.getElementById('metrica-vehiculos-autorizados');
+        if (etiquetaMetricaAutorizados) {
+            etiquetaMetricaAutorizados.textContent = totalAutorizados;
+        }
+
+        // Métrica 2: Cantidad de vehículos que se encuentran físicamente dentro del campus.
+        const totalEnInstalaciones = coleccionVehiculos.filter(function(vehiculo) {
+            return vehiculo.estado_autorizacion === "Autorizado" && vehiculo.ubicacion_actual === "Dentro de las instalaciones";
+        }).length;
+        const etiquetaMetricaEnInstalaciones = document.getElementById('metrica-vehiculos-instalaciones');
+        if (etiquetaMetricaEnInstalaciones) {
+            etiquetaMetricaEnInstalaciones.textContent = totalEnInstalaciones;
+        }
+
+        // Métrica 3: Total consolidado de solicitudes pendientes de revisión.
+        const vehiculosPendientes = coleccionVehiculos.filter(function(vehiculo) {
+            return vehiculo.estado_autorizacion === "Pendiente";
+        }).length;
+        const visitasPendientes = coleccionAutorizaciones.filter(function(autorizacion) {
+            return autorizacion.estado_solicitud === "Pendiente";
+        }).length;
+        const etiquetaMetricaPendientes = document.getElementById('metrica-solicitudes-pendientes');
+        if (etiquetaMetricaPendientes) {
+            etiquetaMetricaPendientes.textContent = vehiculosPendientes + visitasPendientes;
+        }
+
+        // Métrica 4: Cantidad de visitas autorizadas programadas para el día de hoy reutilizando esFechaActualHoy de scripts/informacion.js.
+        const visitasHoy = coleccionAutorizaciones.filter(function(autorizacion) {
+            return autorizacion.estado_solicitud === "Autorizado" && 
+                   autorizacion.visita && 
+                   esFechaActualHoy(autorizacion.visita.fecha_programada);
+        }).length;
+        const etiquetaMetricaVisitasHoy = document.getElementById('metrica-visitas-hoy');
+        if (etiquetaMetricaVisitasHoy) {
+            etiquetaMetricaVisitasHoy.textContent = visitasHoy;
+        }
+    }
+
+    // 4. Renderización de la tabla de solicitudes pendientes de aprobación o rechazo.
     function renderizarSolicitudesPendientes() {
-        const contenedor = document.getElementById('cuerpo-tabla-pendientes');
-        if (!contenedor) return;
-
-        const db = obtenerDB();
-        const vehiculosPendientes = (db.vehiculos || []).filter(v => v.estado_autorizacion === "Pendiente");
-        const visitasPendientes = (db.autorizaciones_visitas || []).filter(a => a.estado_solicitud === "Pendiente");
-
-        contenedor.innerHTML = '';
-
-        if (vehiculosPendientes.length === 0 && visitasPendientes.length === 0) {
-            contenedor.innerHTML = `<tr><td colspan="5" class="mensaje-tabla-vacia">No existen registros de solicitudes pendientes para revisión</td></tr>`;
+        const cuerpoTablaPendientes = document.getElementById('cuerpo-tabla-pendientes');
+        if (!cuerpoTablaPendientes) {
             return;
         }
 
-        // Solicitudes de Registro Vehicular
-        vehiculosPendientes.forEach(solicitud => {
-            const propietario = (db.usuarios || []).find(u => u.numero_identificacion === solicitud.propietario_id);
-            const nombre = propietario ? `${propietario.nombres_apellidos} (${propietario.tipo_usuario})` : "Usuario institucional";
+        const baseDeDatos = obtenerBaseDatos();
+        const vehiculosPendientes = (baseDeDatos.vehiculos || []).filter(function(vehiculo) {
+            return vehiculo.estado_autorizacion === "Pendiente";
+        });
+        const visitasPendientes = (baseDeDatos.autorizaciones_visitas || []).filter(function(autorizacion) {
+            return autorizacion.estado_solicitud === "Pendiente";
+        });
 
-            const fila = `
+        cuerpoTablaPendientes.innerHTML = '';
+
+        if (vehiculosPendientes.length === 0 && visitasPendientes.length === 0) {
+            cuerpoTablaPendientes.innerHTML = `<tr><td colspan="5" class="mensaje-tabla-vacia">No existen registros de solicitudes pendientes para revisión</td></tr>`;
+            return;
+        }
+
+        // Renderiza solicitudes de vehículos propios de estudiantes o docentes.
+        vehiculosPendientes.forEach(function(solicitudVehiculo) {
+            const usuarioPropietario = (baseDeDatos.usuarios || []).find(function(usuario) {
+                return usuario.numero_identificacion === solicitudVehiculo.propietario_id;
+            });
+            const nombrePropietario = usuarioPropietario 
+                ? `${usuarioPropietario.nombres_apellidos} (${usuarioPropietario.tipo_usuario})` 
+                : "Usuario institucional";
+
+            const codigoHtmlFila = `
                 <tr>
-                    <td>${solicitud.fecha_registro}</td>
-                    <td>${nombre}</td>
-                    <td><strong>${solicitud.placa_vehicular}</strong></td>
-                    <td>${solicitud.tipo_vehiculo}</td>
+                    <td>${solicitudVehiculo.fecha_registro}</td>
+                    <td>${nombrePropietario}</td>
+                    <td><strong>${solicitudVehiculo.placa_vehicular}</strong></td>
+                    <td>${solicitudVehiculo.tipo_vehiculo}</td>
                     <td class="columna-centrada">
-                        <button type="button" class="boton-tabla-icono" title="Revisar solicitud vehicular" onclick="abrirRevisionRegistro('${solicitud.identificador_sistema || solicitud.placa_vehicular}')">
+                        <button type="button" class="boton-tabla-icono" title="Revisar solicitud vehicular" onclick="abrirRevisionRegistro('${solicitudVehiculo.identificador_sistema || solicitudVehiculo.placa_vehicular}')">
                             <img src="recursos/imagenes/crear-autorizacion.svg" alt="Revisar">
                         </button>
                     </td>
                 </tr>`;
-            contenedor.insertAdjacentHTML('beforeend', fila);
+            cuerpoTablaPendientes.insertAdjacentHTML('beforeend', codigoHtmlFila);
         });
 
-        // Solicitudes de Visitas
-        visitasPendientes.forEach(solicitud => {
-            const solicitante = (db.usuarios || []).find(u => u.numero_identificacion === solicitud.solicitante_id);
-            const tipoUsuario = (solicitante && solicitante.tipo_usuario) ? ` (${solicitante.tipo_usuario})` : "";
-            const nombreSolicitante = solicitante 
-                ? `${solicitante.nombres_apellidos}${tipoUsuario} <strong>(Visita)</strong>` 
+        // Renderiza solicitudes de permisos para visitantes externos.
+        visitasPendientes.forEach(function(solicitudVisita) {
+            const usuarioSolicitante = (baseDeDatos.usuarios || []).find(function(usuario) {
+                return usuario.numero_identificacion === solicitudVisita.solicitante_id;
+            });
+            const etiquetaTipoUsuario = (usuarioSolicitante && usuarioSolicitante.tipo_usuario) ? ` (${usuarioSolicitante.tipo_usuario})` : "";
+            const nombreSolicitante = usuarioSolicitante 
+                ? `${usuarioSolicitante.nombres_apellidos}${etiquetaTipoUsuario} <strong>(Visita)</strong>` 
                 : `Solicitante institucional <strong>(Visita)</strong>`;
 
-            const valorPlaca = (solicitud.vehiculo && solicitud.vehiculo.placa_vehicular) ? solicitud.vehiculo.placa_vehicular : "S/P";
-            const tipoVehiculo = (solicitud.vehiculo && solicitud.vehiculo.tipo_vehiculo) ? solicitud.vehiculo.tipo_vehiculo : "Peatonal / Otro";
+            const valorPlaca = (solicitudVisita.vehiculo && solicitudVisita.vehiculo.placa_vehicular) ? solicitudVisita.vehiculo.placa_vehicular : "S/P";
+            const tipoVehiculo = (solicitudVisita.vehiculo && solicitudVisita.vehiculo.tipo_vehiculo) ? solicitudVisita.vehiculo.tipo_vehiculo : "Peatonal / Otro";
 
-            const fila = `
+            const codigoHtmlFila = `
                 <tr>
-                    <td>${solicitud.fecha_registro}</td>
+                    <td>${solicitudVisita.fecha_registro}</td>
                     <td>${nombreSolicitante}</td>
                     <td><strong>${valorPlaca}</strong></td>
                     <td>${tipoVehiculo}</td>
                     <td class="columna-centrada">
-                        <button type="button" class="boton-tabla-icono" title="Revisar autorización de visita" onclick="abrirRevisionAutorizacion('${solicitud.identificador_solicitud}')">
+                        <button type="button" class="boton-tabla-icono" title="Revisar autorización de visita" onclick="abrirRevisionAutorizacion('${solicitudVisita.identificador_solicitud}')">
                             <img src="recursos/imagenes/crear-autorizacion.svg" alt="Revisar">
                         </button>
                     </td>
                 </tr>`;
-            contenedor.insertAdjacentHTML('beforeend', fila);
+            cuerpoTablaPendientes.insertAdjacentHTML('beforeend', codigoHtmlFila);
         });
     }
 
-    // 5. RENDERIZAR REGISTRO VEHICULAR CON FILTROS (TARJETA 3: EXCLUSIVAMENTE VEHÍCULOS DE USUARIOS)
+    // 5. Renderización del registro vehicular institucional aplicando los criterios de filtrado seleccionados.
     function renderizarRegistroVehicular(filtroTexto = '', filtroUsuario = '', filtroVehiculo = '') {
-        const contenedor = document.getElementById('cuerpo-tabla-registro-institucional');
-        if (!contenedor) return;
+        const cuerpoTablaRegistroInstitucional = document.getElementById('cuerpo-tabla-registro-institucional');
+        if (!cuerpoTablaRegistroInstitucional) {
+            return;
+        }
 
-        const db = obtenerDB();
-        // Solo vehículos autorizados de los usuarios institucionales (no visitas ni temporales)
-        const vehiculosAutorizados = (db.vehiculos || []).filter(v => v.estado_autorizacion === "Autorizado");
+        const baseDeDatos = obtenerBaseDatos();
+        // Discrimina exclusivamente los vehículos activos y autorizados de miembros de la institución.
+        const vehiculosAutorizados = (baseDeDatos.vehiculos || []).filter(function(vehiculo) {
+            return vehiculo.estado_autorizacion === "Autorizado";
+        });
 
-        contenedor.innerHTML = '';
+        cuerpoTablaRegistroInstitucional.innerHTML = '';
 
-        const normalizar = (txt) => (txt || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
-        const filtroNorm = normalizar(filtroTexto);
+        if (vehiculosAutorizados.length === 0) {
+            cuerpoTablaRegistroInstitucional.innerHTML = `<tr><td colspan="5" class="mensaje-tabla-vacia">No existen vehículos registrados en el sistema</td></tr>`;
+            return;
+        }
 
-        const resultados = vehiculosAutorizados.filter(v => {
-            const propietario = (db.usuarios || []).find(u => u.numero_identificacion === v.propietario_id);
-            const nombrePropietario = propietario ? propietario.nombres_apellidos : '';
-            const tipoUsuario = propietario ? propietario.tipo_usuario : '';
+        const filtroTextoNormalizado = normalizarTextoAlfanumerico(filtroTexto);
 
-            const idTexto = (v.identificador_sistema || '').toLowerCase();
-            const idNorm = normalizar(v.identificador_sistema);
-            const placaTexto = (v.placa_vehicular || '').toLowerCase();
-            const placaNorm = normalizar(v.placa_vehicular);
+        // Array.prototype.filter: Discrimina vehículos por coincidencia textual, rol de usuario o tipo vehicular.
+        const vehiculosFiltrados = vehiculosAutorizados.filter(function(vehiculo) {
+            const usuarioPropietario = (baseDeDatos.usuarios || []).find(function(usuario) {
+                return usuario.numero_identificacion === vehiculo.propietario_id;
+            });
+            const nombrePropietario = usuarioPropietario ? usuarioPropietario.nombres_apellidos : '';
+            const tipoUsuario = usuarioPropietario ? usuarioPropietario.tipo_usuario : '';
+
+            const identificadorTexto = (vehiculo.identificador_sistema || '').toLowerCase();
+            const identificadorNormalizado = normalizarTextoAlfanumerico(vehiculo.identificador_sistema);
+            const placaTexto = (vehiculo.placa_vehicular || '').toLowerCase();
+            const placaNormalizada = normalizarTextoAlfanumerico(vehiculo.placa_vehicular);
             const nombreTexto = nombrePropietario.toLowerCase();
-            const nombreNorm = normalizar(nombrePropietario);
+            const nombreNormalizado = normalizarTextoAlfanumerico(nombrePropietario);
 
             const coincideTexto = !filtroTexto || 
-                idTexto.includes(filtroTexto) ||
-                idNorm.includes(filtroNorm) ||
-                placaTexto.includes(filtroTexto) ||
-                placaNorm.includes(filtroNorm) ||
-                nombreTexto.includes(filtroTexto) ||
-                nombreNorm.includes(filtroNorm);
+                identificadorTexto.includes(filtroTexto.toLowerCase()) ||
+                identificadorNormalizado.includes(filtroTextoNormalizado) ||
+                placaTexto.includes(filtroTexto.toLowerCase()) ||
+                placaNormalizada.includes(filtroTextoNormalizado) ||
+                nombreTexto.includes(filtroTexto.toLowerCase()) ||
+                nombreNormalizado.includes(filtroTextoNormalizado);
 
             const coincideUsuario = !filtroUsuario || tipoUsuario === filtroUsuario;
-            const coincideVehiculo = !filtroVehiculo || v.tipo_vehiculo === filtroVehiculo;
+            const coincideVehiculo = !filtroVehiculo || vehiculo.tipo_vehiculo === filtroVehiculo;
 
             return coincideTexto && coincideUsuario && coincideVehiculo;
         });
 
-        if (resultados.length === 0) {
-            contenedor.innerHTML = `<tr><td colspan="5" class="mensaje-tabla-vacia">No se encontraron registros de vehículos con los criterios seleccionados</td></tr>`;
+        if (vehiculosFiltrados.length === 0) {
+            cuerpoTablaRegistroInstitucional.innerHTML = `<tr><td colspan="5" class="mensaje-tabla-vacia">No se encontraron registros de vehículos con los criterios seleccionados</td></tr>`;
             return;
         }
 
-        resultados.forEach(v => {
-            const propietario = (db.usuarios || []).find(u => u.numero_identificacion === v.propietario_id);
-            const nombreCompleto = propietario 
-                ? `${propietario.nombres_apellidos} (${propietario.tipo_usuario})` 
+        vehiculosFiltrados.forEach(function(vehiculo) {
+            const usuarioPropietario = (baseDeDatos.usuarios || []).find(function(usuario) {
+                return usuario.numero_identificacion === vehiculo.propietario_id;
+            });
+            const nombreCompleto = usuarioPropietario 
+                ? `${usuarioPropietario.nombres_apellidos} (${usuarioPropietario.tipo_usuario})` 
                 : "Sin propietario asignado";
 
-            const fila = `
+            const codigoHtmlFila = `
                 <tr>
-                    <td><span class="dato-valor">${v.identificador_sistema}</span></td>
+                    <td><span class="dato-valor">${vehiculo.identificador_sistema}</span></td>
                     <td>${nombreCompleto}</td>
-                    <td><strong>${v.placa_vehicular}</strong></td>
-                    <td>${v.tipo_vehiculo}</td>
+                    <td><strong>${vehiculo.placa_vehicular}</strong></td>
+                    <td>${vehiculo.tipo_vehiculo}</td>
                     <td class="columna-centrada">
-                        <button type="button" class="boton-tabla-icono" title="Ver ficha técnica" onclick="abrirFichaVehiculoAdmin('${v.identificador_sistema}')">
+                        <button type="button" class="boton-tabla-icono" title="Ver ficha técnica" onclick="abrirFichaVehiculoAdmin('${vehiculo.identificador_sistema}')">
                             <img src="recursos/imagenes/ficha-vehicular.svg" alt="Ver">
                         </button>
                     </td>
                 </tr>`;
-            contenedor.insertAdjacentHTML('beforeend', fila);
+            cuerpoTablaRegistroInstitucional.insertAdjacentHTML('beforeend', codigoHtmlFila);
         });
     }
 
-    // 6. FILTRADO (Se aplica únicamente al presionar el botón "Comprobar")
-    function ejecutarFiltros() {
-        const texto = document.getElementById('filtro-busqueda-general')?.value.trim().toLowerCase() || '';
-        const tipoUsr = document.getElementById('filtro-tipo-usuario')?.value || '';
-        const tipoVeh = document.getElementById('filtro-tipo-vehiculo')?.value || '';
-        renderizarRegistroVehicular(texto, tipoUsr, tipoVeh);
+    // 6. Aplicación de filtros en la tabla de registro vehicular institucional al presionar el botón Comprobar.
+    function ejecutarFiltrosRegistroVehicular() {
+        const textoBusqueda = document.getElementById('filtro-busqueda-general')?.value.trim().toLowerCase() || '';
+        const tipoUsuarioSeleccionado = document.getElementById('filtro-tipo-usuario')?.value || '';
+        const tipoVehiculoSeleccionado = document.getElementById('filtro-tipo-vehiculo')?.value || '';
+        renderizarRegistroVehicular(textoBusqueda, tipoUsuarioSeleccionado, tipoVehiculoSeleccionado);
     }
 
-    document.getElementById('boton-ejecutar-filtro')?.addEventListener('click', ejecutarFiltros);
-    document.getElementById('filtro-busqueda-general')?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            ejecutarFiltros();
-        }
-    });
+    const botonEjecutarFiltro = document.getElementById('boton-ejecutar-filtro');
+    if (botonEjecutarFiltro) {
+        botonEjecutarFiltro.addEventListener('click', ejecutarFiltrosRegistroVehicular);
+    }
 
+    const campoFiltroBusquedaGeneral = document.getElementById('filtro-busqueda-general');
+    if (campoFiltroBusquedaGeneral) {
+        campoFiltroBusquedaGeneral.addEventListener('keydown', function(evento) {
+            if (evento.key === 'Enter') {
+                evento.preventDefault();
+                ejecutarFiltrosRegistroVehicular();
+            }
+        });
+    }
 
-    document.getElementById('boton-registro-actividades')?.addEventListener('click', () => {
-        // Limpiar filtros al abrir para mostrar todo el historial completo de todos los puntos de control
-        const inputTexto = document.getElementById('filtro-modal-act-texto');
-        const inputFecha = document.getElementById('filtro-modal-act-fecha');
-        const inputPunto = document.getElementById('filtro-modal-act-punto');
-        const inputMov = document.getElementById('filtro-modal-act-mov');
-        
-        if (inputTexto) inputTexto.value = '';
-        if (inputFecha) inputFecha.value = '';
-        if (inputPunto) inputPunto.value = '';
-        if (inputMov) inputMov.value = '';
+    // Configuración y despliegue del modal de registro consolidado de actividades.
+    const botonRegistroActividades = document.getElementById('boton-registro-actividades');
+    if (botonRegistroActividades) {
+        botonRegistroActividades.addEventListener('click', function() {
+            // Restablece los filtros del modal para exhibir todo el historial de movimientos.
+            const campoFiltroTexto = document.getElementById('filtro-modal-act-texto');
+            const campoFiltroFecha = document.getElementById('filtro-modal-act-fecha');
+            const selectorFiltroPunto = document.getElementById('filtro-modal-act-punto');
+            const selectorFiltroMovimiento = document.getElementById('filtro-modal-act-mov');
+            
+            if (campoFiltroTexto) campoFiltroTexto.value = '';
+            if (campoFiltroFecha) campoFiltroFecha.value = '';
+            if (selectorFiltroPunto) selectorFiltroPunto.value = '';
+            if (selectorFiltroMovimiento) selectorFiltroMovimiento.value = '';
 
-        renderizarRegistroActividadesModal();
-        abrirModal('modal-registro-actividades');
-    });
+            renderizarRegistroActividadesModal();
+            abrirModal('modal-registro-actividades');
+        });
+    }
 
-    // 2. Función para pintar la tabla y aplicar filtros en vivo (Movimientos globales de todos los puntos de control)
+    // Renderiza la tabla de actividades del modal con filtros en tiempo real.
     function renderizarRegistroActividadesModal() {
-        const contenedor = document.getElementById('cuerpo-tabla-actividades-modal');
-        if (!contenedor) return;
-
-        // Capturar filtros
-        const filtroTexto = document.getElementById('filtro-modal-act-texto')?.value.trim().toLowerCase() || '';
-        const filtroFecha = document.getElementById('filtro-modal-act-fecha')?.value || ''; // Viene en formato YYYY-MM-DD
-        const filtroPunto = document.getElementById('filtro-modal-act-punto')?.value || '';
-        const filtroMov = document.getElementById('filtro-modal-act-mov')?.value || '';
-
-        const dbActual = obtenerDB();
-        const historial = dbActual.historial_movimientos || [];
-
-        contenedor.innerHTML = '';
-
-        if (historial.length === 0) {
-            contenedor.innerHTML = `<tr><td colspan="7" class="mensaje-tabla-vacia">No se han registrado movimientos vehiculares en ningún punto de control</td></tr>`;
+        const cuerpoTablaActividadesModal = document.getElementById('cuerpo-tabla-actividades-modal');
+        if (!cuerpoTablaActividadesModal) {
             return;
         }
 
-        // Formatear la fecha seleccionada de YYYY-MM-DD a DD/MM/YYYY para comparar con la BD
-        let fechaFormateada = '';
-        if (filtroFecha) {
-            const [y, m, d] = filtroFecha.split('-');
-            fechaFormateada = `${d}/${m}/${y}`;
+        const filtroTexto = document.getElementById('filtro-modal-act-texto')?.value.trim().toLowerCase() || '';
+        const filtroFecha = document.getElementById('filtro-modal-act-fecha')?.value || '';
+        const filtroPunto = document.getElementById('filtro-modal-act-punto')?.value || '';
+        const filtroMovimiento = document.getElementById('filtro-modal-act-mov')?.value || '';
+
+        const baseDeDatos = obtenerBaseDatos();
+        const historialMovimientos = baseDeDatos.historial_movimientos || [];
+
+        cuerpoTablaActividadesModal.innerHTML = '';
+
+        if (historialMovimientos.length === 0) {
+            cuerpoTablaActividadesModal.innerHTML = `<tr><td colspan="7" class="mensaje-tabla-vacia">No se han registrado movimientos vehiculares en ningún punto de control</td></tr>`;
+            return;
         }
 
-        const normalizar = (txt) => (txt || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
-        const normalizarPunto = (p) => (p || '').toString().toUpperCase().replace(/PUNTO\s*DE\s*CONTROL/g, '').replace(/[^A-Z0-9]/g, '');
-        const filtroNorm = normalizar(filtroTexto);
+        let fechaFormateada = '';
+        if (filtroFecha) {
+            const partesFecha = filtroFecha.split('-');
+            fechaFormateada = `${partesFecha[2]}/${partesFecha[1]}/${partesFecha[0]}`;
+        }
 
-        // Pre-procesar cada movimiento con su identificador y tipo de vehículo exacto
-        const movimientosConInfo = historial.slice().reverse().map(item => {
-            const placaBuscada = (item.placa_vehicular || '').trim().toUpperCase();
-            const idBuscado = (item.identificador || '').trim().toUpperCase();
+        const filtroTextoNormalizado = normalizarTextoAlfanumerico(filtroTexto);
 
-            const vehiculoReal = (dbActual.vehiculos || []).find(v => 
-                (v.placa_vehicular && v.placa_vehicular.trim().toUpperCase() === placaBuscada) || 
-                (v.identificador_sistema && v.identificador_sistema.trim().toUpperCase() === idBuscado)
-            );
+        // Array.prototype.map: Vincula cada movimiento con los datos completos del vehículo si es institucional.
+        const movimientosProcesados = historialMovimientos.slice().reverse().map(function(movimiento) {
+            const placaBuscada = (movimiento.placa_vehicular || '').trim().toUpperCase();
+            const identificadorBuscado = (movimiento.identificador || '').trim().toUpperCase();
+
+            const vehiculoRegistrado = (baseDeDatos.vehiculos || []).find(function(vehiculo) {
+                return (vehiculo.placa_vehicular && vehiculo.placa_vehicular.trim().toUpperCase() === placaBuscada) || 
+                       (vehiculo.identificador_sistema && vehiculo.identificador_sistema.trim().toUpperCase() === identificadorBuscado);
+            });
             
-            const identificador = vehiculoReal ? vehiculoReal.identificador_sistema : (item.identificador && item.identificador !== "-" ? item.identificador : "");
-            const tipoVehiculo = vehiculoReal ? vehiculoReal.tipo_vehiculo : (item.tipo_vehiculo && item.tipo_vehiculo !== "-" ? item.tipo_vehiculo : "");
+            const identificadorCalculado = vehiculoRegistrado ? vehiculoRegistrado.identificador_sistema : (movimiento.identificador && movimiento.identificador !== "-" ? movimiento.identificador : "");
+            const tipoVehiculoCalculado = vehiculoRegistrado ? vehiculoRegistrado.tipo_vehiculo : (movimiento.tipo_vehiculo && movimiento.tipo_vehiculo !== "-" ? movimiento.tipo_vehiculo : "");
 
             return {
-                ...item,
-                identificadorCalculado: identificador,
-                tipoVehiculoCalculado: tipoVehiculo
+                ...movimiento,
+                identificadorCalculado: identificadorCalculado,
+                tipoVehiculoCalculado: tipoVehiculoCalculado
             };
         });
 
-        // Filtrar array con todos los criterios de búsqueda
-        const resultados = movimientosConInfo.filter(item => {
-            const idTexto = (item.identificadorCalculado || '').toLowerCase();
-            const idNorm = normalizar(item.identificadorCalculado);
-            const placaTexto = (item.placa_vehicular || '').toLowerCase();
-            const placaNorm = normalizar(item.placa_vehicular);
-            const propTexto = (item.propietario || '').toLowerCase();
-            const propNorm = normalizar(item.propietario);
+        // Aplica los filtros de búsqueda sobre el historial de movimientos.
+        const movimientosFiltrados = movimientosProcesados.filter(function(movimiento) {
+            const identificadorTexto = (movimiento.identificadorCalculado || '').toLowerCase();
+            const identificadorNormalizado = normalizarTextoAlfanumerico(movimiento.identificadorCalculado);
+            const placaTexto = (movimiento.placa_vehicular || '').toLowerCase();
+            const placaNormalizada = normalizarTextoAlfanumerico(movimiento.placa_vehicular);
+            const propietarioTexto = (movimiento.propietario || '').toLowerCase();
+            const propietarioNormalizado = normalizarTextoAlfanumerico(movimiento.propietario);
 
             const coincideTexto = !filtroTexto || 
-                idTexto.includes(filtroTexto) ||
-                idNorm.includes(filtroNorm) ||
+                identificadorTexto.includes(filtroTexto) ||
+                identificadorNormalizado.includes(filtroTextoNormalizado) ||
                 placaTexto.includes(filtroTexto) ||
-                placaNorm.includes(filtroNorm) ||
-                propTexto.includes(filtroTexto) ||
-                propNorm.includes(filtroNorm);
+                placaNormalizada.includes(filtroTextoNormalizado) ||
+                propietarioTexto.includes(filtroTexto) ||
+                propietarioNormalizado.includes(filtroTextoNormalizado);
             
-            const coincideFecha = !fechaFormateada || item.fecha === fechaFormateada;
+            const coincideFecha = !fechaFormateada || movimiento.fecha === fechaFormateada;
             
-            // Normalizar punto de control (ej: "Punto de control N01", "N01", "01")
-            const ptoItemNorm = normalizarPunto(item.punto_control);
-            const filtroPuntoNorm = normalizarPunto(filtroPunto);
-            const coincidePunto = !filtroPunto || ptoItemNorm === filtroPuntoNorm || (!ptoItemNorm && filtroPuntoNorm === 'N01');
+            const puntoMovimientoNormalizado = normalizarCodigoPuntoControl(movimiento.punto_control);
+            const puntoFiltroNormalizado = normalizarCodigoPuntoControl(filtroPunto);
+            const coincidePunto = !filtroPunto || puntoMovimientoNormalizado === puntoFiltroNormalizado || (!puntoMovimientoNormalizado && puntoFiltroNormalizado === 'N01');
             
-            const coincideMov = !filtroMov || item.tipo_movimiento === filtroMov;
+            const coincideMovimiento = !filtroMovimiento || movimiento.tipo_movimiento === filtroMovimiento;
 
-            return coincideTexto && coincideFecha && coincidePunto && coincideMov;
+            return coincideTexto && coincideFecha && coincidePunto && coincideMovimiento;
         });
 
-        if (resultados.length === 0) {
-            contenedor.innerHTML = `<tr><td colspan="7" class="mensaje-tabla-vacia">No se encontraron registros de movimientos relacionados con los filtros seleccionados</td></tr>`;
+        if (movimientosFiltrados.length === 0) {
+            cuerpoTablaActividadesModal.innerHTML = `<tr><td colspan="7" class="mensaje-tabla-vacia">No se encontraron registros de movimientos relacionados con los filtros seleccionados</td></tr>`;
             return;
         }
 
-        resultados.forEach(item => {
-            const esVehiculoInstitucional = item.identificadorCalculado && 
-                (dbActual.vehiculos || []).some(v => v.identificador_sistema === item.identificadorCalculado);
+        movimientosFiltrados.forEach(function(movimiento) {
+            const esVehiculoInstitucional = movimiento.identificadorCalculado && 
+                (baseDeDatos.vehiculos || []).some(function(vehiculo) {
+                    return vehiculo.identificador_sistema === movimiento.identificadorCalculado;
+                });
 
             const botonFichaHtml = esVehiculoInstitucional
-                ? `<button type="button" class="boton-tabla-icono" title="Ver ficha técnica" onclick="abrirFichaVehiculoAdmin('${item.identificadorCalculado}')">
+                ? `<button type="button" class="boton-tabla-icono" title="Ver ficha técnica" onclick="abrirFichaVehiculoAdmin('${movimiento.identificadorCalculado}')">
                        <img src="recursos/imagenes/ficha-vehicular.svg" alt="Ficha">
                    </button>`
                 : ``;
 
-            const puntoFormateado = normalizarPunto(item.punto_control) || 'N01';
-            const idMostrar = (item.identificadorCalculado && item.identificadorCalculado !== "-") ? item.identificadorCalculado : "";
-            const placaMostrar = (item.placa_vehicular && item.placa_vehicular !== "-") ? item.placa_vehicular : "";
-            const tipoVehiculoMostrar = (item.tipoVehiculoCalculado && item.tipoVehiculoCalculado !== "-") ? item.tipoVehiculoCalculado : "";
-            const fechaHoraMostrar = (item.fecha && item.hora) ? `${item.fecha} - ${item.hora}` : (item.fecha || "");
+            const puntoFormateado = normalizarCodigoPuntoControl(movimiento.punto_control) || 'N01';
+            const identificadorMostrar = (movimiento.identificadorCalculado && movimiento.identificadorCalculado !== "-") ? movimiento.identificadorCalculado : "";
+            const placaMostrar = (movimiento.placa_vehicular && movimiento.placa_vehicular !== "-") ? movimiento.placa_vehicular : "";
+            const tipoVehiculoMostrar = (movimiento.tipoVehiculoCalculado && movimiento.tipoVehiculoCalculado !== "-") ? movimiento.tipoVehiculoCalculado : "";
+            const fechaHoraMostrar = (movimiento.fecha && movimiento.hora) ? `${movimiento.fecha} - ${movimiento.hora}` : (movimiento.fecha || "");
 
-            const spanId = idMostrar ? `<span class="dato-valor">${idMostrar}</span>` : "";
+            const spanIdentificador = identificadorMostrar ? `<span class="dato-valor">${identificadorMostrar}</span>` : "";
 
-            const fila = `
+            const codigoHtmlFila = `
                 <tr>
                     <td>${fechaHoraMostrar}</td>
-                    <td>${spanId}</td>
+                    <td>${spanIdentificador}</td>
                     <td><strong>${placaMostrar}</strong></td>
                     <td>${tipoVehiculoMostrar}</td>
                     <td>${puntoFormateado}</td>
-                    <td><strong>${item.tipo_movimiento || ""}</strong></td>
+                    <td><strong>${movimiento.tipo_movimiento || ""}</strong></td>
                     <td class="columna-centrada">${botonFichaHtml}</td>
                 </tr>
             `;
-            contenedor.insertAdjacentHTML('beforeend', fila);
+            cuerpoTablaActividadesModal.insertAdjacentHTML('beforeend', codigoHtmlFila);
         });
     }
 
-    // 3. Eventos en tiempo real para los 4 filtros del modal
+    // Escuchadores de eventos para aplicar filtros en vivo al interactuar con los campos del modal de actividades.
     document.getElementById('filtro-modal-act-texto')?.addEventListener('input', renderizarRegistroActividadesModal);
     document.getElementById('filtro-modal-act-fecha')?.addEventListener('change', renderizarRegistroActividadesModal);
     document.getElementById('filtro-modal-act-punto')?.addEventListener('change', renderizarRegistroActividadesModal);
     document.getElementById('filtro-modal-act-mov')?.addEventListener('change', renderizarRegistroActividadesModal);
 
+    // 7. Configuración de acciones dentro del modal de la ficha vehicular.
+    const botonModificarVehiculo = document.getElementById('btn-admin-modificar-vehiculo');
+    if (botonModificarVehiculo) {
+        botonModificarVehiculo.addEventListener('click', function() {
+            const identificadorActual = identificadorVehiculoActualEnFicha || document.querySelector('#modal-ficha-vehicular .identificador-texto-modal .dato-valor')?.textContent.trim();
+            if (!identificadorActual || identificadorActual === '-') {
+                return;
+            }
 
-    // 7. BOTONES DE LA FICHA VEHICULAR
+            cerrarModal('modal-ficha-vehicular');
+            abrirModalModificarVehiculo(identificadorActual);
+        });
+    }
 
-    // Botón: Modificar Información
-    document.getElementById('btn-admin-modificar-vehiculo')?.addEventListener('click', () => {
-        const idActual = vehiculoActualEnFicha || document.querySelector('#modal-ficha-vehicular .identificador-texto-modal .dato-valor')?.textContent.trim();
-        if (!idActual || idActual === '-') return;
+    // Botón para exportar e imprimir en PDF la credencial vehicular.
+    const botonExportarPdf = document.getElementById('btn-admin-exportar-pdf');
+    if (botonExportarPdf) {
+        botonExportarPdf.addEventListener('click', function() {
+            const identificadorActual = identificadorVehiculoActualEnFicha || document.querySelector('#modal-ficha-vehicular .identificador-texto-modal .dato-valor')?.textContent.trim();
+            if (!identificadorActual || identificadorActual === '-') {
+                return;
+            }
 
-        cerrarModal('modal-ficha-vehicular');
-        abrirModalModificarVehiculo(idActual);
-    });
+            const baseDeDatos = obtenerBaseDatos();
+            const vehiculoEncontrado = (baseDeDatos?.vehiculos || []).find(function(vehiculo) {
+                return vehiculo.identificador_sistema === identificadorActual;
+            });
+            if (!vehiculoEncontrado) {
+                return;
+            }
 
-    // Botón: Exportar Ficha PDF (Solo credencial del vehículo seleccionado)
-    document.getElementById('btn-admin-exportar-pdf')?.addEventListener('click', () => {
-        const botonExportarPdf = document.getElementById('btn-admin-exportar-pdf');
-        if (botonExportarPdf) {
-            botonExportarPdf.onclick = function() {
-                const idActual = (typeof vehiculoActualEnFicha !== 'undefined' && vehiculoActualEnFicha)
-                    ? vehiculoActualEnFicha
-                    : document.querySelector('#modal-ficha-vehicular .identificador-texto-modal .dato-valor')?.textContent.trim();
+            const etiquetaImpresionPlaca = document.getElementById('print-placa');
+            const imagenImpresionCodigoQr = document.getElementById('print-qr');
+            const etiquetaImpresionIdentificador = document.getElementById('print-identificador');
 
-                if (!idActual || idActual === '-') return;
+            if (etiquetaImpresionPlaca) {
+                etiquetaImpresionPlaca.textContent = vehiculoEncontrado.placa_vehicular;
+            }
+            if (etiquetaImpresionIdentificador) {
+                etiquetaImpresionIdentificador.textContent = vehiculoEncontrado.identificador_sistema;
+            }
 
-                const db = typeof obtenerBaseDatos === 'function' 
-                    ? obtenerBaseDatos() 
-                    : JSON.parse(localStorage.getItem('base_de_datos') || localStorage.getItem('inveh_db'));
-
-                const vehiculo = (db?.vehiculos || []).find(v => v.identificador_sistema === idActual);
-                if (!vehiculo) return;
-
-                const printPlaca = document.getElementById('print-placa');
-                const printQr = document.getElementById('print-qr');
-                const printId = document.getElementById('print-identificador');
-
-                if (printPlaca) printPlaca.textContent = vehiculo.placa_vehicular;
-                if (printId) printId.textContent = vehiculo.identificador_sistema;
-
-                // Bandera de control para evitar que se dispare dos veces
-                let yaSeImprimio = false;
-                function dispararImpresionUnica() {
-                    if (yaSeImprimio) return;
-                    yaSeImprimio = true;
-                    window.print();
+            let impresionYaEjecutada = false;
+            function dispararImpresionUnica() {
+                if (impresionYaEjecutada) {
+                    return;
                 }
+                impresionYaEjecutada = true;
+                // window.print: Abre el diálogo de impresión nativo del navegador.
+                window.print();
+            }
 
-                if (printQr) {
-                    const rutaQr = (vehiculo.codigo_qr_ruta && vehiculo.codigo_qr_ruta !== "")
-                        ? vehiculo.codigo_qr_ruta
-                        : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(vehiculo.identificador_sistema + '|' + vehiculo.placa_vehicular)}`;
+            if (imagenImpresionCodigoQr) {
+                const rutaCodigoQr = (vehiculoEncontrado.codigo_qr_ruta && vehiculoEncontrado.codigo_qr_ruta !== "")
+                    ? vehiculoEncontrado.codigo_qr_ruta
+                    : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(vehiculoEncontrado.identificador_sistema + '|' + vehiculoEncontrado.placa_vehicular)}`;
 
-                    printQr.onload = dispararImpresionUnica;
-                    printQr.onerror = () => {
-                        printQr.src = "recursos/imagenes/codigo-qr.png";
-                        dispararImpresionUnica();
-                    };
+                imagenImpresionCodigoQr.onload = dispararImpresionUnica;
+                imagenImpresionCodigoQr.onerror = function() {
+                    imagenImpresionCodigoQr.src = "recursos/imagenes/codigo-qr.png";
+                    dispararImpresionUnica();
+                };
 
-                    printQr.src = rutaQr;
+                imagenImpresionCodigoQr.src = rutaCodigoQr;
 
-                    // Si la imagen ya está en caché y cargada, dispara una sola vez
-                    if (printQr.complete && printQr.naturalWidth !== 0) {
-                        dispararImpresionUnica();
-                    }
-                } else {
+                if (imagenImpresionCodigoQr.complete && imagenImpresionCodigoQr.naturalWidth !== 0) {
                     dispararImpresionUnica();
                 }
-            };
-        }
-    });
-
-    // Botón: Desvincular Vehículo desde la Ficha
-    document.getElementById('btn-admin-desvincular-ficha')?.addEventListener('click', () => {
-        const idActual = vehiculoActualEnFicha || document.querySelector('#modal-ficha-vehicular .identificador-texto-modal .dato-valor')?.textContent.trim();
-        if (!idActual || idActual === '-') return;
-
-        vehiculoParaDesvincularAdmin = idActual;
-        cerrarModal('modal-ficha-vehicular');
-
-        const textoIdentificador = document.querySelector('#modal-desvincular-vehiculo .identificador-vehiculo-enfasis .dato-valor');
-        if (textoIdentificador) {
-            textoIdentificador.textContent = idActual;
-        }
-        abrirModal('modal-desvincular-vehiculo');
-    });
-
-    // Confirmar Desvinculación ("Sí, desvincular")
-    document.getElementById('boton-proceder-desvincular')?.addEventListener('click', () => {
-        if (!vehiculoParaDesvincularAdmin) return;
-        const db = obtenerDB();
-
-        db.vehiculos = (db.vehiculos || []).filter(v => v.identificador_sistema !== vehiculoParaDesvincularAdmin);
-        guardarDB(db);
-
-        cerrarModal('modal-desvincular-vehiculo');
-        setTimeout(() => {
-            abrirModal('modal-desvinculacion-exito');
-            actualizarMetricas();
-            renderizarRegistroVehicular();
-            renderizarSolicitudesPendientes();
-        }, 300);
-    });
-
-    // --- GUARDAR CAMBIOS DE LA MODIFICACIÓN ---
-    document.getElementById('form-modificar-vehiculo')?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        if (!vehiculoActualEnFicha) return;
-
-        const db = obtenerDB();
-        const vehiculo = (db.vehiculos || []).find(v => v.identificador_sistema === vehiculoActualEnFicha);
-
-        if (vehiculo) {
-            const tiempo = obtenerFechaHoraActual();
-
-            // 1. Actualizar únicamente los campos editables
-            vehiculo.color = document.getElementById('mod-color-vehiculo').value.trim() || vehiculo.color;
-            vehiculo.estado_autorizacion = document.getElementById('mod-estado-vehiculo').value;
-            vehiculo.observaciones = document.getElementById('mod-observaciones-vehiculo').value.trim() || 'Sin observaciones';
-            
-            // 2. Registrar la fecha de actualización
-            vehiculo.fecha_actualizacion = tiempo.fecha;
-
-            // 3. Persistir cambios en LocalStorage
-            guardarDB(db);
-
-            // 4. Cerrar formulario y abrir confirmación de éxito exacta de Figma
-            cerrarModal('modal-modificar-vehiculo');
-
-            const tituloModal = document.getElementById('titulo-modal-exito-admin');
-            const infoModal = document.getElementById('info-fecha-exito-admin');
-
-            if (tituloModal) {
-                tituloModal.textContent = "Registro vehicular modificado correctamente";
+            } else {
+                dispararImpresionUnica();
             }
-            if (infoModal) {
-                infoModal.textContent = `Fecha y hora en que se modificó el registro: ${tiempo.textoCompleto}`;
+        });
+    }
+
+    // Botón para iniciar el flujo de desvinculación de un vehículo desde la ficha.
+    const botonDesvincularDesdeFicha = document.getElementById('btn-admin-desvincular-ficha');
+    if (botonDesvincularDesdeFicha) {
+        botonDesvincularDesdeFicha.addEventListener('click', function() {
+            const identificadorActual = identificadorVehiculoActualEnFicha || document.querySelector('#modal-ficha-vehicular .identificador-texto-modal .dato-valor')?.textContent.trim();
+            if (!identificadorActual || identificadorActual === '-') {
+                return;
             }
 
-            setTimeout(() => {
-                abrirModal('modal-admin-exito');
+            identificadorVehiculoParaDesvincular = identificadorActual;
+            cerrarModal('modal-ficha-vehicular');
+
+            const etiquetaIdentificadorDesvinculo = document.querySelector('#modal-desvincular-vehiculo .identificador-vehiculo-enfasis .dato-valor');
+            if (etiquetaIdentificadorDesvinculo) {
+                etiquetaIdentificadorDesvinculo.textContent = identificadorActual;
+            }
+            abrirModal('modal-desvincular-vehiculo');
+        });
+    }
+
+    // Botón de confirmación definitiva de desvinculación de vehículo.
+    const botonProcederDesvincular = document.getElementById('boton-proceder-desvincular');
+    if (botonProcederDesvincular) {
+        botonProcederDesvincular.addEventListener('click', function() {
+            if (!identificadorVehiculoParaDesvincular) {
+                return;
+            }
+            const baseDeDatos = obtenerBaseDatos();
+
+            baseDeDatos.vehiculos = (baseDeDatos.vehiculos || []).filter(function(vehiculo) {
+                return vehiculo.identificador_sistema !== identificadorVehiculoParaDesvincular;
+            });
+            guardarCambios(baseDeDatos);
+
+            cerrarModal('modal-desvincular-vehiculo');
+            setTimeout(function() {
+                abrirModal('modal-desvinculacion-exito');
                 actualizarMetricas();
                 renderizarRegistroVehicular();
                 renderizarSolicitudesPendientes();
             }, 300);
-        }
-    });
+        });
+    }
 
-    // 8. BOTONES: APROBAR Y RECHAZAR SOLICITUDES
+    // Procesa el formulario de edición de datos de vehículo.
+    const formularioModificarVehiculo = document.getElementById('form-modificar-vehiculo');
+    if (formularioModificarVehiculo) {
+        formularioModificarVehiculo.addEventListener('submit', function(evento) {
+            evento.preventDefault();
+            if (!identificadorVehiculoActualEnFicha) {
+                return;
+            }
 
-    // ACEPTAR REGISTRO VEHICULAR
-    document.getElementById('btn-aprobar-registro')?.addEventListener('click', () => {
-        if (!placaVehiculoEnRevision) return;
-        const db = obtenerDB();
-        const vehiculo = (db.vehiculos || []).find(v => v.placa_vehicular === placaVehiculoEnRevision);
+            const baseDeDatos = obtenerBaseDatos();
+            const vehiculoEncontrado = (baseDeDatos.vehiculos || []).find(function(vehiculo) {
+                return vehiculo.identificador_sistema === identificadorVehiculoActualEnFicha;
+            });
 
-        if (vehiculo) {
-            const tiempo = obtenerFechaHoraActual();
-            vehiculo.identificador_sistema = generarSiguienteIdentificador(db.vehiculos.filter(v => v.estado_autorizacion === "Autorizado"));
-            vehiculo.codigo_qr_ruta = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(vehiculo.identificador_sistema + '|' + vehiculo.placa_vehicular)}`;
-            vehiculo.estado_autorizacion = "Autorizado";
-            vehiculo.fecha_registro = tiempo.fecha;
-            vehiculo.fecha_actualizacion = tiempo.fecha;
+            if (vehiculoEncontrado) {
+                // Reutiliza la función global obtenerFechaHoraActual de scripts/informacion.js.
+                const datosFechaHora = obtenerFechaHoraActual();
+
+                // Actualiza los valores modificables del vehículo.
+                vehiculoEncontrado.color = document.getElementById('mod-color-vehiculo').value.trim() || vehiculoEncontrado.color;
+                vehiculoEncontrado.estado_autorizacion = document.getElementById('mod-estado-vehiculo').value;
+                vehiculoEncontrado.observaciones = document.getElementById('mod-observaciones-vehiculo').value.trim() || 'Sin observaciones';
+                vehiculoEncontrado.fecha_actualizacion = datosFechaHora.fecha;
+
+                guardarCambios(baseDeDatos);
+                cerrarModal('modal-modificar-vehiculo');
+
+                const etiquetaTituloModal = document.getElementById('titulo-modal-exito-admin');
+                const etiquetaInfoModal = document.getElementById('info-fecha-exito-admin');
+
+                if (etiquetaTituloModal) {
+                    etiquetaTituloModal.textContent = "Registro vehicular modificado correctamente";
+                }
+                if (etiquetaInfoModal) {
+                    etiquetaInfoModal.textContent = `Fecha y hora en que se modificó el registro: ${datosFechaHora.textoCompleto}`;
+                }
+
+                setTimeout(function() {
+                    abrirModal('modal-admin-exito');
+                    actualizarMetricas();
+                    renderizarRegistroVehicular();
+                    renderizarSolicitudesPendientes();
+                }, 300);
+            }
+        });
+    }
+
+    // 8. Botones para aprobar o rechazar solicitudes pendientes de registro vehicular y visitas.
+
+    // Aprobación de solicitud vehicular de usuario institucional.
+    const botonAprobarRegistro = document.getElementById('btn-aprobar-registro');
+    if (botonAprobarRegistro) {
+        botonAprobarRegistro.addEventListener('click', function() {
+            if (!placaVehiculoEnRevision) {
+                return;
+            }
+            const baseDeDatos = obtenerBaseDatos();
+            const vehiculoEncontrado = (baseDeDatos.vehiculos || []).find(function(vehiculo) {
+                return vehiculo.placa_vehicular === placaVehiculoEnRevision;
+            });
+
+            if (vehiculoEncontrado) {
+                const datosFechaHora = obtenerFechaHoraActual();
+                const vehiculosAutorizados = baseDeDatos.vehiculos.filter(function(vehiculo) {
+                    return vehiculo.estado_autorizacion === "Autorizado";
+                });
+                // Reutiliza generarSiguienteIdentificadorVehicular de scripts/informacion.js.
+                vehiculoEncontrado.identificador_sistema = generarSiguienteIdentificadorVehicular(vehiculosAutorizados);
+                vehiculoEncontrado.codigo_qr_ruta = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(vehiculoEncontrado.identificador_sistema + '|' + vehiculoEncontrado.placa_vehicular)}`;
+                vehiculoEncontrado.estado_autorizacion = "Autorizado";
+                vehiculoEncontrado.fecha_registro = datosFechaHora.fecha;
+                vehiculoEncontrado.fecha_actualizacion = datosFechaHora.fecha;
+                
+                guardarCambios(baseDeDatos);
+                cerrarModal('modal-revision-registro');
+
+                const etiquetaTituloModal = document.getElementById('titulo-modal-exito-admin');
+                const etiquetaInfoModal = document.getElementById('info-fecha-exito-admin');
+                if (etiquetaTituloModal) {
+                    etiquetaTituloModal.textContent = "Registro vehicular creado correctamente";
+                }
+                if (etiquetaInfoModal) {
+                    etiquetaInfoModal.textContent = `Fecha y hora en que se creó el registro: ${datosFechaHora.textoCompleto}`;
+                }
+
+                setTimeout(function() {
+                    abrirModal('modal-admin-exito');
+                    actualizarMetricas();
+                    renderizarSolicitudesPendientes();
+                    renderizarRegistroVehicular();
+                }, 300);
+            }
+        });
+    }
+
+    // Rechazo de solicitud vehicular de usuario institucional.
+    const botonRechazarRegistro = document.getElementById('btn-rechazar-registro');
+    if (botonRechazarRegistro) {
+        botonRechazarRegistro.addEventListener('click', function() {
+            if (!placaVehiculoEnRevision) {
+                return;
+            }
+            const baseDeDatos = obtenerBaseDatos();
+            baseDeDatos.vehiculos = (baseDeDatos.vehiculos || []).filter(function(vehiculo) {
+                return vehiculo.placa_vehicular !== placaVehiculoEnRevision;
+            });
             
-            guardarDB(db);
+            guardarCambios(baseDeDatos);
             cerrarModal('modal-revision-registro');
+            actualizarMetricas();
+            renderizarSolicitudesPendientes();
+        });
+    }
 
-            const tituloModal = document.getElementById('titulo-modal-exito-admin');
-            const infoModal = document.getElementById('info-fecha-exito-admin');
-            if (tituloModal) tituloModal.textContent = "Registro vehicular creado correctamente";
-            if (infoModal) infoModal.textContent = `Fecha y hora en que se creó el registro: ${tiempo.textoCompleto}`;
+    // Aprobación de solicitud de autorización de visita.
+    const botonAprobarAutorizacion = document.getElementById('btn-aprobar-autorizacion');
+    if (botonAprobarAutorizacion) {
+        botonAprobarAutorizacion.addEventListener('click', function() {
+            if (!identificadorAutorizacionEnRevision) {
+                return;
+            }
+            const baseDeDatos = obtenerBaseDatos();
+            const autorizacionEncontrada = (baseDeDatos.autorizaciones_visitas || []).find(function(autorizacion) {
+                return autorizacion.identificador_solicitud === identificadorAutorizacionEnRevision;
+            });
 
-            setTimeout(() => {
-                abrirModal('modal-admin-exito');
-                actualizarMetricas();
-                renderizarSolicitudesPendientes();
-                renderizarRegistroVehicular();
-            }, 300);
-        }
-    });
+            if (autorizacionEncontrada) {
+                const datosFechaHora = obtenerFechaHoraActual();
+                autorizacionEncontrada.estado_solicitud = "Autorizado";
+                autorizacionEncontrada.fecha_actualizacion = datosFechaHora.fecha;
+                
+                guardarCambios(baseDeDatos);
+                cerrarModal('modal-revision-autorizacion');
 
-    // RECHAZAR REGISTRO VEHICULAR
-    document.getElementById('btn-rechazar-registro')?.addEventListener('click', () => {
-        if (!placaVehiculoEnRevision) return;
-        const db = obtenerDB();
-        db.vehiculos = (db.vehiculos || []).filter(v => v.placa_vehicular !== placaVehiculoEnRevision);
-        
-        guardarDB(db);
-        cerrarModal('modal-revision-registro');
-        actualizarMetricas();
-        renderizarSolicitudesPendientes();
-    });
+                const etiquetaTituloModal = document.getElementById('titulo-modal-exito-admin');
+                const etiquetaInfoModal = document.getElementById('info-fecha-exito-admin');
+                if (etiquetaTituloModal) {
+                    etiquetaTituloModal.textContent = "Autorización de acceso creada correctamente";
+                }
+                if (etiquetaInfoModal) {
+                    etiquetaInfoModal.textContent = `Fecha y hora en que se aprobó la solicitud: ${datosFechaHora.textoCompleto}`;
+                }
 
-    // ACEPTAR VISITA
-    document.getElementById('btn-aprobar-autorizacion')?.addEventListener('click', () => {
-        if (!idAutorizacionEnRevision) return;
-        const db = obtenerDB();
-        const autorizacion = (db.autorizaciones_visitas || []).find(a => a.identificador_solicitud === idAutorizacionEnRevision);
+                setTimeout(function() {
+                    abrirModal('modal-admin-exito');
+                    actualizarMetricas();
+                    renderizarSolicitudesPendientes();
+                }, 300);
+            }
+        });
+    }
 
-        if (autorizacion) {
-            const tiempo = obtenerFechaHoraActual();
-            autorizacion.estado_solicitud = "Autorizado";
-            autorizacion.fecha_actualizacion = tiempo.fecha;
+    // Rechazo de solicitud de autorización de visita.
+    const botonRechazarAutorizacion = document.getElementById('btn-rechazar-autorizacion');
+    if (botonRechazarAutorizacion) {
+        botonRechazarAutorizacion.addEventListener('click', function() {
+            if (!identificadorAutorizacionEnRevision) {
+                return;
+            }
+            const baseDeDatos = obtenerBaseDatos();
+            baseDeDatos.autorizaciones_visitas = (baseDeDatos.autorizaciones_visitas || []).filter(function(autorizacion) {
+                return autorizacion.identificador_solicitud !== identificadorAutorizacionEnRevision;
+            });
             
-            guardarDB(db);
+            guardarCambios(baseDeDatos);
             cerrarModal('modal-revision-autorizacion');
+            actualizarMetricas();
+            renderizarSolicitudesPendientes();
+        });
+    }
 
-            const tituloModal = document.getElementById('titulo-modal-exito-admin');
-            const infoModal = document.getElementById('info-fecha-exito-admin');
-            if (tituloModal) tituloModal.textContent = "Autorización de acceso creada correctamente";
-            if (infoModal) infoModal.textContent = `Fecha y hora en que se aprobó la solicitud: ${tiempo.textoCompleto}`;
-
-            setTimeout(() => {
-                abrirModal('modal-admin-exito');
-                actualizarMetricas();
-                renderizarSolicitudesPendientes();
-            }, 300);
-        }
-    });
-
-    // RECHAZAR VISITA
-    document.getElementById('btn-rechazar-autorizacion')?.addEventListener('click', () => {
-        if (!idAutorizacionEnRevision) return;
-        const db = obtenerDB();
-        db.autorizaciones_visitas = (db.autorizaciones_visitas || []).filter(a => a.identificador_solicitud !== idAutorizacionEnRevision);
-        
-        guardarDB(db);
-        cerrarModal('modal-revision-autorizacion');
-        actualizarMetricas();
-        renderizarSolicitudesPendientes();
-    });
-
-    // Carga inicial
+    // Carga inicial al iniciar la consola administrativa.
     actualizarMetricas();
     renderizarSolicitudesPendientes();
     renderizarRegistroVehicular();
 });
 
-
-// FUNCIONES GLOBALES PARA ABRIR MODALES CON DATOS EN VIVO
-
-
-function abrirRevisionRegistro(idOPlaca) {
-    const db = obtenerDB();
-    const vehiculo = (db.vehiculos || []).find(v => v.identificador_sistema === idOPlaca || v.placa_vehicular === idOPlaca);
-    if (!vehiculo) return;
-
-    placaVehiculoEnRevision = vehiculo.placa_vehicular;
-    const solicitante = (db.usuarios || []).find(u => u.numero_identificacion === vehiculo.propietario_id);
-
-    if (solicitante) {
-        document.getElementById('rev-reg-nombre').textContent = solicitante.nombres_apellidos;
-        document.getElementById('rev-reg-cedula').textContent = solicitante.numero_identificacion;
-        document.getElementById('rev-reg-correo').textContent = solicitante.correo_institucional || '-';
-        document.getElementById('rev-reg-tipo').textContent = solicitante.tipo_usuario || '-';
-        document.getElementById('rev-reg-facultad').textContent = solicitante.facultad || '-';
+// Despliega el modal para revisar la solicitud vehicular pendiente seleccionada.
+function abrirRevisionRegistro(identificadorOPlaca) {
+    const baseDeDatos = obtenerBaseDatos();
+    const vehiculoEncontrado = (baseDeDatos.vehiculos || []).find(function(vehiculo) {
+        return vehiculo.identificador_sistema === identificadorOPlaca || vehiculo.placa_vehicular === identificadorOPlaca;
+    });
+    if (!vehiculoEncontrado) {
+        return;
     }
 
-    document.getElementById('rev-reg-placa').textContent = vehiculo.placa_vehicular;
-    document.getElementById('rev-reg-tipo-vehiculo').textContent = vehiculo.tipo_vehiculo;
-    document.getElementById('rev-reg-modelo').textContent = `${vehiculo.fabricante} ${vehiculo.modelo}`;
-    document.getElementById('rev-reg-anio').textContent = vehiculo.anio_fabricacion;
-    document.getElementById('rev-reg-color').textContent = vehiculo.color;
-    document.getElementById('rev-reg-obs').textContent = vehiculo.observaciones || 'Sin observaciones';
+    placaVehiculoEnRevision = vehiculoEncontrado.placa_vehicular;
+    const usuarioSolicitante = (baseDeDatos.usuarios || []).find(function(usuario) {
+        return usuario.numero_identificacion === vehiculoEncontrado.propietario_id;
+    });
+
+    if (usuarioSolicitante) {
+        document.getElementById('rev-reg-nombre').textContent = usuarioSolicitante.nombres_apellidos;
+        document.getElementById('rev-reg-cedula').textContent = usuarioSolicitante.numero_identificacion;
+        document.getElementById('rev-reg-correo').textContent = usuarioSolicitante.correo_institucional || '-';
+        document.getElementById('rev-reg-tipo').textContent = usuarioSolicitante.tipo_usuario || '-';
+        document.getElementById('rev-reg-facultad').textContent = usuarioSolicitante.facultad || '-';
+    }
+
+    document.getElementById('rev-reg-placa').textContent = vehiculoEncontrado.placa_vehicular;
+    document.getElementById('rev-reg-tipo-vehiculo').textContent = vehiculoEncontrado.tipo_vehiculo;
+    document.getElementById('rev-reg-modelo').textContent = `${vehiculoEncontrado.fabricante} ${vehiculoEncontrado.modelo}`;
+    document.getElementById('rev-reg-anio').textContent = vehiculoEncontrado.anio_fabricacion;
+    document.getElementById('rev-reg-color').textContent = vehiculoEncontrado.color;
+    document.getElementById('rev-reg-obs').textContent = vehiculoEncontrado.observaciones || 'Sin observaciones';
 
     abrirModal('modal-revision-registro');
 }
 
-function abrirRevisionAutorizacion(idSolicitud) {
-    const db = obtenerDB();
-    const autorizacion = (db.autorizaciones_visitas || []).find(a => a.identificador_solicitud === idSolicitud);
-    if (!autorizacion) return;
-
-    idAutorizacionEnRevision = idSolicitud;
-    const solicitante = (db.usuarios || []).find(u => u.numero_identificacion === autorizacion.solicitante_id);
-
-    if (solicitante) {
-        document.getElementById('rev-aut-sol-nombre').textContent = solicitante.nombres_apellidos;
-        document.getElementById('rev-aut-sol-cedula').textContent = solicitante.numero_identificacion;
-        document.getElementById('rev-aut-sol-facultad').textContent = solicitante.facultad || '-';
-        document.getElementById('rev-aut-sol-tipo').textContent = solicitante.tipo_usuario || '-';
+// Despliega el modal para revisar la solicitud de autorización de visita pendiente seleccionada.
+function abrirRevisionAutorizacion(identificadorSolicitud) {
+    const baseDeDatos = obtenerBaseDatos();
+    const autorizacionEncontrada = (baseDeDatos.autorizaciones_visitas || []).find(function(autorizacion) {
+        return autorizacion.identificador_solicitud === identificadorSolicitud;
+    });
+    if (!autorizacionEncontrada) {
+        return;
     }
 
-    const vis = autorizacion.visitante || {};
-    document.getElementById('rev-aut-vis-nombre').textContent = vis.nombres_apellidos || '-';
-    document.getElementById('rev-aut-vis-tipo-doc').textContent = vis.tipo_identificacion || '-';
-    document.getElementById('rev-aut-vis-num-doc').textContent = vis.numero_identificacion || '-';
-    document.getElementById('rev-aut-vis-tel').textContent = vis.telefono || 'No registrado';
+    identificadorAutorizacionEnRevision = identificadorSolicitud;
+    const usuarioSolicitante = (baseDeDatos.usuarios || []).find(function(usuario) {
+        return usuario.numero_identificacion === autorizacionEncontrada.solicitante_id;
+    });
 
-    const veh = autorizacion.vehiculo || {};
-    document.getElementById('rev-aut-veh-placa').textContent = veh.placa_vehicular || 'Sin placa';
-    document.getElementById('rev-aut-veh-tipo').textContent = veh.tipo_vehiculo || 'Otro';
-    document.getElementById('rev-aut-veh-modelo').textContent = `${veh.fabricante || ''} ${veh.modelo || ''}`.trim() || '-';
-    document.getElementById('rev-aut-veh-color').textContent = veh.color || '-';
+    if (usuarioSolicitante) {
+        document.getElementById('rev-aut-sol-nombre').textContent = usuarioSolicitante.nombres_apellidos;
+        document.getElementById('rev-aut-sol-cedula').textContent = usuarioSolicitante.numero_identificacion;
+        document.getElementById('rev-aut-sol-facultad').textContent = usuarioSolicitante.facultad || '-';
+        document.getElementById('rev-aut-sol-tipo').textContent = usuarioSolicitante.tipo_usuario || '-';
+    }
 
-    const det = autorizacion.visita || {};
-    document.getElementById('rev-aut-vis-fecha').textContent = det.fecha_programada || '-';
-    document.getElementById('rev-aut-vis-hora').textContent = det.hora_programada || '-';
-    document.getElementById('rev-aut-vis-motivo').textContent = det.motivo_visita || '-';
-    document.getElementById('rev-aut-vis-destino').textContent = det.area_destino || '-';
+    const datosVisitante = autorizacionEncontrada.visitante || {};
+    document.getElementById('rev-aut-vis-nombre').textContent = datosVisitante.nombres_apellidos || '-';
+    document.getElementById('rev-aut-vis-tipo-doc').textContent = datosVisitante.tipo_identificacion || '-';
+    document.getElementById('rev-aut-vis-num-doc').textContent = datosVisitante.numero_identificacion || '-';
+    document.getElementById('rev-aut-vis-tel').textContent = datosVisitante.telefono || 'No registrado';
+
+    const datosVehiculo = autorizacionEncontrada.vehiculo || {};
+    document.getElementById('rev-aut-veh-placa').textContent = datosVehiculo.placa_vehicular || 'Sin placa';
+    document.getElementById('rev-aut-veh-tipo').textContent = datosVehiculo.tipo_vehiculo || 'Otro';
+    document.getElementById('rev-aut-veh-modelo').textContent = `${datosVehiculo.fabricante || ''} ${datosVehiculo.modelo || ''}`.trim() || '-';
+    document.getElementById('rev-aut-veh-color').textContent = datosVehiculo.color || '-';
+
+    const datosVisita = autorizacionEncontrada.visita || {};
+    document.getElementById('rev-aut-vis-fecha').textContent = datosVisita.fecha_programada || '-';
+    document.getElementById('rev-aut-vis-hora').textContent = datosVisita.hora_programada || '-';
+    document.getElementById('rev-aut-vis-motivo').textContent = datosVisita.motivo_visita || '-';
+    document.getElementById('rev-aut-vis-destino').textContent = datosVisita.area_destino || '-';
 
     abrirModal('modal-revision-autorizacion');
 }
 
-function abrirFichaVehiculoAdmin(idVehiculo) {
-    const db = obtenerDB();
-    const vehiculo = (db.vehiculos || []).find(v => v.identificador_sistema === idVehiculo);
-    if (!vehiculo) return;
-
-    vehiculoActualEnFicha = vehiculo.identificador_sistema;
-    const propietario = (db.usuarios || []).find(u => u.numero_identificacion === vehiculo.propietario_id);
-
-    document.querySelector('.etiqueta-placa-ficha').textContent = vehiculo.placa_vehicular;
-    document.querySelector('.identificador-texto-modal .dato-valor').textContent = vehiculo.identificador_sistema;
-    document.querySelector('.imagen-qr-modal').src = vehiculo.codigo_qr_ruta || '';
-
-    const datosVeh = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:first-child .item-dato-modal span');
-    if (datosVeh.length >= 5) {
-        datosVeh[0].textContent = vehiculo.tipo_vehiculo;
-        datosVeh[1].textContent = `${vehiculo.fabricante} ${vehiculo.modelo}`;
-        datosVeh[2].textContent = vehiculo.anio_fabricacion;
-        datosVeh[3].textContent = vehiculo.color;
-        datosVeh[4].textContent = vehiculo.observaciones;
+// Despliega la ficha vehicular en modo administrador para inspeccionar datos completos.
+function abrirFichaVehiculoAdmin(identificadorVehiculo) {
+    const baseDeDatos = obtenerBaseDatos();
+    const vehiculoEncontrado = (baseDeDatos.vehiculos || []).find(function(vehiculo) {
+        return vehiculo.identificador_sistema === identificadorVehiculo;
+    });
+    if (!vehiculoEncontrado) {
+        return;
     }
 
-    const datosReg = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:last-child .tarjeta-informacion-modal:nth-child(2) .item-dato-modal span');
-    if (datosReg.length >= 3) {
-        datosReg[0].textContent = vehiculo.fecha_registro;
-        datosReg[1].textContent = vehiculo.fecha_actualizacion;
-        datosReg[2].textContent = vehiculo.estado_autorizacion;
+    identificadorVehiculoActualEnFicha = vehiculoEncontrado.identificador_sistema;
+    const usuarioPropietario = (baseDeDatos.usuarios || []).find(function(usuario) {
+        return usuario.numero_identificacion === vehiculoEncontrado.propietario_id;
+    });
+
+    document.querySelector('.etiqueta-placa-ficha').textContent = vehiculoEncontrado.placa_vehicular;
+    document.querySelector('.identificador-texto-modal .dato-valor').textContent = vehiculoEncontrado.identificador_sistema;
+    document.querySelector('.imagen-qr-modal').src = vehiculoEncontrado.codigo_qr_ruta || '';
+
+    const elementosDatosVehiculo = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:first-child .item-dato-modal span');
+    if (elementosDatosVehiculo.length >= 5) {
+        elementosDatosVehiculo[0].textContent = vehiculoEncontrado.tipo_vehiculo;
+        elementosDatosVehiculo[1].textContent = `${vehiculoEncontrado.fabricante} ${vehiculoEncontrado.modelo}`;
+        elementosDatosVehiculo[2].textContent = vehiculoEncontrado.anio_fabricacion;
+        elementosDatosVehiculo[3].textContent = vehiculoEncontrado.color;
+        elementosDatosVehiculo[4].textContent = vehiculoEncontrado.observaciones;
     }
 
-    const datosProp = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:last-child .tarjeta-informacion-modal:nth-child(3) .item-dato-modal span');
-    if (datosProp.length >= 6 && propietario) {
-        datosProp[0].textContent = propietario.nombres_apellidos;
-        datosProp[1].textContent = propietario.numero_identificacion;
-        datosProp[2].textContent = propietario.correo_institucional || '-';
-        datosProp[3].textContent = propietario.tipo_usuario;
-        datosProp[4].textContent = propietario.facultad || '-';
-        datosProp[5].textContent = propietario.carrera || '-';
+    const elementosDatosRegistro = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:last-child .tarjeta-informacion-modal:nth-child(2) .item-dato-modal span');
+    if (elementosDatosRegistro.length >= 3) {
+        elementosDatosRegistro[0].textContent = vehiculoEncontrado.fecha_registro;
+        elementosDatosRegistro[1].textContent = vehiculoEncontrado.fecha_actualizacion;
+        elementosDatosRegistro[2].textContent = vehiculoEncontrado.estado_autorizacion;
+    }
+
+    const elementosDatosPropietario = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:last-child .tarjeta-informacion-modal:nth-child(3) .item-dato-modal span');
+    if (elementosDatosPropietario.length >= 6 && usuarioPropietario) {
+        elementosDatosPropietario[0].textContent = usuarioPropietario.nombres_apellidos;
+        elementosDatosPropietario[1].textContent = usuarioPropietario.numero_identificacion;
+        elementosDatosPropietario[2].textContent = usuarioPropietario.correo_institucional || '-';
+        elementosDatosPropietario[3].textContent = usuarioPropietario.tipo_usuario;
+        elementosDatosPropietario[4].textContent = usuarioPropietario.facultad || '-';
+        elementosDatosPropietario[5].textContent = usuarioPropietario.carrera || '-';
     }
 
     abrirModal('modal-ficha-vehicular');
 }
 
-// --- APERTURA Y PRECARGA DEL MODAL DE MODIFICACIÓN ---
-function abrirModalModificarVehiculo(idVehiculo) {
-    const db = obtenerDB();
-    const vehiculo = (db.vehiculos || []).find(v => v.identificador_sistema === idVehiculo);
-    if (!vehiculo) return;
+// Precarga los campos editables y despliega el formulario de modificación de vehículo.
+function abrirModalModificarVehiculo(identificadorVehiculo) {
+    const baseDeDatos = obtenerBaseDatos();
+    const vehiculoEncontrado = (baseDeDatos.vehiculos || []).find(function(vehiculo) {
+        return vehiculo.identificador_sistema === identificadorVehiculo;
+    });
+    if (!vehiculoEncontrado) {
+        return;
+    }
 
-    vehiculoActualEnFicha = vehiculo.identificador_sistema;
+    identificadorVehiculoActualEnFicha = vehiculoEncontrado.identificador_sistema;
 
-    // 1. Inyectar datos en el bloque estático (no editable)
-    document.getElementById('mod-estatico-placa').textContent = vehiculo.placa_vehicular;
-    document.getElementById('mod-estatico-tipo').textContent = vehiculo.tipo_vehiculo;
-    document.getElementById('mod-estatico-modelo').textContent = `${vehiculo.fabricante} ${vehiculo.modelo}`;
-    document.getElementById('mod-estatico-anio').textContent = vehiculo.anio_fabricacion;
-    document.getElementById('mod-estatico-identificador').textContent = vehiculo.identificador_sistema;
+    // Inyecta datos no modificables en las etiquetas informativas del modal.
+    document.getElementById('mod-estatico-placa').textContent = vehiculoEncontrado.placa_vehicular;
+    document.getElementById('mod-estatico-tipo').textContent = vehiculoEncontrado.tipo_vehiculo;
+    document.getElementById('mod-estatico-modelo').textContent = `${vehiculoEncontrado.fabricante} ${vehiculoEncontrado.modelo}`;
+    document.getElementById('mod-estatico-anio').textContent = vehiculoEncontrado.anio_fabricacion;
+    document.getElementById('mod-estatico-identificador').textContent = vehiculoEncontrado.identificador_sistema;
 
-    // 2. Precargar los únicos campos editables
-    document.getElementById('mod-color-vehiculo').value = vehiculo.color || '';
-    document.getElementById('mod-estado-vehiculo').value = vehiculo.estado_autorizacion || 'Autorizado';
-    document.getElementById('mod-observaciones-vehiculo').value = (vehiculo.observaciones && vehiculo.observaciones !== 'Sin observaciones') 
-        ? vehiculo.observaciones 
+    // Precarga los únicos campos editables autorizados.
+    document.getElementById('mod-color-vehiculo').value = vehiculoEncontrado.color || '';
+    document.getElementById('mod-estado-vehiculo').value = vehiculoEncontrado.estado_autorizacion || 'Autorizado';
+    document.getElementById('mod-observaciones-vehiculo').value = (vehiculoEncontrado.observaciones && vehiculoEncontrado.observaciones !== 'Sin observaciones') 
+        ? vehiculoEncontrado.observaciones 
         : '';
 
     abrirModal('modal-modificar-vehiculo');
 }
+
+// Expone las funciones en el ámbito global window para permitir su ejecución desde atributos HTML.
+window.abrirRevisionRegistro = abrirRevisionRegistro;
+window.abrirRevisionAutorizacion = abrirRevisionAutorizacion;
+window.abrirFichaVehiculoAdmin = abrirFichaVehiculoAdmin;
+window.abrirModalModificarVehiculo = abrirModalModificarVehiculo;

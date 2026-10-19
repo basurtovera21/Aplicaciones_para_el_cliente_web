@@ -12,7 +12,7 @@
 </head>
 <body>
 
-  <!-- Barra de Navegación -->
+  <!-- Barra de navegación institucional -->
   <header class="barra-navegacion">
     <div class="barra-navegacion-identidad">
       <img src="recursos/imagenes/logotipo-uleam.png" alt="Logotipo" class="barra-navegacion-identificador">
@@ -29,7 +29,7 @@
 
   <main class="contenedor-punto-control">
 
-    <!-- TARJETA 1: BUSCADOR Y COMPROBACIÓN -->
+    <!-- Tarjeta 1: Buscador y comprobación de placas o identificadores -->
     <section class="tarjeta-control tarjeta-busqueda-control">
       <div class="fila-superior-control">
         <div class="bloque-identificador-punto">
@@ -48,7 +48,7 @@
         </button>
       </div>
 
-      <!-- Barra de Búsqueda -->
+      <!-- Formulario de búsqueda rápida por placa o código -->
       <form class="formulario-comprobacion-control" id="form-comprobar-vehiculo" novalidate>
         <div class="campo-entrada-placa-contenedor">
           <input 
@@ -65,13 +65,13 @@
         </button>
       </form>
 
-      <!-- Mensaje cuando no hay coincidencias -->
+      <!-- Mensaje informativo cuando no se encuentran coincidencias -->
       <p class="mensaje-sin-coincidencia" id="mensaje-sin-coincidencia" style="display: none;">
         No se encontró ningún registro con los datos registrados
       </p>
     </section>
 
-    <!-- TARJETA 2: RESULTADO DE COINCIDENCIA (Oculta por defecto) -->
+    <!-- Tarjeta 2: Ficha con resultado de coincidencia vehicular (oculta por defecto) -->
     <section class="tarjeta-control tarjeta-resultado-vehiculo" id="tarjeta-resultado-coincidencia" style="display: none;">
       <div class="cabecera-resultado-control">
         <div class="bloque-placa-id-control">
@@ -81,16 +81,16 @@
         <span class="etiqueta-estado-instalaciones" id="res-ubicacion">-</span>
       </div>
 
-      <!-- Información en dos columnas -->
+      <!-- Disposición en dos columnas: información del propietario y del vehículo -->
       <div class="rejilla-detalles-control">
-        <!-- Columna Propietario -->
+        <!-- Columna 1: Información del propietario -->
         <div class="columna-detalle-control">
           <h3 class="subtitulo-detalle-control" id="res-titulo-propietario">Información del propietario</h3>
           <p class="item-detalle-control">Apellidos y nombres: <span class="dato-valor" id="res-propietario-nombre">-</span></p>
           <p class="item-detalle-control">Número de identificación: <span class="dato-valor" id="res-propietario-cedula">-</span></p>
         </div>
 
-        <!-- Columna Vehículo -->
+        <!-- Columna 2: Información del vehículo -->
         <div class="columna-detalle-control">
           <h3 class="subtitulo-detalle-control">Información del vehículo</h3>
           <div class="filas-dos-datos-control">
@@ -101,7 +101,7 @@
         </div>
       </div>
 
-      <!-- Barra de acciones inferiores con botón dinámico (Entrada / Salida) -->
+      <!-- Barra de acciones inferiores con botón dinámico de registro -->
       <div class="pie-resultado-control">
         <button type="button" class="boton-ficha-control" id="btn-ver-ficha-control">
           <img src="recursos/imagenes/ficha-vehicular.svg" alt="" class="icono-boton-accion">
@@ -112,7 +112,7 @@
           Sin registro de movimientos previos hoy
         </p>
 
-        <!-- Botón que alterna entre Entrada (verde/primario) y Salida (salmón) -->
+        <!-- Botón que alterna entre registrar entrada o registrar salida -->
         <button type="button" class="boton-accion-movimiento" id="btn-confirmar-movimiento">
           <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-accion" id="icono-movimiento">
           <span id="texto-btn-movimiento">Confirmar movimiento</span>
@@ -120,7 +120,7 @@
       </div>
     </section>
 
-    <!-- TARJETA 3: HISTORIAL DE MOVIMIENTOS NAVEGABLE -->
+    <!-- Tarjeta 3: Panel de historial de movimientos vehiculares -->
     <section class="tarjeta-control tarjeta-panel-fijo">
       <header class="cabecera-panel-tabla">
         <h2 class="titulo-panel-control">Historial de movimientos</h2>
@@ -139,12 +139,13 @@
             </tr>
           </thead>
           <tbody id="cuerpo-tabla-historial">
-            <!-- Filas dinámicas -->
+            <!-- Filas de movimientos renderizadas dinámicamente -->
           </tbody>
         </table>
       </div>
     </section>
 
+    <!-- Modal: Confirmación de movimiento registrado correctamente -->
     <div class="superposicion-modal" id="modal-movimiento-exito" aria-hidden="true" role="dialog">
     <div class="contenedor-modal modal-ancho-mediano">
       <div class="cabecera-modal">
@@ -173,6 +174,7 @@
   </div>
   
 
+  <!-- Modal: Autorización temporal de acceso vehicular -->
   <div class="superposicion-modal" id="modal-registro-temporal" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-registro">
         
@@ -183,7 +185,7 @@
           </button>
         </div>
 
-        <!-- Banner Informativo -->
+        <!-- Banner informativo sobre el registro temporal -->
         <div class="banner-informativo-registro">
           <img src="recursos/imagenes/informacion.svg" alt="Info" class="icono-banner-grande">
           <p class="texto-banner-unico">
@@ -193,7 +195,7 @@
 
         <form class="formulario-registro-vehiculo" id="form-registro-temporal" novalidate>
           
-          <!-- SECCIÓN 1: INFORMACIÓN DEL VISITANTE (Siempre visible) -->
+          <!-- Sección 1: Información del visitante (visible por defecto) -->
           <div class="seccion-formulario-modal">
             <h4 class="titulo-seccion-grande">Información del visitante</h4>
             <div class="cuerpo-grid-formulario">
@@ -220,7 +222,7 @@
             </div>
           </div>
 
-          <!-- SECCIÓN 2: INFORMACIÓN DEL VEHÍCULO (Desplegable) -->
+          <!-- Sección 2: Información del vehículo visitante (desplegable) -->
           <div class="seccion-formulario-modal">
             <button type="button" class="boton-desplegar-compacto" data-objetivo="seccion-temp-vehiculo">
               <h4 class="titulo-seccion-grande">Información del vehículo</h4>
@@ -252,7 +254,7 @@
             </div>
           </div>
 
-          <!-- SECCIÓN 3: DETALLE DE LA VISITA (Desplegable) -->
+          <!-- Sección 3: Detalle de la visita (desplegable) -->
           <div class="seccion-formulario-modal">
             <button type="button" class="boton-desplegar-compacto" data-objetivo="seccion-temp-visita">
               <h4 class="titulo-seccion-grande">Detalle de la visita</h4>
@@ -284,7 +286,7 @@
             </div>
           </div>
 
-          <!-- Botones inferiores -->
+          <!-- Botonera de confirmación y cancelación -->
           <div class="contenedor-acciones-extremos">
             <button type="submit" class="boton-accion-modal fondo-neutro">
               <img src="recursos/imagenes/aceptar.svg" alt="" class="icono-boton-modal">
@@ -302,7 +304,7 @@
 
   </main>
 
-  <!-- Modal Ficha Vehicular Reutilizable -->
+  <!-- Modal reutilizable de ficha técnica vehicular con credencial y QR -->
   <div class="superposicion-modal" id="modal-ficha-vehicular" aria-hidden="true" role="dialog">
     <div class="contenedor-modal modal-ancho-ficha">
       <div class="cabecera-modal">
@@ -360,9 +362,10 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- Inclusión de scripts del sistema -->
   <script src="scripts/modal.js"></script>
   <script src="scripts/informacion.js"></script>
+  <script src="scripts/validaciones.js"></script>
   <script src="scripts/punto-control.js"></script>
 </body>
 </html>

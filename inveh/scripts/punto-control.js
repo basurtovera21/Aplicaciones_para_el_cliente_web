@@ -1,737 +1,782 @@
+// Variable global para almacenar en memoria el vehículo o visita identificado tras la búsqueda.
 let vehiculoEncontradoActual = null;
 
-// --- FUNCIONES DE AYUDA INTEGRADAS ---
-function activarAlertaControl(campo, mensaje) {
-    if (!campo) return;
-    const contenedor = campo.closest('.bloque-campo-formulario');
-    const alerta = contenedor ? contenedor.querySelector('.texto-alerta-error') : null;
-    if (alerta) {
-        alerta.textContent = mensaje;
-        alerta.style.display = 'block';
-        campo.style.borderColor = 'var(--color-alerta-salmon-fondo)';
-    }
-}
-
-function desactivarAlertaControl(campo) {
-    if (!campo) return;
-    const contenedor = campo.closest('.bloque-campo-formulario');
-    const alerta = contenedor ? contenedor.querySelector('.texto-alerta-error') : null;
-    if (alerta) {
-        alerta.style.display = 'none';
-        campo.style.borderColor = 'var(--borde-suave)';
-    }
-}
-
-function validarCedulaControl(cedula) {
-    if (cedula.length !== 10 || !/^\d+$/.test(cedula)) return false;
-    const region = parseInt(cedula.substring(0, 2));
-    if (region < 1 || region > 24) return false;
-    let suma = 0;
-    for (let i = 0; i < 9; i++) {
-        let mult = (i % 2 === 0) ? parseInt(cedula[i]) * 2 : parseInt(cedula[i]) * 1;
-        if (mult > 9) mult -= 9;
-        suma += mult;
-    }
-    const verificador = (suma % 10 === 0) ? 0 : 10 - (suma % 10);
-    return verificador === parseInt(cedula[9]);
-}
-
-function esFechaDeHoy(fechaStr) {
-    if (!fechaStr) return false;
-    const ahora = new Date();
-    const hoyAnio = ahora.getFullYear();
-    const hoyMes = ahora.getMonth() + 1; // 1-12
-    const hoyDia = ahora.getDate();
-
-    const str = String(fechaStr).trim();
-
-    // Formato YYYY-MM-DD
-    if (/^\d{4}-\d{1,2}-\d{1,2}/.test(str)) {
-        const partes = str.split('T')[0].split('-');
-        const anio = parseInt(partes[0], 10);
-        const mes = parseInt(partes[1], 10);
-        const dia = parseInt(partes[2], 10);
-        return anio === hoyAnio && mes === hoyMes && dia === hoyDia;
+// Localiza el último movimiento vehicular asentado en el historial para sincronizar su estado.
+function obtenerUltimoMovimientoVehiculo(historialMovimientos, vehiculo) {
+    if (!Array.isArray(historialMovimientos) || !vehiculo) {
+        return null;
     }
 
-    // Formato DD/MM/YYYY
-    if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(str)) {
-        const partes = str.split('/');
-        const dia = parseInt(partes[0], 10);
-        const mes = parseInt(partes[1], 10);
-        const anio = parseInt(partes[2], 10);
-        return anio === hoyAnio && mes === hoyMes && dia === hoyDia;
-    }
+    // Utiliza la función compartida de normalización alfanumérica definida en scripts/informacion.js.
+    const placaVehiculoNormalizada = normalizarTextoAlfanumerico(vehiculo.placa_vehicular);
+    const identificadorVehiculoNormalizado = normalizarTextoAlfanumerico(vehiculo.identificador_sistema || vehiculo.identificador_solicitud);
 
-    const d = new Date(str);
-    if (!isNaN(d.getTime())) {
-        return d.getFullYear() === hoyAnio && (d.getMonth() + 1) === hoyMes && d.getDate() === hoyDia;
-    }
-
-    return false;
-}
-
-function obtenerUltimoMovimientoVehiculo(historial, vehiculo) {
-    if (!Array.isArray(historial) || !vehiculo) return null;
-    const normalizar = (txt) => (txt || '').toString().trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-    const placaVehNorm = normalizar(vehiculo.placa_vehicular);
-    const idVehNorm = normalizar(vehiculo.identificador_sistema || vehiculo.identificador_solicitud);
-
-    const movimientos = historial.filter(m => {
-        const mPlaca = normalizar(m.placa_vehicular);
-        const mId = normalizar(m.identificador);
-        const coincidePlaca = mPlaca && placaVehNorm && mPlaca !== 'SP' && mPlaca === placaVehNorm;
-        const coincideId = mId && idVehNorm && mId === idVehNorm;
-        return coincidePlaca || coincideId;
+    // Array.prototype.filter: Filtra los movimientos que concuerden por placa o identificador institucional.
+    const movimientosCoincidentes = historialMovimientos.filter(function(movimiento) {
+        const placaMovimientoNormalizada = normalizarTextoAlfanumerico(movimiento.placa_vehicular);
+        const identificadorMovimientoNormalizado = normalizarTextoAlfanumerico(movimiento.identificador);
+        const coincidePlaca = placaMovimientoNormalizada && placaVehiculoNormalizada && placaMovimientoNormalizada !== 'SP' && placaMovimientoNormalizada === placaVehiculoNormalizada;
+        const coincideIdentificador = identificadorMovimientoNormalizado && identificadorVehiculoNormalizado && identificadorMovimientoNormalizado === identificadorVehiculoNormalizado;
+        return coincidePlaca || coincideIdentificador;
     });
 
-    return movimientos.length > 0 ? movimientos[movimientos.length - 1] : null;
+    // Retorna el último elemento del arreglo de movimientos filtrados si existe alguno.
+    return movimientosCoincidentes.length > 0 ? movimientosCoincidentes[movimientosCoincidentes.length - 1] : null;
 }
 
+// document.addEventListener: Registra la inicialización general de la interfaz al cargarse el documento.
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. VERIFICAR SESIÓN DE PUNTO DE CONTROL
-    const sesion = JSON.parse(localStorage.getItem('sesion_activa'));
-    if (!sesion || sesion.rol_sistema !== 'guardia') {
+    // 1. Verificación de sesión de guardia de punto de control.
+    const sesionActiva = JSON.parse(localStorage.getItem('sesion_activa'));
+    if (!sesionActiva || sesionActiva.rol_sistema !== 'guardia') {
+        // window.location.href: Redirige a la pantalla de login si no hay privilegios de guardia.
         window.location.href = 'inicio-sesion.html';
         return;
     }
 
-    const nombrePuntoAsignado = sesion.punto_control_asignado || "Punto de control N01";
-    const headerPunto = document.getElementById('header-punto-control');
-    if (headerPunto) headerPunto.textContent = nombrePuntoAsignado;
-
-    const insignia = document.getElementById('insignia-punto');
-    if (insignia) {
-        const digitos = nombrePuntoAsignado.replace(/\D/g, ''); 
-        insignia.textContent = digitos ? digitos.padStart(2, '0') : '--';
+    // Configura visualmente el encabezado del punto de control asignado a la sesión actual.
+    const nombrePuntoAsignado = sesionActiva.punto_control_asignado || "Punto de control N01";
+    const etiquetaEncabezadoPuntoControl = document.getElementById('header-punto-control');
+    if (etiquetaEncabezadoPuntoControl) {
+        etiquetaEncabezadoPuntoControl.textContent = nombrePuntoAsignado;
     }
 
-    document.getElementById('boton-cerrar-sesion')?.addEventListener('click', () => {
-        localStorage.removeItem('sesion_activa');
-        window.location.href = 'inicio-sesion.html';
-    });
+    // Extrae y formatea el número de garita para la insignia visual.
+    const etiquetaInsigniaPuntoControl = document.getElementById('insignia-punto');
+    if (etiquetaInsigniaPuntoControl) {
+        // String.prototype.replace: Extrae los dígitos numéricos del texto descriptivo del punto de control.
+        const digitosPunto = nombrePuntoAsignado.replace(/\D/g, ''); 
+        etiquetaInsigniaPuntoControl.textContent = digitosPunto ? digitosPunto.padStart(2, '0') : '--';
+    }
 
-    // 2. RENDERIZAR HISTORIAL
-    function renderizarHistorial() {
-        const contenedor = document.getElementById('cuerpo-tabla-historial');
-        if (!contenedor) return;
-
-        const db = typeof obtenerBaseDatos === 'function' ? obtenerBaseDatos() : JSON.parse(localStorage.getItem('base_de_datos'));
-        const historial = db?.historial_movimientos || [];
-        contenedor.innerHTML = '';
-
-        // Filtrar exclusivamente los registros que corresponden al punto de control asignado a esta sesión
-        const puntoActual = sesion.punto_control_asignado || "Punto de control N01";
-        const normalizarPunto = (p) => (p || '').toString().trim().toUpperCase().replace(/PUNTO\s*DE\s*CONTROL/g, '').replace(/[^A-Z0-9]/g, '');
-        const codigoPuntoActual = normalizarPunto(puntoActual);
-
-        const historialFiltrado = historial.filter(item => {
-            const codigoItem = normalizarPunto(item.punto_control);
-            // Compatibilidad con registros previos sin punto especificado
-            if (!codigoItem) return codigoPuntoActual === "N01";
-            return codigoItem === codigoPuntoActual;
+    // Registra el evento de cierre de sesión para el personal de control.
+    const botonCerrarSesion = document.getElementById('boton-cerrar-sesion');
+    if (botonCerrarSesion) {
+        botonCerrarSesion.addEventListener('click', function() {
+            // localStorage.removeItem: Limpia la sesión del usuario del almacenamiento persistente.
+            localStorage.removeItem('sesion_activa');
+            window.location.href = 'inicio-sesion.html';
         });
+    }
 
-        if (historialFiltrado.length === 0) {
-            contenedor.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--color-texto-atenuado);">No se han registrado movimientos vehiculares en este punto de control</td></tr>`;
+    // 2. Renderización de la tabla del historial de movimientos vehiculares.
+    function renderizarHistorial() {
+        const cuerpoTablaHistorial = document.getElementById('cuerpo-tabla-historial');
+        if (!cuerpoTablaHistorial) {
             return;
         }
 
-        historialFiltrado.slice().reverse().forEach(item => {
-            const fila = `
+        // Obtiene la persistencia centralizada mediante la función global reutilizable de scripts/informacion.js.
+        const baseDeDatos = obtenerBaseDatos();
+        const historialMovimientos = baseDeDatos?.historial_movimientos || [];
+        // Element.innerHTML: Vacía los registros visuales anteriores de la tabla.
+        cuerpoTablaHistorial.innerHTML = '';
+
+        // Utiliza la función compartida normalizarCodigoPuntoControl de scripts/informacion.js.
+        const codigoPuntoActual = normalizarCodigoPuntoControl(sesionActiva.punto_control_asignado || "Punto de control N01");
+
+        // Array.prototype.filter: Filtra los movimientos vehiculares que pertenecen estrictamente a este punto de control.
+        const historialFiltrado = historialMovimientos.filter(function(movimiento) {
+            const codigoMovimiento = normalizarCodigoPuntoControl(movimiento.punto_control);
+            if (!codigoMovimiento) {
+                return codigoPuntoActual === "N01";
+            }
+            return codigoMovimiento === codigoPuntoActual;
+        });
+
+        // Muestra mensaje informativo si la tabla no contiene movimientos registrados.
+        if (historialFiltrado.length === 0) {
+            cuerpoTablaHistorial.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--color-texto-atenuado);">No se han registrado movimientos vehiculares en este punto de control</td></tr>`;
+            return;
+        }
+
+        // Array.prototype.slice y reverse: Invierte el listado para presentar los eventos más recientes primero.
+        historialFiltrado.slice().reverse().forEach(function(movimiento) {
+            const codigoHtmlFila = `
                 <tr>
-                    <td>${item.fecha}</td>
-                    <td>${item.hora}</td>
-                    <td><strong>${item.placa_vehicular}</strong></td>
-                    <td>${item.propietario}</td>
-                    <td>${item.tipo_usuario}</td>
+                    <td>${movimiento.fecha}</td>
+                    <td>${movimiento.hora}</td>
+                    <td><strong>${movimiento.placa_vehicular}</strong></td>
+                    <td>${movimiento.propietario}</td>
+                    <td>${movimiento.tipo_usuario}</td>
                     <td class="columna-centrada">
                         <span class="dato-valor movimiento-tabla-texto">
-                            ${item.tipo_movimiento}
+                            ${movimiento.tipo_movimiento}
                         </span>
                     </td>
                 </tr>`;
-            contenedor.insertAdjacentHTML('beforeend', fila);
+            // Element.insertAdjacentHTML: Inserta la fila al final del cuerpo de la tabla.
+            cuerpoTablaHistorial.insertAdjacentHTML('beforeend', codigoHtmlFila);
         });
     }
 
-    // 3. BUSCADOR DE VEHÍCULOS
-    const formComprobar = document.getElementById('form-comprobar-vehiculo');
-    const entradaBusqueda = document.getElementById('entrada-busqueda-control');
-    const tarjetaResultado = document.getElementById('tarjeta-resultado-coincidencia');
-    const mensajeError = document.getElementById('mensaje-sin-coincidencia');
+    // 3. Mecanismo de comprobación y búsqueda de vehículos o visitas.
+    const formularioComprobarVehiculo = document.getElementById('form-comprobar-vehiculo');
+    const campoEntradaBusquedaControl = document.getElementById('entrada-busqueda-control');
+    const tarjetaResultadoCoincidencia = document.getElementById('tarjeta-resultado-coincidencia');
+    const etiquetaMensajeSinCoincidencia = document.getElementById('mensaje-sin-coincidencia');
 
-    if (entradaBusqueda) {
-        entradaBusqueda.addEventListener('input', () => {
-            entradaBusqueda.value = entradaBusqueda.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
-            if (mensajeError) mensajeError.style.display = 'none';
-        });
-    }
-
-    formComprobar?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const criterio = entradaBusqueda.value.trim().toUpperCase();
-
-        if (!criterio) {
-            vehiculoEncontradoActual = null;
-            if (tarjetaResultado) tarjetaResultado.style.display = 'none';
-            if (mensajeError) {
-                mensajeError.textContent = "Registre una placa o identificador vehicular";
-                mensajeError.style.display = 'block';
+    // Normaliza caracteres en el campo de búsqueda de placa o identificador.
+    if (campoEntradaBusquedaControl) {
+        campoEntradaBusquedaControl.addEventListener('input', function() {
+            campoEntradaBusquedaControl.value = campoEntradaBusquedaControl.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+            if (etiquetaMensajeSinCoincidencia) {
+                etiquetaMensajeSinCoincidencia.style.display = 'none';
             }
-            return;
-        }
-
-        const db = typeof obtenerBaseDatos === 'function' ? obtenerBaseDatos() : JSON.parse(localStorage.getItem('base_de_datos'));
-        const normalizar = (txt) => (txt || '').toString().trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-        const criterioNorm = normalizar(criterio);
-
-        // 1. Buscar en vehículos propios autorizados
-        let vehiculo = (db?.vehiculos || []).find(v => {
-            if (v.estado_autorizacion !== "Autorizado") return false;
-            const placaNorm = normalizar(v.placa_vehicular);
-            const idSisNorm = normalizar(v.identificador_sistema);
-            return (placaNorm && placaNorm === criterioNorm) || (idSisNorm && idSisNorm === criterioNorm);
         });
+    }
 
-        // 2. Buscar en visitas autorizadas y registros temporales
-        if (!vehiculo) {
-            const autorizacion = (db?.autorizaciones_visitas || []).find(a => {
-                const estado = a.estado_solicitud || a.estado_autorizacion;
-                if (estado !== "Autorizado") return false;
+    // Escucha el envío del formulario para ejecutar la búsqueda de coincidencias.
+    if (formularioComprobarVehiculo) {
+        formularioComprobarVehiculo.addEventListener('submit', function(evento) {
+            // Event.preventDefault: Evita la recarga automática de la página.
+            evento.preventDefault();
+            const criterioBusqueda = campoEntradaBusquedaControl.value.trim().toUpperCase();
 
-                const idSolNorm = normalizar(a.identificador_solicitud || a.identificador_sistema);
-                const placaVisitaNorm = normalizar(a.vehiculo?.placa_vehicular);
+            // Valida que el guardia haya ingresado un criterio de búsqueda.
+            if (!criterioBusqueda) {
+                vehiculoEncontradoActual = null;
+                if (tarjetaResultadoCoincidencia) {
+                    tarjetaResultadoCoincidencia.style.display = 'none';
+                }
+                if (etiquetaMensajeSinCoincidencia) {
+                    etiquetaMensajeSinCoincidencia.textContent = "Registre una placa o identificador vehicular";
+                    etiquetaMensajeSinCoincidencia.style.display = 'block';
+                }
+                return;
+            }
 
-                const coincideId = idSolNorm && idSolNorm === criterioNorm;
-                const coincidePlaca = placaVisitaNorm && placaVisitaNorm !== "SP" && placaVisitaNorm === criterioNorm;
+            const baseDeDatos = obtenerBaseDatos();
+            // Emplea la función global normalizarTextoAlfanumerico.
+            const criterioNormalizado = normalizarTextoAlfanumerico(criterioBusqueda);
 
-                if (!coincideId && !coincidePlaca) return false;
-
-                // Validación estricta de fecha para visitas:
-                // Solo debe aparecer si es el día correspondiente a la fecha programada.
-                // Si el vehículo ya ingresó (está dentro), se le permite procesar su salida.
-                const fechaProg = a.visita?.fecha_programada;
-                const estaDentro = a.ubicacion_actual === "Dentro de las instalaciones";
-                if (!estaDentro && fechaProg && !esFechaDeHoy(fechaProg)) {
+            // Paso 1: Busca en la colección de vehículos propios autorizados del personal y estudiantes.
+            let vehiculo = (baseDeDatos?.vehiculos || []).find(function(vehiculoRegistrado) {
+                if (vehiculoRegistrado.estado_autorizacion !== "Autorizado") {
                     return false;
                 }
-
-                return true;
+                const placaNormalizada = normalizarTextoAlfanumerico(vehiculoRegistrado.placa_vehicular);
+                const identificadorNormalizado = normalizarTextoAlfanumerico(vehiculoRegistrado.identificador_sistema);
+                return (placaNormalizada && placaNormalizada === criterioNormalizado) || 
+                       (identificadorNormalizado && identificadorNormalizado === criterioNormalizado);
             });
 
-            if (autorizacion) {
-                const solicitante = (db?.usuarios || []).find(u => u.numero_identificacion === autorizacion.solicitante_id);
-                const veh = autorizacion.vehiculo || {};
-                const vis = autorizacion.visitante || {};
-                vehiculo = {
-                    es_visita: true,
-                    identificador_solicitud: autorizacion.identificador_solicitud,
-                    identificador_sistema: autorizacion.identificador_solicitud,
-                    placa_vehicular: veh.placa_vehicular || "S/P",
-                    tipo_vehiculo: veh.tipo_vehiculo || "Peatonal / Otro",
-                    color: veh.color || "No especificado",
-                    fabricante: veh.fabricante || "No especificado",
-                    modelo: veh.modelo || "No especificado",
-                    ubicacion_actual: autorizacion.ubicacion_actual || "Fuera de las instalaciones",
-                    propietario_nombre: vis.nombres_apellidos || "Visitante",
-                    propietario_cedula: vis.numero_identificacion || "-",
-                    titulo_propietario: "Información del visitante (Visita)",
-                    solicitante_nombre: solicitante ? solicitante.nombres_apellidos : "Institucional"
-                };
-            }
-        }
+            // Paso 2: Si no se encuentra en vehículos propios, busca en autorizaciones de visitas aprobadas.
+            if (!vehiculo) {
+                const autorizacionVisita = (baseDeDatos?.autorizaciones_visitas || []).find(function(registroAutorizacion) {
+                    const estadoAutorizacion = registroAutorizacion.estado_solicitud || registroAutorizacion.estado_autorizacion;
+                    if (estadoAutorizacion !== "Autorizado") {
+                        return false;
+                    }
 
-        if (vehiculo) {
-            // Sincronizar ubicación_actual según el último movimiento registrado en el sistema
-            const ultimoMov = obtenerUltimoMovimientoVehiculo(db?.historial_movimientos, vehiculo);
-            if (ultimoMov) {
-                vehiculo.ubicacion_actual = (ultimoMov.tipo_movimiento === "Entrada")
-                    ? "Dentro de las instalaciones"
-                    : "Fuera de las instalaciones";
-            } else if (!vehiculo.ubicacion_actual) {
-                vehiculo.ubicacion_actual = "Fuera de las instalaciones";
-            }
+                    const identificadorSolicitudNormalizado = normalizarTextoAlfanumerico(registroAutorizacion.identificador_solicitud || registroAutorizacion.identificador_sistema);
+                    const placaVisitaNormalizada = normalizarTextoAlfanumerico(registroAutorizacion.vehiculo?.placa_vehicular);
 
-            // Si la ubicación en la base de datos estaba desactualizada, sincronizarla
-            let cambiosSync = false;
-            if (!vehiculo.es_visita && Array.isArray(db?.vehiculos)) {
-                const vEnDb = db.vehiculos.find(v => normalizar(v.identificador_sistema) === normalizar(vehiculo.identificador_sistema));
-                if (vEnDb && vEnDb.ubicacion_actual !== vehiculo.ubicacion_actual) {
-                    vEnDb.ubicacion_actual = vehiculo.ubicacion_actual;
-                    cambiosSync = true;
+                    const coincideIdentificador = identificadorSolicitudNormalizado && identificadorSolicitudNormalizado === criterioNormalizado;
+                    const coincidePlaca = placaVisitaNormalizada && placaVisitaNormalizada !== "SP" && placaVisitaNormalizada === criterioNormalizado;
+
+                    if (!coincideIdentificador && !coincidePlaca) {
+                        return false;
+                    }
+
+                    // Validación cronológica: utiliza la función compartida esFechaActualHoy de scripts/informacion.js.
+                    const fechaProgramadaVisita = registroAutorizacion.visita?.fecha_programada;
+                    const estaDentroInstalaciones = registroAutorizacion.ubicacion_actual === "Dentro de las instalaciones";
+                    if (!estaDentroInstalaciones && fechaProgramadaVisita && !esFechaActualHoy(fechaProgramadaVisita)) {
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                if (autorizacionVisita) {
+                    const usuarioSolicitante = (baseDeDatos?.usuarios || []).find(function(usuario) {
+                        return usuario.numero_identificacion === autorizacionVisita.solicitante_id;
+                    });
+                    const vehiculoVisita = autorizacionVisita.vehiculo || {};
+                    const datosVisitante = autorizacionVisita.visitante || {};
+
+                    // Mapea la estructura del vehículo de visita para unificar la renderización visual.
+                    vehiculo = {
+                        es_visita: true,
+                        identificador_solicitud: autorizacionVisita.identificador_solicitud,
+                        identificador_sistema: autorizacionVisita.identificador_solicitud,
+                        placa_vehicular: vehiculoVisita.placa_vehicular || "S/P",
+                        tipo_vehiculo: vehiculoVisita.tipo_vehiculo || "Peatonal / Otro",
+                        color: vehiculoVisita.color || "No especificado",
+                        fabricante: vehiculoVisita.fabricante || "No especificado",
+                        modelo: vehiculoVisita.modelo || "No especificado",
+                        ubicacion_actual: autorizacionVisita.ubicacion_actual || "Fuera de las instalaciones",
+                        propietario_nombre: datosVisitante.nombres_apellidos || "Visitante",
+                        propietario_cedula: datosVisitante.numero_identificacion || "-",
+                        titulo_propietario: "Información del visitante (Visita)",
+                        solicitante_nombre: usuarioSolicitante ? usuarioSolicitante.nombres_apellidos : "Institucional"
+                    };
                 }
-            } else if (vehiculo.es_visita && Array.isArray(db?.autorizaciones_visitas)) {
-                const aEnDb = db.autorizaciones_visitas.find(a => normalizar(a.identificador_solicitud) === normalizar(vehiculo.identificador_solicitud));
-                if (aEnDb && aEnDb.ubicacion_actual !== vehiculo.ubicacion_actual) {
-                    aEnDb.ubicacion_actual = vehiculo.ubicacion_actual;
-                    cambiosSync = true;
+            }
+
+            // Si se identificó un vehículo o visita, sincroniza su estado y muestra los resultados.
+            if (vehiculo) {
+                const ultimoMovimientoRegistrado = obtenerUltimoMovimientoVehiculo(baseDeDatos?.historial_movimientos, vehiculo);
+                if (ultimoMovimientoRegistrado) {
+                    vehiculo.ubicacion_actual = (ultimoMovimientoRegistrado.tipo_movimiento === "Entrada")
+                        ? "Dentro de las instalaciones"
+                        : "Fuera de las instalaciones";
+                } else if (!vehiculo.ubicacion_actual) {
+                    vehiculo.ubicacion_actual = "Fuera de las instalaciones";
+                }
+
+                // Sincroniza en la base de datos si existía discrepancia de ubicación física.
+                let huboSincronizacionUbicacion = false;
+                if (!vehiculo.es_visita && Array.isArray(baseDeDatos?.vehiculos)) {
+                    const vehiculoEnBaseDatos = baseDeDatos.vehiculos.find(function(registroVehiculo) {
+                        return normalizarTextoAlfanumerico(registroVehiculo.identificador_sistema) === normalizarTextoAlfanumerico(vehiculo.identificador_sistema);
+                    });
+                    if (vehiculoEnBaseDatos && vehiculoEnBaseDatos.ubicacion_actual !== vehiculo.ubicacion_actual) {
+                        vehiculoEnBaseDatos.ubicacion_actual = vehiculo.ubicacion_actual;
+                        huboSincronizacionUbicacion = true;
+                    }
+                } else if (vehiculo.es_visita && Array.isArray(baseDeDatos?.autorizaciones_visitas)) {
+                    const autorizacionEnBaseDatos = baseDeDatos.autorizaciones_visitas.find(function(registroAutorizacion) {
+                        return normalizarTextoAlfanumerico(registroAutorizacion.identificador_solicitud) === normalizarTextoAlfanumerico(vehiculo.identificador_solicitud);
+                    });
+                    if (autorizacionEnBaseDatos && autorizacionEnBaseDatos.ubicacion_actual !== vehiculo.ubicacion_actual) {
+                        autorizacionEnBaseDatos.ubicacion_actual = vehiculo.ubicacion_actual;
+                        huboSincronizacionUbicacion = true;
+                    }
+                }
+
+                if (huboSincronizacionUbicacion) {
+                    guardarCambios(baseDeDatos);
+                }
+
+                vehiculoEncontradoActual = vehiculo;
+                if (etiquetaMensajeSinCoincidencia) {
+                    etiquetaMensajeSinCoincidencia.style.display = 'none';
+                }
+                mostrarResultadoVehiculo(vehiculo, baseDeDatos);
+            } else {
+                vehiculoEncontradoActual = null;
+                if (tarjetaResultadoCoincidencia) {
+                    tarjetaResultadoCoincidencia.style.display = 'none';
+                }
+                if (etiquetaMensajeSinCoincidencia) {
+                    etiquetaMensajeSinCoincidencia.textContent = "No se encontró ningún resultado con los datos registrados";
+                    etiquetaMensajeSinCoincidencia.style.display = 'block';
                 }
             }
-            if (cambiosSync) {
-                if (typeof guardarCambios === 'function') guardarCambios(db);
-                else localStorage.setItem('base_de_datos', JSON.stringify(db));
-            }
+        });
+    }
 
-            vehiculoEncontradoActual = vehiculo;
-            if (mensajeError) mensajeError.style.display = 'none';
-            mostrarResultadoVehiculo(vehiculo, db);
-        } else {
-            vehiculoEncontradoActual = null;
-            if (tarjetaResultado) tarjetaResultado.style.display = 'none';
-            if (mensajeError) {
-                mensajeError.textContent = "No se encontró ningún resultado con los datos registrados";
-                mensajeError.style.display = 'block';
-            }
-        }
-    });
-
-    // 4. MOSTRAR TARJETA DE RESULTADO Y ALTERNAR BOTÓN
-    function mostrarResultadoVehiculo(vehiculo, db) {
-        // Asegurar que vehiculo tenga la ubicación sincronizada según el último movimiento en el historial
-        const ultimoMov = obtenerUltimoMovimientoVehiculo(db?.historial_movimientos, vehiculo);
-        if (ultimoMov) {
-            vehiculo.ubicacion_actual = (ultimoMov.tipo_movimiento === "Entrada")
+    // 4. Despliega la tarjeta visual con los datos del vehículo y el botón dinámico de Entrada/Salida.
+    function mostrarResultadoVehiculo(vehiculo, baseDeDatos) {
+        const ultimoMovimientoRegistrado = obtenerUltimoMovimientoVehiculo(baseDeDatos?.historial_movimientos, vehiculo);
+        if (ultimoMovimientoRegistrado) {
+            vehiculo.ubicacion_actual = (ultimoMovimientoRegistrado.tipo_movimiento === "Entrada")
                 ? "Dentro de las instalaciones"
                 : "Fuera de las instalaciones";
         } else if (!vehiculo.ubicacion_actual) {
             vehiculo.ubicacion_actual = "Fuera de las instalaciones";
         }
 
+        // Actualiza los elementos textuales con las especificaciones del vehículo.
         document.getElementById('res-placa').textContent = vehiculo.placa_vehicular;
         document.getElementById('res-identificador').textContent = vehiculo.identificador_sistema;
         document.getElementById('res-ubicacion').textContent = vehiculo.ubicacion_actual;
 
-        const btnFicha = document.getElementById('btn-ver-ficha-control');
+        const botonVerFichaVehicular = document.getElementById('btn-ver-ficha-control');
 
+        // Adapta los títulos y datos si el registro corresponde a una visita o a un miembro institucional.
         if (vehiculo.es_visita) {
             document.getElementById('res-titulo-propietario').textContent = vehiculo.titulo_propietario;
             document.getElementById('res-propietario-nombre').textContent = vehiculo.propietario_nombre;
             document.getElementById('res-propietario-cedula').textContent = vehiculo.propietario_cedula;
-            if (btnFicha) btnFicha.style.display = 'none';
+            if (botonVerFichaVehicular) {
+                botonVerFichaVehicular.style.display = 'none';
+            }
         } else {
-            const propietario = (db?.usuarios || []).find(u => u.numero_identificacion === vehiculo.propietario_id);
-            const tipoUsr = propietario ? `(${propietario.tipo_usuario})` : "";
-            document.getElementById('res-titulo-propietario').textContent = `Información del propietario ${tipoUsr}`;
-            document.getElementById('res-propietario-nombre').textContent = propietario ? propietario.nombres_apellidos : "No registrado";
+            const usuarioPropietario = (baseDeDatos?.usuarios || []).find(function(usuario) {
+                return usuario.numero_identificacion === vehiculo.propietario_id;
+            });
+            const etiquetaTipoUsuario = usuarioPropietario ? `(${usuarioPropietario.tipo_usuario})` : "";
+            document.getElementById('res-titulo-propietario').textContent = `Información del propietario ${etiquetaTipoUsuario}`;
+            document.getElementById('res-propietario-nombre').textContent = usuarioPropietario ? usuarioPropietario.nombres_apellidos : "No registrado";
             document.getElementById('res-propietario-cedula').textContent = vehiculo.propietario_id;
-            if (btnFicha) btnFicha.style.display = 'inline-flex';
+            if (botonVerFichaVehicular) {
+                botonVerFichaVehicular.style.display = 'inline-flex';
+            }
         }
 
         document.getElementById('res-tipo-vehiculo').textContent = vehiculo.tipo_vehiculo;
         document.getElementById('res-color').textContent = vehiculo.color;
         document.getElementById('res-modelo').textContent = `${vehiculo.fabricante || ''} ${vehiculo.modelo || ''}`.trim() || '-';
 
-        const textoUltimoMov = document.getElementById('res-ultimo-movimiento');
-        if (textoUltimoMov) {
-            if (ultimoMov) {
-                const puntoTexto = ultimoMov.punto_control ? ` (${ultimoMov.punto_control.replace('Punto de control ', '')})` : '';
-                textoUltimoMov.textContent = `Último movimiento: ${ultimoMov.tipo_movimiento} registrada el ${ultimoMov.fecha} a las ${ultimoMov.hora}${puntoTexto}.`;
+        // Actualiza el texto descriptivo del último movimiento asentado.
+        const etiquetaUltimoMovimiento = document.getElementById('res-ultimo-movimiento');
+        if (etiquetaUltimoMovimiento) {
+            if (ultimoMovimientoRegistrado) {
+                const puntoTexto = ultimoMovimientoRegistrado.punto_control ? ` (${ultimoMovimientoRegistrado.punto_control.replace('Punto de control ', '')})` : '';
+                etiquetaUltimoMovimiento.textContent = `Último movimiento: ${ultimoMovimientoRegistrado.tipo_movimiento} registrada el ${ultimoMovimientoRegistrado.fecha} a las ${ultimoMovimientoRegistrado.hora}${puntoTexto}.`;
             } else {
-                textoUltimoMov.textContent = "Sin movimientos previos registrados hoy.";
+                etiquetaUltimoMovimiento.textContent = "Sin movimientos previos registrados hoy.";
             }
         }
 
         configurarBotonMovimiento(vehiculo.ubicacion_actual);
-        if (tarjetaResultado) tarjetaResultado.style.display = 'flex';
-    }
-
-    function configurarBotonMovimiento(ubicacion) {
-        const btn = document.getElementById('btn-confirmar-movimiento');
-        const txt = document.getElementById('texto-btn-movimiento');
-        const icono = document.getElementById('icono-movimiento');
-
-        if (ubicacion === "Dentro de las instalaciones") {
-            btn.className = "boton-accion-movimiento movimiento-salida";
-            txt.textContent = "Confirmar salida";
-            if (icono) icono.src = "recursos/imagenes/eliminar.svg";
-        } else {
-            btn.className = "boton-accion-movimiento movimiento-entrada";
-            txt.textContent = "Confirmar entrada";
-            if (icono) icono.src = "recursos/imagenes/aceptar.svg";
+        if (tarjetaResultadoCoincidencia) {
+            tarjetaResultadoCoincidencia.style.display = 'flex';
         }
     }
 
-    // 5. REGISTRAR EL MOVIMIENTO
-    document.getElementById('btn-confirmar-movimiento')?.addEventListener('click', function() {
-        if (!vehiculoEncontradoActual) return;
+    // Configura el estilo, ícono y texto del botón de confirmación de movimiento.
+    function configurarBotonMovimiento(ubicacionActual) {
+        const botonAccionMovimiento = document.getElementById('btn-confirmar-movimiento');
+        const etiquetaTextoBotonMovimiento = document.getElementById('texto-btn-movimiento');
+        const iconoBotonMovimiento = document.getElementById('icono-movimiento');
 
-        const db = typeof obtenerBaseDatos === 'function' ? obtenerBaseDatos() : JSON.parse(localStorage.getItem('base_de_datos'));
-        const ahora = new Date();
-        const dia = String(ahora.getDate()).padStart(2, '0');
-        const mes = String(ahora.getMonth() + 1).padStart(2, '0');
-        const fechaHoy = `${dia}/${mes}/${ahora.getFullYear()}`;
-        const horaHoy = `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
-
-        let tipoMovimiento = "";
-
-        if (vehiculoEncontradoActual.es_visita) {
-            const normalizar = (txt) => (txt || '').toString().trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-            const idActualNorm = normalizar(vehiculoEncontradoActual.identificador_solicitud || vehiculoEncontradoActual.identificador_sistema);
-            const placaActualNorm = normalizar(vehiculoEncontradoActual.placa_vehicular);
-
-            const autorizacion = (db?.autorizaciones_visitas || []).find(a => {
-                const aIdNorm = normalizar(a.identificador_solicitud || a.identificador_sistema);
-                const aPlacaNorm = normalizar(a.vehiculo?.placa_vehicular);
-                return (aIdNorm && aIdNorm === idActualNorm) || (aPlacaNorm && aPlacaNorm !== 'SP' && aPlacaNorm === placaActualNorm);
-            });
-            if (!autorizacion) return;
-
-            const ubicacionActual = autorizacion.ubicacion_actual || vehiculoEncontradoActual.ubicacion_actual || "Fuera de las instalaciones";
-            const esSalida = ubicacionActual === "Dentro de las instalaciones";
-            tipoMovimiento = esSalida ? "Salida" : "Entrada";
-
-            if (!Array.isArray(db.historial_movimientos)) db.historial_movimientos = [];
-            db.historial_movimientos.push({
-                fecha: fechaHoy,
-                hora: horaHoy,
-                identificador: autorizacion.identificador_solicitud,
-                tipo_vehiculo: autorizacion.vehiculo?.tipo_vehiculo || "Peatonal / Otro",
-                placa_vehicular: autorizacion.vehiculo?.placa_vehicular || "S/P",
-                propietario: autorizacion.visitante?.nombres_apellidos || "Visitante",
-                tipo_usuario: "Visitante",
-                tipo_movimiento: tipoMovimiento,
-                punto_control: sesion.punto_control_asignado || "Punto de control N01"
-            });
-
-            if (esSalida) {
-                db.autorizaciones_visitas = db.autorizaciones_visitas.filter(a => normalizar(a.identificador_solicitud) !== normalizar(autorizacion.identificador_solicitud));
-                tarjetaResultado.style.display = 'none';
-                if (entradaBusqueda) entradaBusqueda.value = '';
-                vehiculoEncontradoActual = null;
-            } else {
-                autorizacion.ubicacion_actual = "Dentro de las instalaciones";
-                vehiculoEncontradoActual.ubicacion_actual = autorizacion.ubicacion_actual;
+        if (ubicacionActual === "Dentro de las instalaciones") {
+            botonAccionMovimiento.className = "boton-accion-movimiento movimiento-salida";
+            etiquetaTextoBotonMovimiento.textContent = "Confirmar salida";
+            if (iconoBotonMovimiento) {
+                iconoBotonMovimiento.src = "recursos/imagenes/eliminar.svg";
             }
         } else {
-            const normalizar = (txt) => (txt || '').toString().trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-            const idActualNorm = normalizar(vehiculoEncontradoActual.identificador_sistema);
-            const placaActualNorm = normalizar(vehiculoEncontradoActual.placa_vehicular);
+            botonAccionMovimiento.className = "boton-accion-movimiento movimiento-entrada";
+            etiquetaTextoBotonMovimiento.textContent = "Confirmar entrada";
+            if (iconoBotonMovimiento) {
+                iconoBotonMovimiento.src = "recursos/imagenes/aceptar.svg";
+            }
+        }
+    }
 
-            const vehiculo = (db?.vehiculos || []).find(v => {
-                const vIdNorm = normalizar(v.identificador_sistema);
-                const vPlacaNorm = normalizar(v.placa_vehicular);
-                return (vIdNorm && vIdNorm === idActualNorm) || (vPlacaNorm && vPlacaNorm !== 'SP' && vPlacaNorm === placaActualNorm);
+    // 5. Registro persistente del movimiento (Entrada o Salida) en el historial.
+    const botonConfirmarMovimiento = document.getElementById('btn-confirmar-movimiento');
+    if (botonConfirmarMovimiento) {
+        botonConfirmarMovimiento.addEventListener('click', function() {
+            if (!vehiculoEncontradoActual) {
+                return;
+            }
+
+            const baseDeDatos = obtenerBaseDatos();
+            // Reutiliza la función global obtenerFechaHoraActual de scripts/informacion.js.
+            const tiempoActual = obtenerFechaHoraActual();
+            const cadenaFechaActual = tiempoActual.fecha;
+            const cadenaHoraActual = tiempoActual.hora;
+
+            let tipoMovimiento = "";
+
+            // Procesa si el vehículo en cuestión corresponde a una visita.
+            if (vehiculoEncontradoActual.es_visita) {
+                const identificadorActualNormalizado = normalizarTextoAlfanumerico(vehiculoEncontradoActual.identificador_solicitud || vehiculoEncontradoActual.identificador_sistema);
+                const placaActualNormalizada = normalizarTextoAlfanumerico(vehiculoEncontradoActual.placa_vehicular);
+
+                const autorizacionVisita = (baseDeDatos?.autorizaciones_visitas || []).find(function(registroAutorizacion) {
+                    const idNormalizado = normalizarTextoAlfanumerico(registroAutorizacion.identificador_solicitud || registroAutorizacion.identificador_sistema);
+                    const placaNormalizada = normalizarTextoAlfanumerico(registroAutorizacion.vehiculo?.placa_vehicular);
+                    return (idNormalizado && idNormalizado === identificadorActualNormalizado) || 
+                           (placaNormalizada && placaNormalizada !== 'SP' && placaNormalizada === placaActualNormalizada);
+                });
+                if (!autorizacionVisita) {
+                    return;
+                }
+
+                const ubicacionPrevia = autorizacionVisita.ubicacion_actual || vehiculoEncontradoActual.ubicacion_actual || "Fuera de las instalaciones";
+                const esSalida = ubicacionPrevia === "Dentro de las instalaciones";
+                tipoMovimiento = esSalida ? "Salida" : "Entrada";
+
+                if (!Array.isArray(baseDeDatos.historial_movimientos)) {
+                    baseDeDatos.historial_movimientos = [];
+                }
+                // Array.prototype.push: Anexa el nuevo evento de movimiento vehicular de visita.
+                baseDeDatos.historial_movimientos.push({
+                    fecha: cadenaFechaActual,
+                    hora: cadenaHoraActual,
+                    identificador: autorizacionVisita.identificador_solicitud,
+                    tipo_vehiculo: autorizacionVisita.vehiculo?.tipo_vehiculo || "Peatonal / Otro",
+                    placa_vehicular: autorizacionVisita.vehiculo?.placa_vehicular || "S/P",
+                    propietario: autorizacionVisita.visitante?.nombres_apellidos || "Visitante",
+                    tipo_usuario: "Visitante",
+                    tipo_movimiento: tipoMovimiento,
+                    punto_control: sesionActiva.punto_control_asignado || "Punto de control N01"
+                });
+
+                // Si concluye la visita con una salida, se retira de la lista activa; si entra, se marca dentro.
+                if (esSalida) {
+                    baseDeDatos.autorizaciones_visitas = baseDeDatos.autorizaciones_visitas.filter(function(registroAutorizacion) {
+                        return normalizarTextoAlfanumerico(registroAutorizacion.identificador_solicitud) !== normalizarTextoAlfanumerico(autorizacionVisita.identificador_solicitud);
+                    });
+                    tarjetaResultadoCoincidencia.style.display = 'none';
+                    if (campoEntradaBusquedaControl) {
+                        campoEntradaBusquedaControl.value = '';
+                    }
+                    vehiculoEncontradoActual = null;
+                } else {
+                    autorizacionVisita.ubicacion_actual = "Dentro de las instalaciones";
+                    vehiculoEncontradoActual.ubicacion_actual = autorizacionVisita.ubicacion_actual;
+                }
+            } else {
+                // Procesa si el vehículo pertenece a un usuario institucional regular.
+                const identificadorActualNormalizado = normalizarTextoAlfanumerico(vehiculoEncontradoActual.identificador_sistema);
+                const placaActualNormalizada = normalizarTextoAlfanumerico(vehiculoEncontradoActual.placa_vehicular);
+
+                const vehiculo = (baseDeDatos?.vehiculos || []).find(function(registroVehiculo) {
+                    const idNormalizado = normalizarTextoAlfanumerico(registroVehiculo.identificador_sistema);
+                    const placaNormalizada = normalizarTextoAlfanumerico(registroVehiculo.placa_vehicular);
+                    return (idNormalizado && idNormalizado === identificadorActualNormalizado) || 
+                           (placaNormalizada && placaNormalizada !== 'SP' && placaNormalizada === placaActualNormalizada);
+                });
+                if (!vehiculo) {
+                    return;
+                }
+
+                const usuarioPropietario = (baseDeDatos?.usuarios || []).find(function(usuario) {
+                    return usuario.numero_identificacion === vehiculo.propietario_id;
+                });
+
+                const ubicacionPrevia = vehiculo.ubicacion_actual || vehiculoEncontradoActual.ubicacion_actual || "Fuera de las instalaciones";
+                const esSalida = ubicacionPrevia === "Dentro de las instalaciones";
+                tipoMovimiento = esSalida ? "Salida" : "Entrada";
+
+                vehiculo.ubicacion_actual = esSalida ? "Fuera de las instalaciones" : "Dentro de las instalaciones";
+                vehiculoEncontradoActual.ubicacion_actual = vehiculo.ubicacion_actual;
+
+                if (!Array.isArray(baseDeDatos.historial_movimientos)) {
+                    baseDeDatos.historial_movimientos = [];
+                }
+                baseDeDatos.historial_movimientos.push({
+                    fecha: cadenaFechaActual,
+                    hora: cadenaHoraActual,
+                    identificador: vehiculo.identificador_sistema,
+                    tipo_vehiculo: vehiculo.tipo_vehiculo,
+                    placa_vehicular: vehiculo.placa_vehicular,
+                    propietario: usuarioPropietario ? usuarioPropietario.nombres_apellidos : "No asignado",
+                    tipo_usuario: usuarioPropietario ? usuarioPropietario.tipo_usuario : "Estudiante",
+                    tipo_movimiento: tipoMovimiento,
+                    punto_control: sesionActiva.punto_control_asignado || "Punto de control N01"
+                });
+            }
+
+            // Persiste los cambios mediante la función reutilizable guardarCambios.
+            guardarCambios(baseDeDatos);
+
+            // Refresca la información visual de la tarjeta tras el movimiento.
+            if (vehiculoEncontradoActual) {
+                document.getElementById('res-ubicacion').textContent = vehiculoEncontradoActual.ubicacion_actual;
+                const etiquetaTipoMovimiento = vehiculoEncontradoActual.ubicacion_actual === "Dentro de las instalaciones" ? "Entrada" : "Salida";
+                const etiquetaPuntoControl = (sesionActiva.punto_control_asignado || "Punto de control N01").replace('Punto de control ', '');
+                document.getElementById('res-ultimo-movimiento').textContent = `Último movimiento: ${etiquetaTipoMovimiento} registrada el ${cadenaFechaActual} a las ${cadenaHoraActual} (${etiquetaPuntoControl}).`;
+                configurarBotonMovimiento(vehiculoEncontradoActual.ubicacion_actual);
+            }
+
+            renderizarHistorial();
+
+            // Configura y despliega el modal de confirmación del movimiento registrado.
+            const etiquetaTituloModal = document.getElementById('titulo-modal-movimiento');
+            const etiquetaFechaModal = document.getElementById('info-fecha-movimiento');
+            if (etiquetaTituloModal) {
+                etiquetaTituloModal.textContent = `${tipoMovimiento} registrada correctamente`;
+            }
+            if (etiquetaFechaModal) {
+                etiquetaFechaModal.textContent = `Fecha y hora en que se registró el movimiento: ${cadenaFechaActual} a las ${cadenaHoraActual}.`;
+            }
+
+            abrirModal('modal-movimiento-exito');
+        });
+    }
+
+    // 6. Despliega la ficha técnica detallada del vehículo seleccionado.
+    const botonVerFichaControl = document.getElementById('btn-ver-ficha-control');
+    if (botonVerFichaControl) {
+        botonVerFichaControl.addEventListener('click', function() {
+            if (!vehiculoEncontradoActual || !vehiculoEncontradoActual.identificador_sistema) {
+                return;
+            }
+            
+            const baseDeDatos = obtenerBaseDatos();
+            const vehiculo = vehiculoEncontradoActual;
+            const usuarioPropietario = (baseDeDatos?.usuarios || []).find(function(usuario) {
+                return usuario.numero_identificacion === vehiculo.propietario_id;
             });
-            if (!vehiculo) return;
 
-            const propietario = (db?.usuarios || []).find(u => u.numero_identificacion === vehiculo.propietario_id);
+            document.querySelector('.etiqueta-placa-ficha').textContent = vehiculo.placa_vehicular;
+            document.querySelector('.identificador-texto-modal .dato-valor').textContent = vehiculo.identificador_sistema;
+            
+            const imagenCodigoQr = document.querySelector('.imagen-qr-modal');
+            if (imagenCodigoQr) {
+                // encodeURIComponent: Codifica de forma segura la cadena con el identificador y placa para generar el QR.
+                imagenCodigoQr.src = vehiculo.codigo_qr_ruta && vehiculo.codigo_qr_ruta !== ""
+                    ? vehiculo.codigo_qr_ruta
+                    : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(vehiculo.identificador_sistema + '|' + vehiculo.placa_vehicular)}`;
+            }
 
-            const ubicacionActual = vehiculo.ubicacion_actual || vehiculoEncontradoActual.ubicacion_actual || "Fuera de las instalaciones";
-            const esSalida = ubicacionActual === "Dentro de las instalaciones";
-            tipoMovimiento = esSalida ? "Salida" : "Entrada";
+            // Asigna las especificaciones técnicas del vehículo en la ficha.
+            const elementosDatosVehiculo = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:first-child .item-dato-modal span');
+            if (elementosDatosVehiculo.length >= 5) {
+                elementosDatosVehiculo[0].textContent = vehiculo.tipo_vehiculo;
+                elementosDatosVehiculo[1].textContent = `${vehiculo.fabricante} ${vehiculo.modelo}`;
+                elementosDatosVehiculo[2].textContent = vehiculo.anio_fabricacion;
+                elementosDatosVehiculo[3].textContent = vehiculo.color;
+                elementosDatosVehiculo[4].textContent = vehiculo.observaciones || 'Sin observaciones';
+            }
 
-            vehiculo.ubicacion_actual = esSalida ? "Fuera de las instalaciones" : "Dentro de las instalaciones";
-            vehiculoEncontradoActual.ubicacion_actual = vehiculo.ubicacion_actual;
+            // Asigna los datos de fecha y estado de registro en la segunda columna.
+            const elementosDatosRegistro = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:last-child .tarjeta-informacion-modal:nth-child(2) .item-dato-modal span');
+            if (elementosDatosRegistro.length >= 3) {
+                elementosDatosRegistro[0].textContent = vehiculo.fecha_registro;
+                elementosDatosRegistro[1].textContent = vehiculo.fecha_actualizacion;
+                elementosDatosRegistro[2].textContent = vehiculo.estado_autorizacion;
+            }
 
-            if (!Array.isArray(db.historial_movimientos)) db.historial_movimientos = [];
-            db.historial_movimientos.push({
-                fecha: fechaHoy,
-                hora: horaHoy,
-                identificador: vehiculo.identificador_sistema,
-                tipo_vehiculo: vehiculo.tipo_vehiculo,
-                placa_vehicular: vehiculo.placa_vehicular,
-                propietario: propietario ? propietario.nombres_apellidos : "No asignado",
-                tipo_usuario: propietario ? propietario.tipo_usuario : "Estudiante",
-                tipo_movimiento: tipoMovimiento,
-                punto_control: sesion.punto_control_asignado || "Punto de control N01"
-            });
-        }
+            // Asigna los datos personales e institucionales del propietario del vehículo.
+            const elementosDatosPropietario = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:last-child .tarjeta-informacion-modal:nth-child(3) .item-dato-modal span');
+            if (elementosDatosPropietario.length >= 6 && usuarioPropietario) {
+                elementosDatosPropietario[0].textContent = usuarioPropietario.nombres_apellidos;
+                elementosDatosPropietario[1].textContent = usuarioPropietario.numero_identificacion;
+                elementosDatosPropietario[2].textContent = usuarioPropietario.correo_institucional || '-';
+                elementosDatosPropietario[3].textContent = usuarioPropietario.tipo_usuario;
+                elementosDatosPropietario[4].textContent = usuarioPropietario.facultad || '-';
+                elementosDatosPropietario[5].textContent = usuarioPropietario.carrera || '-';
+            }
 
-        if (typeof guardarCambios === 'function') {
-            guardarCambios(db);
-        } else {
-            localStorage.setItem('base_de_datos', JSON.stringify(db));
-        }
+            abrirModal('modal-ficha-vehicular');
+        });
+    }
 
-        if (vehiculoEncontradoActual) {
-            document.getElementById('res-ubicacion').textContent = vehiculoEncontradoActual.ubicacion_actual;
-            const tipoReg = vehiculoEncontradoActual.ubicacion_actual === "Dentro de las instalaciones" ? "Entrada" : "Salida";
-            const ptoActualTag = (sesion.punto_control_asignado || "Punto de control N01").replace('Punto de control ', '');
-            document.getElementById('res-ultimo-movimiento').textContent = `Último movimiento: ${tipoReg} registrada el ${fechaHoy} a las ${horaHoy} (${ptoActualTag}).`;
-            configurarBotonMovimiento(vehiculoEncontradoActual.ubicacion_actual);
-        }
-
-        renderizarHistorial();
-
-        const tituloModal = document.getElementById('titulo-modal-movimiento');
-        const infoFecha = document.getElementById('info-fecha-movimiento');
-        if (tituloModal) tituloModal.textContent = `${tipoMovimiento} registrada correctamente`;
-        if (infoFecha) infoFecha.textContent = `Fecha y hora en que se registró el movimiento: ${fechaHoy} a las ${horaHoy}.`;
-
-        abrirModal('modal-movimiento-exito');
-    });
-
-    // 6. ABRIR FICHA TÉCNICA DEL VEHÍCULO ENCONTRADO
-    document.getElementById('btn-ver-ficha-control')?.addEventListener('click', () => {
-        if (!vehiculoEncontradoActual || !vehiculoEncontradoActual.identificador_sistema) return;
-        
-        const db = typeof obtenerBaseDatos === 'function' ? obtenerBaseDatos() : JSON.parse(localStorage.getItem('base_de_datos'));
-        const vehiculo = vehiculoEncontradoActual;
-        const propietario = (db?.usuarios || []).find(u => u.numero_identificacion === vehiculo.propietario_id);
-
-        document.querySelector('.etiqueta-placa-ficha').textContent = vehiculo.placa_vehicular;
-        document.querySelector('.identificador-texto-modal .dato-valor').textContent = vehiculo.identificador_sistema;
-        
-        const imagenQr = document.querySelector('.imagen-qr-modal');
-        if (imagenQr) {
-            imagenQr.src = vehiculo.codigo_qr_ruta && vehiculo.codigo_qr_ruta !== ""
-                ? vehiculo.codigo_qr_ruta
-                : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(vehiculo.identificador_sistema + '|' + vehiculo.placa_vehicular)}`;
-        }
-
-        const datosVeh = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:first-child .item-dato-modal span');
-        if (datosVeh.length >= 5) {
-            datosVeh[0].textContent = vehiculo.tipo_vehiculo;
-            datosVeh[1].textContent = `${vehiculo.fabricante} ${vehiculo.modelo}`;
-            datosVeh[2].textContent = vehiculo.anio_fabricacion;
-            datosVeh[3].textContent = vehiculo.color;
-            datosVeh[4].textContent = vehiculo.observaciones || 'Sin observaciones';
-        }
-
-        const datosReg = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:last-child .tarjeta-informacion-modal:nth-child(2) .item-dato-modal span');
-        if (datosReg.length >= 3) {
-            datosReg[0].textContent = vehiculo.fecha_registro;
-            datosReg[1].textContent = vehiculo.fecha_actualizacion;
-            datosReg[2].textContent = vehiculo.estado_autorizacion;
-        }
-
-        const datosProp = document.querySelectorAll('#modal-ficha-vehicular .columna-modal:last-child .tarjeta-informacion-modal:nth-child(3) .item-dato-modal span');
-        if (datosProp.length >= 6 && propietario) {
-            datosProp[0].textContent = propietario.nombres_apellidos;
-            datosProp[1].textContent = propietario.numero_identificacion;
-            datosProp[2].textContent = propietario.correo_institucional || '-';
-            datosProp[3].textContent = propietario.tipo_usuario;
-            datosProp[4].textContent = propietario.facultad || '-';
-            datosProp[5].textContent = propietario.carrera || '-';
-        }
-
-        abrirModal('modal-ficha-vehicular');
-    });
-
-    // Carga inicial del historial
+    // Inicializa el renderizado del historial al arrancar la pantalla.
     renderizarHistorial();
 
-    // 7. LÓGICA DEL REGISTRO TEMPORAL
+    // 7. Lógica del registro temporal de ingresos imprevistos en garita.
+    const botonAbrirRegistroTemporal = document.getElementById('boton-registro-temporal');
+    if (botonAbrirRegistroTemporal) {
+        botonAbrirRegistroTemporal.addEventListener('click', function() {
+            abrirModal('modal-registro-temporal');
+        });
+    }
 
-    // Abrir Modal
-    document.getElementById('boton-registro-temporal')?.addEventListener('click', () => {
-        abrirModal('modal-registro-temporal');
-    });
-
-    // Desplegables del modal
-    document.querySelectorAll('#modal-registro-temporal .boton-desplegar-compacto').forEach(boton => {
-        boton.addEventListener('click', function(e) {
-            e.preventDefault();
-            const idContenido = this.getAttribute('data-objetivo');
-            const contenido = document.getElementById(idContenido);
+    // Configura los acordeones desplegables dentro del modal de registro temporal.
+    const botonesAcordeonTemporal = document.querySelectorAll('#modal-registro-temporal .boton-desplegar-compacto');
+    botonesAcordeonTemporal.forEach(function(botonAcordeon) {
+        botonAcordeon.addEventListener('click', function(evento) {
+            evento.preventDefault();
+            const identificadorContenido = this.getAttribute('data-objetivo');
+            const contenedorContenido = document.getElementById(identificadorContenido);
             this.classList.toggle('activo');
-            if (contenido) contenido.classList.toggle('visible');
+            if (contenedorContenido) {
+                contenedorContenido.classList.toggle('visible');
+            }
         });
     });
 
-    const formTemporal = document.getElementById('form-registro-temporal');
-    const tempNombres = document.getElementById('temp-nombres');
-    const tempTipoId = document.getElementById('temp-tipo-id');
-    const tempNumId = document.getElementById('temp-numero-id');
-    const tempPlaca = document.getElementById('temp-placa');
-    const tempTipoVehiculo = document.getElementById('temp-tipo-vehiculo');
-    const tempMotivo = document.getElementById('temp-motivo');
-    const tempDestino = document.getElementById('temp-destino');
+    // Referencias a los campos del formulario de registro temporal.
+    const formularioRegistroTemporal = document.getElementById('form-registro-temporal');
+    const campoTemporalNombres = document.getElementById('temp-nombres');
+    const selectorTemporalTipoIdentificacion = document.getElementById('temp-tipo-id');
+    const campoTemporalNumeroIdentificacion = document.getElementById('temp-numero-id');
+    const campoTemporalPlaca = document.getElementById('temp-placa');
+    const selectorTemporalTipoVehiculo = document.getElementById('temp-tipo-vehiculo');
+    const selectorTemporalMotivo = document.getElementById('temp-motivo');
+    const campoTemporalDestino = document.getElementById('temp-destino');
 
-    if (tempNombres) {
-        tempNombres.addEventListener('input', () => {
-            tempNombres.value = tempNombres.value.replace(/[0-9]/g, '');
-            desactivarAlertaControl(tempNombres);
+    // Limpia caracteres numéricos en el campo de nombres en tiempo real reutilizando ocultarAlertaError de validaciones.js.
+    if (campoTemporalNombres) {
+        campoTemporalNombres.addEventListener('input', function() {
+            campoTemporalNombres.value = campoTemporalNombres.value.replace(/[0-9]/g, '');
+            ocultarAlertaError(campoTemporalNombres);
         });
     }
 
-    if (tempPlaca) {
-        tempPlaca.addEventListener('input', () => {
-            tempPlaca.value = tempPlaca.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            desactivarAlertaControl(tempPlaca);
+    // Normaliza la placa vehicular en mayúsculas sin caracteres especiales.
+    if (campoTemporalPlaca) {
+        campoTemporalPlaca.addEventListener('input', function() {
+            campoTemporalPlaca.value = campoTemporalPlaca.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            ocultarAlertaError(campoTemporalPlaca);
         });
     }
 
-    function obtenerSiguienteIdentificadorAutorizacion(listaAutorizaciones) {
-        let numeroMasAlto = 0; // Inicia en 0 para que la primera sea AUT-000001
+    // Procesa el envío y validación integral del registro temporal.
+    if (formularioRegistroTemporal) {
+        formularioRegistroTemporal.addEventListener('submit', function(evento) {
+            evento.preventDefault();
+            let formularioEsValido = true;
+            
+            const baseDeDatos = obtenerBaseDatos();
 
-        const revisarId = (id) => {
-            if (id && typeof id === 'string' && id.startsWith('AUT-')) {
-                const num = parseInt(id.replace('AUT-', ''), 10);
-                if (!isNaN(num) && num > numeroMasAlto) {
-                    numeroMasAlto = num;
+            // Validación de nombres del visitante temporal mediante mostrarAlertaError/ocultarAlertaError de scripts/validaciones.js.
+            if (campoTemporalNombres.value.trim() === "") {
+                mostrarAlertaError(campoTemporalNombres, "El registro es obligatorio");
+                formularioEsValido = false;
+            } else {
+                ocultarAlertaError(campoTemporalNombres);
+            }
+
+            // Validación de documento: reutiliza la función oficial validarCedulaEcuatoriana de scripts/validaciones.js.
+            if (selectorTemporalTipoIdentificacion.value === "") {
+                mostrarAlertaError(selectorTemporalTipoIdentificacion, "El registro es obligatorio");
+                formularioEsValido = false;
+            } else {
+                ocultarAlertaError(selectorTemporalTipoIdentificacion);
+                const valorIdentificacion = campoTemporalNumeroIdentificacion.value.trim();
+                if (valorIdentificacion === "") {
+                    mostrarAlertaError(campoTemporalNumeroIdentificacion, "El registro es obligatorio");
+                    formularioEsValido = false;
+                } else if (selectorTemporalTipoIdentificacion.value === "cedula" && !validarCedulaEcuatoriana(valorIdentificacion)) {
+                    mostrarAlertaError(campoTemporalNumeroIdentificacion, "El registro tiene un formato no válido");
+                    formularioEsValido = false;
+                } else if (selectorTemporalTipoIdentificacion.value !== "cedula" && (valorIdentificacion.length < 5 || valorIdentificacion.length > 20)) {
+                    mostrarAlertaError(campoTemporalNumeroIdentificacion, "El registro tiene un formato no válido");
+                    formularioEsValido = false;
+                } else {
+                    ocultarAlertaError(campoTemporalNumeroIdentificacion);
                 }
             }
-        };
 
-        const db = typeof obtenerBaseDatos === 'function' ? obtenerBaseDatos() : JSON.parse(localStorage.getItem('base_de_datos') || '{}');
-
-        // 1. Revisar en autorizaciones de visitas existentes
-        const autorizaciones = db?.autorizaciones_visitas || (Array.isArray(listaAutorizaciones) ? listaAutorizaciones : []);
-        autorizaciones.forEach(item => {
-            revisarId(item.identificador_solicitud);
-            revisarId(item.identificador_sistema);
-        });
-
-        // 2. Revisar en historial de movimientos (evita que se repita entre diferentes puntos de control o si el vehículo salió)
-        (db?.historial_movimientos || []).forEach(item => {
-            revisarId(item.identificador);
-            revisarId(item.identificador_solicitud);
-        });
-
-        return `AUT-${String(numeroMasAlto + 1).padStart(6, '0')}`;
-    }
-
-    formTemporal?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        let esValido = true;
-        
-        // Cargamos la BD al inicio para poder validar si la placa ya existe
-        const db = typeof obtenerBaseDatos === 'function' ? obtenerBaseDatos() : JSON.parse(localStorage.getItem('base_de_datos') || '{}');
-
-        // Validar Nombres
-        if (tempNombres.value.trim() === "") { activarAlertaControl(tempNombres, "El registro es obligatorio"); esValido = false; } else { desactivarAlertaControl(tempNombres); }
-
-        // Validar Identificación
-        if (tempTipoId.value === "") {
-            activarAlertaControl(tempTipoId, "El registro es obligatorio");
-            esValido = false;
-        } else {
-            desactivarAlertaControl(tempTipoId);
-            const valId = tempNumId.value.trim();
-            if (valId === "") {
-                activarAlertaControl(tempNumId, "El registro es obligatorio");
-                esValido = false;
-            } else if (tempTipoId.value === "cedula" && typeof validarCedulaControl === 'function' && !validarCedulaControl(valId)) {
-                activarAlertaControl(tempNumId, "El registro tiene un formato no válido");
-                esValido = false;
-            } else if (tempTipoId.value !== "cedula" && (valId.length < 5 || valId.length > 20)) {
-                activarAlertaControl(tempNumId, "El registro tiene un formato no válido");
-                esValido = false;
-            } else { desactivarAlertaControl(tempNumId); }
-        }
-
-        // Validar Vehículo y Placa Única
-        if (tempTipoVehiculo.value === "") {
-            activarAlertaControl(tempTipoVehiculo, "El registro es obligatorio");
-            esValido = false;
-        } else {
-            desactivarAlertaControl(tempTipoVehiculo);
-            if (tempTipoVehiculo.value !== "Otro") {
-                const valPlaca = tempPlaca.value.trim().toUpperCase();
-                if (valPlaca === "") {
-                    activarAlertaControl(tempPlaca, "El registro es obligatorio");
-                    esValido = false;
-                } else {
-                    let placaOk = false;
-                    const tiposEst = ["Automóvil", "Camioneta", "SUV", "Furgoneta", "Bus / buseta", "Camión"];
-                    if (tiposEst.includes(tempTipoVehiculo.value)) {
-                        placaOk = /^[A-Z]{3}[0-9]{4}$/.test(valPlaca);
-                    } else if (tempTipoVehiculo.value === "Motocicleta") {
-                        placaOk = /^[A-Z]{2}[0-9]{3}[A-Z]{1}$/.test(valPlaca);
-                    }
-                    
-                    if (!placaOk) {
-                        activarAlertaControl(tempPlaca, "El registro tiene un formato no válido");
-                        esValido = false;
+            // Validación del tipo de vehículo y de la placa ingresada.
+            if (selectorTemporalTipoVehiculo.value === "") {
+                mostrarAlertaError(selectorTemporalTipoVehiculo, "El registro es obligatorio");
+                formularioEsValido = false;
+            } else {
+                ocultarAlertaError(selectorTemporalTipoVehiculo);
+                if (selectorTemporalTipoVehiculo.value !== "Otro") {
+                    const valorPlaca = campoTemporalPlaca.value.trim().toUpperCase();
+                    if (valorPlaca === "") {
+                        mostrarAlertaError(campoTemporalPlaca, "El registro es obligatorio");
+                        formularioEsValido = false;
                     } else {
-                        // VALIDACIÓN: Comprobar que la placa no esté adentro ni registrada previamente
-                        const existeEnVehiculos = (db.vehiculos || []).some(v => v.placa_vehicular && v.placa_vehicular.toUpperCase() === valPlaca);
-                        const existeEnAutorizaciones = (db.autorizaciones_visitas || []).some(a => a.vehiculo && a.vehiculo.placa_vehicular && a.vehiculo.placa_vehicular.toUpperCase() === valPlaca);
-
-                        if (existeEnVehiculos || existeEnAutorizaciones) {
-                            activarAlertaControl(tempPlaca, "Placa ya registrada en el sistema");
-                            esValido = false;
+                        let tieneFormatoValido = false;
+                        const tiposVehiculoEstandar = ["Automóvil", "Camioneta", "SUV", "Furgoneta", "Bus / buseta", "Camión"];
+                        if (tiposVehiculoEstandar.includes(selectorTemporalTipoVehiculo.value)) {
+                            tieneFormatoValido = /^[A-Z]{3}[0-9]{4}$/.test(valorPlaca);
+                        } else if (selectorTemporalTipoVehiculo.value === "Motocicleta") {
+                            tieneFormatoValido = /^[A-Z]{2}[0-9]{3}[A-Z]{1}$/.test(valorPlaca);
+                        }
+                        
+                        if (!tieneFormatoValido) {
+                            mostrarAlertaError(campoTemporalPlaca, "El registro tiene un formato no válido");
+                            formularioEsValido = false;
                         } else {
-                            desactivarAlertaControl(tempPlaca);
+                            // Verifica que la placa no se encuentre registrada activamente.
+                            const existeEnVehiculos = (baseDeDatos.vehiculos || []).some(function(vehiculo) {
+                                return vehiculo.placa_vehicular && vehiculo.placa_vehicular.toUpperCase() === valorPlaca;
+                            });
+                            const existeEnAutorizaciones = (baseDeDatos.autorizaciones_visitas || []).some(function(autorizacion) {
+                                return autorizacion.vehiculo && autorizacion.vehiculo.placa_vehicular && autorizacion.vehiculo.placa_vehicular.toUpperCase() === valorPlaca;
+                            });
+
+                            if (existeEnVehiculos || existeEnAutorizaciones) {
+                                mostrarAlertaError(campoTemporalPlaca, "Placa ya registrada en el sistema");
+                                formularioEsValido = false;
+                            } else {
+                                ocultarAlertaError(campoTemporalPlaca);
+                            }
                         }
                     }
+                } else {
+                    ocultarAlertaError(campoTemporalPlaca);
                 }
-            } else { desactivarAlertaControl(tempPlaca); }
-        }
-
-        // Validar Motivo y Destino
-        if (tempMotivo.value === "") { activarAlertaControl(tempMotivo, "El registro es obligatorio"); esValido = false; } else { desactivarAlertaControl(tempMotivo); }
-        if (tempDestino.value.trim() === "") { activarAlertaControl(tempDestino, "El registro es obligatorio"); esValido = false; } else { desactivarAlertaControl(tempDestino); }
-
-        // --- GUARDADO FINAL SI TODO ES VÁLIDO ---
-        if (esValido) {
-            const ahora = new Date();
-            const dia = String(ahora.getDate()).padStart(2, '0');
-            const mes = String(ahora.getMonth() + 1).padStart(2, '0');
-            const anio = ahora.getFullYear();
-            const fechaHoy = `${dia}/${mes}/${anio}`;
-            const horaHoy = `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
-            const fechaProgramadaLocal = `${anio}-${mes}-${dia}`; // Evita bugs de zona horaria
-
-            const idAuto = obtenerSiguienteIdentificadorAutorizacion(db.autorizaciones_visitas);
-
-            const nuevaAutorizacion = {
-                identificador_solicitud: idAuto,
-                solicitante_id: sesion.identificador_usuario || "Punto de control",
-                visitante: {
-                    nombres_apellidos: tempNombres.value.trim(),
-                    tipo_identificacion: tempTipoId.options[tempTipoId.selectedIndex].text,
-                    numero_identificacion: tempNumId.value.trim(),
-                    telefono: "No registrado"
-                },
-                vehiculo: {
-                    placa_vehicular: tempPlaca.value.toUpperCase().trim() || "S/P",
-                    tipo_vehiculo: tempTipoVehiculo.value,
-                    fabricante: "No especificado",
-                    modelo: "No especificado",
-                    color: "No especificado"
-                },
-                visita: {
-                    fecha_programada: fechaProgramadaLocal,
-                    hora_programada: horaHoy,
-                    motivo_visita: tempMotivo.value,
-                    area_destino: tempDestino.value.trim()
-                },
-                estado_solicitud: "Autorizado",
-                ubicacion_actual: "Dentro de las instalaciones",
-                fecha_registro: fechaHoy,
-                fecha_actualizacion: fechaHoy
-            };
-
-            if (!Array.isArray(db.autorizaciones_visitas)) db.autorizaciones_visitas = [];
-            db.autorizaciones_visitas.push(nuevaAutorizacion);
-
-            if (!Array.isArray(db.historial_movimientos)) db.historial_movimientos = [];
-            db.historial_movimientos.push({
-                fecha: fechaHoy,
-                hora: horaHoy,
-                identificador: nuevaAutorizacion.identificador_solicitud,
-                tipo_vehiculo: nuevaAutorizacion.vehiculo.tipo_vehiculo,
-                placa_vehicular: nuevaAutorizacion.vehiculo.placa_vehicular,
-                propietario: nuevaAutorizacion.visitante.nombres_apellidos,
-                tipo_usuario: "Visitante",
-                tipo_movimiento: "Entrada",
-                punto_control: sesion.punto_control_asignado || "Punto de control N01"
-            });
-
-            if (typeof guardarCambios === 'function') {
-                guardarCambios(db);
-            } else {
-                localStorage.setItem('base_de_datos', JSON.stringify(db));
             }
 
-            cerrarModal('modal-registro-temporal');
+            // Validación de obligatoriedad para el motivo y destino de la visita.
+            if (selectorTemporalMotivo.value === "") {
+                mostrarAlertaError(selectorTemporalMotivo, "El registro es obligatorio");
+                formularioEsValido = false;
+            } else {
+                ocultarAlertaError(selectorTemporalMotivo);
+            }
 
-            const tituloModal = document.getElementById('titulo-modal-movimiento');
-            const infoFecha = document.getElementById('info-fecha-movimiento');
-            if (tituloModal) tituloModal.textContent = "Entrada registrada correctamente";
-            if (infoFecha) infoFecha.textContent = `Fecha y hora en que se registró el movimiento: ${fechaHoy} a las ${horaHoy}.`;
+            if (campoTemporalDestino.value.trim() === "") {
+                mostrarAlertaError(campoTemporalDestino, "El registro es obligatorio");
+                formularioEsValido = false;
+            } else {
+                ocultarAlertaError(campoTemporalDestino);
+            }
 
-            setTimeout(() => {
-                abrirModal('modal-movimiento-exito');
-                formTemporal.reset();
-                // Opcional: Cerrar los acordeones después de resetear
-                document.querySelectorAll('#modal-registro-temporal .boton-desplegar-compacto').forEach(b => b.classList.remove('activo'));
-                document.querySelectorAll('#modal-registro-temporal .contenido-desplegable').forEach(c => c.classList.remove('visible'));
-                renderizarHistorial();
-            }, 300);
-        }
-    });
+            // Almacenamiento y registro automático del ingreso si todos los campos son conformes.
+            if (formularioEsValido) {
+                // Reutiliza obtenerFechaHoraActual de scripts/informacion.js.
+                const tiempoActual = obtenerFechaHoraActual();
+                const cadenaFechaActual = tiempoActual.fecha;
+                const cadenaHoraActual = tiempoActual.hora;
+                const fechaProgramadaLocal = tiempoActual.fechaISO;
+
+                // Reutiliza la función global generarSiguienteIdentificadorAutorizacion de scripts/informacion.js.
+                const nuevoIdentificadorAutorizacion = generarSiguienteIdentificadorAutorizacion(baseDeDatos.autorizaciones_visitas);
+
+                // Estructura completa de la autorización temporal generada en punto de control.
+                const nuevaAutorizacionTemporal = {
+                    identificador_solicitud: nuevoIdentificadorAutorizacion,
+                    solicitante_id: sesionActiva.identificador_usuario || "Punto de control",
+                    visitante: {
+                        nombres_apellidos: campoTemporalNombres.value.trim(),
+                        tipo_identificacion: selectorTemporalTipoIdentificacion.options[selectorTemporalTipoIdentificacion.selectedIndex].text,
+                        numero_identificacion: campoTemporalNumeroIdentificacion.value.trim(),
+                        telefono: "No registrado"
+                    },
+                    vehiculo: {
+                        placa_vehicular: campoTemporalPlaca.value.toUpperCase().trim() || "S/P",
+                        tipo_vehiculo: selectorTemporalTipoVehiculo.value,
+                        fabricante: "No especificado",
+                        modelo: "No especificado",
+                        color: "No especificado"
+                    },
+                    visita: {
+                        fecha_programada: fechaProgramadaLocal,
+                        hora_programada: cadenaHoraActual,
+                        motivo_visita: selectorTemporalMotivo.value,
+                        area_destino: campoTemporalDestino.value.trim()
+                    },
+                    estado_solicitud: "Autorizado",
+                    ubicacion_actual: "Dentro de las instalaciones",
+                    fecha_registro: cadenaFechaActual,
+                    fecha_actualizacion: cadenaFechaActual
+                };
+
+                if (!Array.isArray(baseDeDatos.autorizaciones_visitas)) {
+                    baseDeDatos.autorizaciones_visitas = [];
+                }
+                baseDeDatos.autorizaciones_visitas.push(nuevaAutorizacionTemporal);
+
+                // Registra simultáneamente el evento de entrada en el historial de movimientos.
+                if (!Array.isArray(baseDeDatos.historial_movimientos)) {
+                    baseDeDatos.historial_movimientos = [];
+                }
+                baseDeDatos.historial_movimientos.push({
+                    fecha: cadenaFechaActual,
+                    hora: cadenaHoraActual,
+                    identificador: nuevaAutorizacionTemporal.identificador_solicitud,
+                    tipo_vehiculo: nuevaAutorizacionTemporal.vehiculo.tipo_vehiculo,
+                    placa_vehicular: nuevaAutorizacionTemporal.vehiculo.placa_vehicular,
+                    propietario: nuevaAutorizacionTemporal.visitante.nombres_apellidos,
+                    tipo_usuario: "Visitante",
+                    tipo_movimiento: "Entrada",
+                    punto_control: sesionActiva.punto_control_asignado || "Punto de control N01"
+                });
+
+                guardarCambios(baseDeDatos);
+                cerrarModal('modal-registro-temporal');
+
+                const etiquetaTituloModal = document.getElementById('titulo-modal-movimiento');
+                const etiquetaFechaModal = document.getElementById('info-fecha-movimiento');
+                if (etiquetaTituloModal) {
+                    etiquetaTituloModal.textContent = "Entrada registrada correctamente";
+                }
+                if (etiquetaFechaModal) {
+                    etiquetaFechaModal.textContent = `Fecha y hora en que se registró el movimiento: ${cadenaFechaActual} a las ${cadenaHoraActual}.`;
+                }
+
+                // setTimeout: Muestra el modal de confirmación y restablece el formulario tras un intervalo suave.
+                setTimeout(function() {
+                    abrirModal('modal-movimiento-exito');
+                    formularioRegistroTemporal.reset();
+                    botonesAcordeonTemporal.forEach(function(botonAcordeon) {
+                        botonAcordeon.classList.remove('activo');
+                    });
+                    const elementosContenidoAcordeon = document.querySelectorAll('#modal-registro-temporal .contenido-desplegable');
+                    elementosContenidoAcordeon.forEach(function(contenido) {
+                        contenido.classList.remove('visible');
+                    });
+                    renderizarHistorial();
+                }, 300);
+            }
+        });
+    }
 });

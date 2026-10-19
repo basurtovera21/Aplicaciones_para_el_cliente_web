@@ -9,6 +9,7 @@
 </head>
 <body>
 
+  <!-- Barra de navegación institucional -->
   <header class="barra-navegacion">
     <div class="barra-navegacion-identidad">
       <img src="recursos/imagenes/logotipo-uleam.png" alt="logotipo" class="barra-navegacion-identificador">
@@ -20,15 +21,18 @@
     </div>
   </header>
 
+  <!-- Contenedor principal de inicio de sesión -->
   <main class="pantalla-inicio-sesion-contenedor">
     <h1 class="titulo-accion-inicio-sesion">Iniciar sesión</h1>
 
+    <!-- Tarjeta del formulario de autenticación -->
     <section class="tarjeta-formulario-inicio-sesion">
       <p class="indicacion-texto-inicio-sesion">
         Acceda utilizando sus credenciales institucionales.
       </p>
 
       <form id="formulario-autenticacion" class="cuerpo-formulario-inicio-sesion" novalidate>
+        <!-- Campo de entrada: correo institucional o usuario -->
         <div class="bloque-campo-inicio-sesion">
           <label for="campo-correo-institucional" class="etiqueta-formulario-inicio-sesion">
             Correo institucional o usuario
@@ -46,7 +50,7 @@
           <span class="texto-alerta-error" id="mensaje-error-correo"></span>
         </div>
 
-
+        <!-- Campo de entrada: contraseña con botón para alternar visibilidad -->
         <div class="bloque-campo-inicio-sesion">
           <label for="campo-clave-acceso" class="etiqueta-formulario-inicio-sesion">
             Contraseña
@@ -70,13 +74,14 @@
           <span class="texto-alerta-error" id="mensaje-error-clave"></span>
         </div>
 
+        <!-- Botón de envío de credenciales -->
         <button type="submit" class="boton-acceder" id="boton-enviar-acceso">
           Acceder
         </button>
-
       </form>
     </section>
 
+    <!-- Botones flotantes de exportación e importación de la base de datos -->
     <div class="contenedor-acciones-bd">
       <input type="file" id="selector-archivo-bd" accept=".json" style="display: none;">
       
@@ -90,6 +95,7 @@
     </div>
   </main>
   
+  <!-- Inclusión de scripts del sistema -->
   <script src="scripts/informacion.js"></script>
   <script src="scripts/inicio-sesion.js"></script>
 </body>

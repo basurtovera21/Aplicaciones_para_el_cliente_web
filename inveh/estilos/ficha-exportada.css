@@ -1,27 +1,25 @@
-/* ===============================================================
-   DISEÑO DE CREDENCIAL IMPRESA / PDF - SISTEMA INVEH
-   =============================================================== */
+/* Diseño y formateo de credencial impresa / PDF */
 
-/* Oculto estrictamente en la pantalla normal */
+/* Estado en pantalla normal */
+/* Se mantiene oculto en la vista regular del navegador web */
 #area-impresion-credencial {
   display: none !important;
 }
 
-/* ===============================================================
-   REGLAS DE IMPRESIÓN (@media print) - EXACTAMENTE 1 HOJA LIMPIA
-   =============================================================== */
+/* Reglas de salida de impresión (@media print) */
 @media print {
-  /* 1. Ocultar todos los elementos directos del body excepto la credencial */
+  /* Oculta toda la interfaz de usuario regular, mostrando solo el contenedor de credencial */
   body > *:not(#area-impresion-credencial) {
     display: none !important;
   }
 
-  /* 2. Configurar la hoja para que no duplique páginas */
+  /* Configuración del lienzo de página: elimina márgenes por defecto del navegador */
   @page {
     size: auto;
-    margin: 0; /* Sin encabezados del navegador como URLs o fechas */
+    margin: 0;
   }
 
+  /* Restablecimiento del lienzo para visualización completa sin barras de desplazamiento */
   html, body {
     overflow: visible !important;
     height: auto !important;
@@ -30,7 +28,7 @@
     background: #FFFFFF !important;
   }
 
-  /* 3. Centrar la credencial en una sola hoja sin saltos de página */
+  /* Contenedor principal de la credencial: centrado en la página sin saltos no deseados */
   #area-impresion-credencial {
     display: flex !important;
     flex-direction: column;
@@ -42,15 +40,17 @@
     margin: 0 !important;
     padding: 0 !important;
     box-sizing: border-box;
+    /* Propiedades de control de paginación para evitar fraccionamiento en múltiples hojas */
     page-break-before: avoid !important;
     page-break-after: avoid !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+    /* Fuerza al motor de impresión a respetar los colores de fondo e imágenes */
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Placa vehicular azul de la foto */
+  /* Distintivo superior con formato de placa institucional */
   .credencial-placa {
     background-color: #546A7B !important;
     color: #FFFFFF !important;
@@ -68,7 +68,7 @@
     print-color-adjust: exact !important;
   }
 
-  /* Tarjeta blanca cuadrada del QR con bordes redondeados */
+  /* Tarjeta blanca con marco delimitador para el código QR */
   .credencial-tarjeta-qr {
     background-color: #FFFFFF !important;
     border: 1px solid #CBD5E1 !important;
@@ -84,13 +84,14 @@
     print-color-adjust: exact !important;
   }
 
+  /* Imagen renderizada del código QR en alta fidelidad */
   .credencial-imagen-qr {
     width: 100%;
     height: 100%;
     object-fit: contain;
   }
 
-  /* Identificador debajo del QR */
+  /* Etiqueta tipográfica con el identificador institucional del vehículo */
   .credencial-identificador {
     font-size: 15px;
     font-weight: 500;

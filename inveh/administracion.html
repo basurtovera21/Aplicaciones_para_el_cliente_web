@@ -15,6 +15,7 @@
 </head>
 <body>
 
+  <!-- Barra de navegación institucional -->
   <header class="barra-navegacion">
     <div class="barra-navegacion-identidad">
       <img src="recursos/imagenes/logotipo-uleam.png" alt="Logotipo" class="barra-navegacion-identificador">
@@ -31,7 +32,7 @@
 
   <main class="contenedor-administracion">
 
-    <!-- Tarjeta 1: Métricas y Resumen Ejecutivo -->
+    <!-- Tarjeta 1: Métricas y resumen ejecutivo institucional -->
     <section class="tarjeta-resumen-metricas">
       <div class="bloque-identidad-admin">
         <div class="avatar-iniciales-admin">AD</div>
@@ -67,6 +68,7 @@
       </div>
     </section>
 
+    <!-- Tarjeta 2: Panel de solicitudes pendientes de revisión -->
     <section class="tarjeta-panel-administracion tarjeta-panel-fijo">
       <header class="cabecera-panel-tabla">
         <h2 class="titulo-panel-administracion">Solicitudes pendientes de revisión</h2>
@@ -84,13 +86,13 @@
             </tr>
           </thead>
           <tbody id="cuerpo-tabla-pendientes">
-            <!-- Filas dinámicas -->
+            <!-- Filas de solicitudes pendientes renderizadas dinámicamente -->
           </tbody>
         </table>
       </div>
     </section>
 
-
+    <!-- Tarjeta 3: Registro vehicular institucional y filtros de búsqueda -->
     <section class="tarjeta-panel-administracion tarjeta-panel-fijo">
       <header class="cabecera-panel-tabla">
         <h2 class="titulo-panel-administracion">Registro vehicular institucional</h2>
@@ -150,14 +152,13 @@
             </tr>
           </thead>
           <tbody id="cuerpo-tabla-registro-institucional">
-            <!-- Filas dinámicas -->
+            <!-- Filas de vehículos registrados renderizadas dinámicamente -->
           </tbody>
         </table>
       </div>
     </section>
 
-
-    <!-- MODAL 1: REVISIÓN DE REGISTRO VEHICULAR -->
+    <!-- Modal 1: Revisión y aprobación de solicitudes de registro vehicular -->
     <div class="superposicion-modal" id="modal-revision-registro" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-registro">
         <div class="cabecera-modal">
@@ -214,7 +215,7 @@
       </div>
     </div>
 
-    <!-- MODAL 2: REVISIÓN DE AUTORIZACIÓN DE VISITAS -->
+    <!-- Modal 2: Revisión y aprobación de solicitudes de autorización de visitas -->
     <div class="superposicion-modal" id="modal-revision-autorizacion" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-registro">
         <div class="cabecera-modal">
@@ -288,7 +289,7 @@
       </div>
     </div>
 
-    <!-- MODAL 3: FICHA VEHICULAR (ADMINISTRACIÓN CON 4 BOTONES) -->
+    <!-- Modal 3: Ficha vehicular con acciones de gestión administrativa -->
     <div class="superposicion-modal" id="modal-ficha-vehicular" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-ficha">
         <div class="cabecera-modal">
@@ -361,6 +362,7 @@
       </div>
     </div>
 
+    <!-- Modal 4: Modificación de datos del registro vehicular -->
     <div class="superposicion-modal" id="modal-modificar-vehiculo" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-registro">
         <div class="cabecera-modal">
@@ -385,12 +387,13 @@
           </div>
 
           <div class="rejilla-no-editable-columnas">
-            <!-- Hilera izquierda: Placa y Tipo -->
+            <!-- Columna 1: Placa y tipo de vehículo (no editable) -->
             <div class="columna-datos-no-editable">
               <p class="item-revision">Placa vehicular: <span class="dato-valor" id="mod-estatico-placa">-</span></p>
               <p class="item-revision">Tipo de vehículo: <span class="dato-valor" id="mod-estatico-tipo">-</span></p>
             </div>
 
+            <!-- Columna 2: Fabricante, modelo y año (no editable) -->
             <div class="columna-datos-no-editable">
               <p class="item-revision">Fabricante / Modelo: <span class="dato-valor" id="mod-estatico-modelo">-</span></p>
               <p class="item-revision">Año de fabricación: <span class="dato-valor" id="mod-estatico-anio">-</span></p>
@@ -436,7 +439,7 @@
       </div>
     </div>
 
-    <!-- MODAL 5: CONFIRMAR DESVINCULACIÓN -->
+    <!-- Modal 5: Confirmación de desvinculación vehicular -->
     <div class="superposicion-modal" id="modal-desvincular-vehiculo" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-mediano">
         <div class="cabecera-modal">
@@ -469,7 +472,7 @@
       </div>
     </div>
 
-    <!-- MODAL 6: DESVINCULACIÓN COMPLETADA -->
+    <!-- Modal 6: Notificación de desvinculación completada -->
     <div class="superposicion-modal" id="modal-desvinculacion-exito" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-mediano">
         <div class="cabecera-modal">
@@ -495,7 +498,7 @@
       </div>
     </div>
 
-    <!-- MODAL 7: CONFIRMACIÓN DE ÉXITO GENERAL -->
+    <!-- Modal 7: Notificación de confirmación de éxito general -->
     <div class="superposicion-modal" id="modal-admin-exito" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-mediano">
         <div class="cabecera-modal">
@@ -519,7 +522,7 @@
       </div>
     </div>
 
-    <!-- MODAL 8: REGISTRO DE ACTIVIDADES (HISTORIAL GLOBAL) -->
+    <!-- Modal 8: Registro de actividades e historial global de movimientos -->
     <div class="superposicion-modal" id="modal-registro-actividades" aria-hidden="true" role="dialog">
       <div class="contenedor-modal modal-ancho-actividades">
         
@@ -534,7 +537,7 @@
           Consulte los movimientos vehiculares registrados en los diferentes puntos de control.
         </p>
 
-        <!-- Barra de Filtros (Estilos y selectores arreglados) -->
+        <!-- Barra de filtros combinados para el historial de actividades -->
         <div class="barra-filtros-vehiculares" style="gap: 16px;">
           <div class="campo-busqueda-contenedor" style="flex: 2;">
             <input 
@@ -595,6 +598,7 @@
 
   </main>
 
+  <!-- Contenedor para impresión de credencial física o exportación PDF -->
   <div id="area-impresion-credencial" style="display: none;" aria-hidden="true">
     <div class="credencial-placa" id="print-placa">-</div>
     <div class="credencial-tarjeta-qr">
@@ -605,9 +609,10 @@
     </p>
   </div>
 
-  <!-- Scripts -->
+  <!-- Inclusión de scripts del sistema -->
   <script src="scripts/modal.js"></script>
   <script src="scripts/informacion.js"></script>
+  <script src="scripts/validaciones.js"></script>
   <script src="scripts/administracion.js"></script>
 </body>
 </html>
