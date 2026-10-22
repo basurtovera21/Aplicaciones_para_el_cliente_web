@@ -122,6 +122,11 @@
     color: var(--boton-primario-texto);
 }
 
+.fondo-neutro:hover { 
+    background-color: var(--boton-primario-hover); 
+    filter: brightness(0.95); 
+}
+
 /* Variante de fondo secundario para botones de cancelar o cerrar */
 .fondo-cancelar {
     background-color: #F1F5F9;

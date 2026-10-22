@@ -85,7 +85,7 @@
 
 .campo-texto-modal::placeholder,
 .campo-area-texto-modal::placeholder { 
-    color: var(--color-texto-atenuado); 
+    color: var(--color-texto-campos); 
     opacity: 1; 
 }
 

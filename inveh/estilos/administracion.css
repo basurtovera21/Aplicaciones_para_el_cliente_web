@@ -14,12 +14,6 @@
   box-sizing: border-box;
 }
 
-.etiqueta-rol-cabecera {
-  font-size: 16px;
-  font-weight: 500;
-  margin-right: 12px;
-}
-
 /* Tarjeta 1: Resumen de métricas (banner superior) */
 
 /* Tarjeta superior horizontal con contadores en vivo e ingreso a actividades */
@@ -191,7 +185,7 @@
   font-size: 16px;
   font-weight: 400;
   letter-spacing: 0.6px;
-  color: var(--color-texto-atenuado);
+  color: var(--color-texto-campos);
   opacity: 1;
 }
 

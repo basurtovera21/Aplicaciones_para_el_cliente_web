@@ -10,6 +10,8 @@ function abrirModal(identificadorDelModal) {
         modalEncontrado.setAttribute('aria-hidden', 'false');
         // Bloquea el desplazamiento del cuerpo de la página mientras el modal permanezca abierto.
         document.body.style.overflow = 'hidden';
+        // Sincroniza el color de los campos de selección, fecha y hora contenidos en el modal.
+        inicializarCamposSeleccionFechaHora(modalEncontrado);
     }
 }
 
@@ -65,4 +67,55 @@ document.addEventListener('keydown', function(evento) {
             cerrarModal(modalActualAbierto);
         }
     }
+});
+
+// Actualiza la clase visual en campos select, date y time según contengan o no un valor seleccionado.
+function sincronizarColorCamposSeleccion(elemento) {
+    if (!elemento) return;
+    // Element.matches: Determina si el elemento interactivo corresponde a una lista desplegable o selector de fecha u hora.
+    if (elemento.matches && (elemento.matches('select') || elemento.matches('input[type="date"]') || elemento.matches('input[type="time"]'))) {
+        if (!elemento.value) {
+            // DOMTokenList.add: Asigna la clase de estado vacío para aplicar el color de marcador de posición.
+            elemento.classList.add('campo-sin-seleccion');
+        } else {
+            // DOMTokenList.remove: Retira la clase para restablecer el color de texto habitual del campo.
+            elemento.classList.remove('campo-sin-seleccion');
+        }
+    }
+}
+
+// Inicializa el estado visual de todos los campos de selección, fecha y hora del contenedor especificado.
+function inicializarCamposSeleccionFechaHora(contenedor = document) {
+    // Element.querySelectorAll: Obtiene todos los campos select, date y time presentes en el ámbito.
+    const camposInteractivos = contenedor.querySelectorAll('select, input[type="date"], input[type="time"]');
+    camposInteractivos.forEach(sincronizarColorCamposSeleccion);
+}
+
+// Asigna las funciones al objeto global window para permitir su invocación desde otros módulos.
+window.sincronizarColorCamposSeleccion = sincronizarColorCamposSeleccion;
+window.inicializarCamposSeleccionFechaHora = inicializarCamposSeleccionFechaHora;
+
+// document.addEventListener: Supervisa eventos de cambio para actualizar el color del campo en tiempo real.
+document.addEventListener('change', function(evento) {
+    sincronizarColorCamposSeleccion(evento.target);
+});
+
+// document.addEventListener: Supervisa entradas de datos directas para actualizar campos de fecha y hora.
+document.addEventListener('input', function(evento) {
+    sincronizarColorCamposSeleccion(evento.target);
+});
+
+// document.addEventListener: Restablece el color de los campos cuando un formulario es reiniciado.
+document.addEventListener('reset', function(evento) {
+    setTimeout(function() {
+        inicializarCamposSeleccionFechaHora(evento.target);
+    }, 0);
+});
+
+// Ejecuta la sincronización inicial de forma inmediata para elementos ya presentes en el DOM.
+inicializarCamposSeleccionFechaHora();
+
+// document.addEventListener: Aplica la sincronización inicial al cargar el contenido del árbol DOM.
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarCamposSeleccionFechaHora();
 });

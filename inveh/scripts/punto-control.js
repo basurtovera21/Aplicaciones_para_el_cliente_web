@@ -1,28 +1,7 @@
 // Variable global para almacenar en memoria el vehículo o visita identificado tras la búsqueda.
 let vehiculoEncontradoActual = null;
 
-// Localiza el último movimiento vehicular asentado en el historial para sincronizar su estado.
-function obtenerUltimoMovimientoVehiculo(historialMovimientos, vehiculo) {
-    if (!Array.isArray(historialMovimientos) || !vehiculo) {
-        return null;
-    }
-
-    // Utiliza la función compartida de normalización alfanumérica definida en scripts/informacion.js.
-    const placaVehiculoNormalizada = normalizarTextoAlfanumerico(vehiculo.placa_vehicular);
-    const identificadorVehiculoNormalizado = normalizarTextoAlfanumerico(vehiculo.identificador_sistema || vehiculo.identificador_solicitud);
-
-    // Array.prototype.filter: Filtra los movimientos que concuerden por placa o identificador institucional.
-    const movimientosCoincidentes = historialMovimientos.filter(function(movimiento) {
-        const placaMovimientoNormalizada = normalizarTextoAlfanumerico(movimiento.placa_vehicular);
-        const identificadorMovimientoNormalizado = normalizarTextoAlfanumerico(movimiento.identificador);
-        const coincidePlaca = placaMovimientoNormalizada && placaVehiculoNormalizada && placaMovimientoNormalizada !== 'SP' && placaMovimientoNormalizada === placaVehiculoNormalizada;
-        const coincideIdentificador = identificadorMovimientoNormalizado && identificadorVehiculoNormalizado && identificadorMovimientoNormalizado === identificadorVehiculoNormalizado;
-        return coincidePlaca || coincideIdentificador;
-    });
-
-    // Retorna el último elemento del arreglo de movimientos filtrados si existe alguno.
-    return movimientosCoincidentes.length > 0 ? movimientosCoincidentes[movimientosCoincidentes.length - 1] : null;
-}
+// Reutiliza las funciones globales obtenerUltimoMovimientoVehiculo y determinarUbicacionVehiculo de scripts/informacion.js.
 
 // document.addEventListener: Registra la inicialización general de la interfaz al cargarse el documento.
 document.addEventListener('DOMContentLoaded', function() {

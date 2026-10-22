@@ -5,12 +5,13 @@
   /* Fondos generales */
   --fondo-principal: #FFFFFF;
   --fondo-tarjeta: #FFFFFF;
-  --fondo-barra-superior: #8D99AE;
+  --fondo-barra-superior: #343a40;
 
   /* Jerarquía de color tipográfica */
   --color-texto-titulo: #000000;
   --color-texto-cuerpo: #292929;
-  --color-texto-atenuado: #8D99AE;
+  --color-texto-atenuado: #424242;
+  --color-texto-campos:#7B899D;
   --color-texto-blanco: #FFFFFF;
 
   /* Estados de botones primarios */
@@ -44,6 +45,30 @@
   padding: 0;
   font-family: "SF Pro", "Inter", -apple-system, sans-serif;
   letter-spacing: 0.6px;
+}
+
+/* Color del texto del marcador de posición en campos de entrada */
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-texto-campos);
+}
+
+/* Color para campos de selección, fecha y hora sin opción o valor seleccionado */
+select:has(option[value=""]:checked),
+select:has(option:not([value]):checked),
+select.campo-sin-seleccion,
+input[type="date"].campo-sin-seleccion,
+input[type="time"].campo-sin-seleccion {
+  color: var(--color-texto-campos);
+}
+
+/* Color estándar para las opciones dentro del menú desplegable */
+select option {
+  color: var(--color-texto-cuerpo);
+}
+
+select option[value=""] {
+  color: var(--color-texto-campos);
 }
 
 /* Estructura base del lienzo de la página */
@@ -93,20 +118,39 @@ body {
 .barra-navegacion-identidad {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 /* Isotipo circular institucional */
 .barra-navegacion-identificador {
-  width: 60px;
-  height: 60px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-/* Título de la aplicación (INVEH) */
+/* Contenedor vertical de títulos institucionales */
+.barra-navegacion-textos-identidad {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+/* Título principal de la aplicación */
 .barra-navegacion-titulo {
-  font-size: 32px;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: #FFFFFF;
+}
+
+/* Subtítulo descriptivo de la plataforma vehicular */
+.barra-navegacion-subtitulo {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #FFFFFF;
 }
 
 /* Área de información del usuario en sesión activa a la derecha */
@@ -114,7 +158,41 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
-  font-size: 16px;
+}
+
+/* Denominación universitaria a la derecha en pantalla de acceso */
+.barra-navegacion-institucion {
+  font-size: 15px;
+  font-weight: 500;
+  color: #FFFFFF;
+}
+
+/* Bloque vertical con el nombre o rol del usuario activo */
+.barra-navegacion-detalles-usuario {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  gap: 2px;
+}
+
+/* Nombre o identificación primaria de la sesión en cabecera */
+.nombre-usuario-sesion,
+.etiqueta-rol-cabecera {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+/* Rol o perfil institucional secundario en cabecera */
+.rol-usuario-sesion {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 0;
 }
 
 /* Botón interactivo para cerrar la sesión activa */
@@ -132,8 +210,8 @@ body {
 
 .boton-cerrar-sesion img,
 .boton-cerrar-sesion .icono-imagen {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
 }
 
 .boton-cerrar-sesion:hover {

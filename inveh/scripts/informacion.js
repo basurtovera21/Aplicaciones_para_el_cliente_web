@@ -380,6 +380,39 @@ function generarSiguienteIdentificadorAutorizacion(listaAutorizaciones) {
     return `AUT-${String(numeroMayorEncontrado + 1).padStart(6, '0')}`;
 }
 
+// Localiza el último movimiento vehicular registrado en el historial para verificar su estado de entrada o salida.
+function obtenerUltimoMovimientoVehiculo(historialMovimientos, vehiculo) {
+    if (!Array.isArray(historialMovimientos) || !vehiculo) {
+        return null;
+    }
+
+    const placaVehiculoNormalizada = normalizarTextoAlfanumerico(vehiculo.placa_vehicular);
+    const identificadorVehiculoNormalizado = normalizarTextoAlfanumerico(vehiculo.identificador_sistema || vehiculo.identificador_solicitud || vehiculo.identificador);
+
+    // Array.prototype.filter: Discrimina movimientos que coincidan con la placa o identificador del vehículo.
+    const movimientosCoincidentes = historialMovimientos.filter(function(movimiento) {
+        const placaMovimientoNormalizada = normalizarTextoAlfanumerico(movimiento.placa_vehicular);
+        const identificadorMovimientoNormalizado = normalizarTextoAlfanumerico(movimiento.identificador);
+        const coincidePlaca = placaMovimientoNormalizada && placaVehiculoNormalizada && placaMovimientoNormalizada !== 'SP' && placaMovimientoNormalizada === placaVehiculoNormalizada;
+        const coincideIdentificador = identificadorMovimientoNormalizado && identificadorVehiculoNormalizado && identificadorMovimientoNormalizado === identificadorVehiculoNormalizado;
+        return coincidePlaca || coincideIdentificador;
+    });
+
+    return movimientosCoincidentes.length > 0 ? movimientosCoincidentes[movimientosCoincidentes.length - 1] : null;
+}
+
+// Determina la ubicación física actual de un vehículo (Dentro o Fuera de las instalaciones) contrastando su historial.
+function determinarUbicacionVehiculo(vehiculo, historialMovimientos) {
+    if (!vehiculo) return "Fuera de las instalaciones";
+    const ultimoMovimiento = obtenerUltimoMovimientoVehiculo(historialMovimientos, vehiculo);
+    if (ultimoMovimiento) {
+        return ultimoMovimiento.tipo_movimiento === "Entrada" 
+            ? "Dentro de las instalaciones" 
+            : "Fuera de las instalaciones";
+    }
+    return vehiculo.ubicacion_actual || "Fuera de las instalaciones";
+}
+
 // Asigna las funciones utilitarias y de persistencia al objeto global window para su reutilización.
 window.obtenerBaseDatos = obtenerBaseDatos;
 window.guardarCambios = guardarCambios;
@@ -392,6 +425,8 @@ window.obtenerFechaHoraActual = obtenerFechaHoraActual;
 window.esFechaActualHoy = esFechaActualHoy;
 window.generarSiguienteIdentificadorVehicular = generarSiguienteIdentificadorVehicular;
 window.generarSiguienteIdentificadorAutorizacion = generarSiguienteIdentificadorAutorizacion;
+window.obtenerUltimoMovimientoVehiculo = obtenerUltimoMovimientoVehiculo;
+window.determinarUbicacionVehiculo = determinarUbicacionVehiculo;
 
 // Ejecuta el procedimiento de inicialización y verificación de persistencia al cargar el archivo.
 inicializarPersistencia();

@@ -108,12 +108,17 @@ document.addEventListener('DOMContentLoaded', function() {
         contenedorRejillaVehiculos.innerHTML = '';
         // Array.prototype.forEach: Itera cada vehículo autorizado para construir y renderizar su tarjeta en el DOM.
         vehiculosAutorizados.forEach(function(vehiculo) {
+            // Sincroniza la ubicación física en tiempo real según el último movimiento registrado.
+            const ubicacionReal = typeof determinarUbicacionVehiculo === 'function'
+                ? determinarUbicacionVehiculo(vehiculo, baseDeDatos.historial_movimientos)
+                : (vehiculo.ubicacion_actual || "Fuera de las instalaciones");
+
             // Construye la estructura visual HTML correspondiente a la tarjeta vehicular.
             const codigoHtmlTarjeta = `
                 <section class="tarjeta-vehiculo-registrado">
                     <div class="fila-cabecera-vehiculo">
                         <span class="etiqueta-placa-vehicular">${vehiculo.placa_vehicular}</span>
-                        <span class="etiqueta-estado-instalaciones">${vehiculo.ubicacion_actual}</span>
+                        <span class="etiqueta-estado-instalaciones">${ubicacionReal}</span>
                     </div>
                     <div class="bloque-identificador-sistema">
                         <span>Identificador: <span class="dato-valor">${vehiculo.identificador_sistema}</span></span>

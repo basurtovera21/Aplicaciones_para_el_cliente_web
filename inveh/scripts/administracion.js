@@ -37,13 +37,74 @@ document.addEventListener('DOMContentLoaded', function() {
             etiquetaMetricaAutorizados.textContent = totalAutorizados;
         }
 
-        // Métrica 2: Cantidad de vehículos que se encuentran físicamente dentro del campus.
-        const totalEnInstalaciones = coleccionVehiculos.filter(function(vehiculo) {
-            return vehiculo.estado_autorizacion === "Autorizado" && vehiculo.ubicacion_actual === "Dentro de las instalaciones";
-        }).length;
+        // Métrica 2: Cantidad de vehículos que se encuentran físicamente dentro del campus (que tendrían que salir por los puntos de control).
+        const historialMovimientos = baseDeDatos.historial_movimientos || [];
+        const vehiculosDentroRegistrados = new Set();
+        let totalEnInstalaciones = 0;
+
+        // Comprueba y contabiliza cada vehículo único si se encuentra dentro de las instalaciones.
+        function registrarVehiculoSiEstaDentro(identificador, placa, ubicacionDefecto) {
+            const idNormalizado = normalizarTextoAlfanumerico(identificador);
+            const placaNormalizada = normalizarTextoAlfanumerico(placa);
+
+            const yaContabilizado = (idNormalizado && vehiculosDentroRegistrados.has(idNormalizado)) ||
+                                   (placaNormalizada && placaNormalizada !== 'SP' && vehiculosDentroRegistrados.has(placaNormalizada));
+            if (yaContabilizado) {
+                return;
+            }
+
+            const vehiculoReferencia = {
+                identificador_sistema: identificador,
+                identificador_solicitud: identificador,
+                placa_vehicular: placa,
+                ubicacion_actual: ubicacionDefecto
+            };
+
+            const ubicacionDeterminada = determinarUbicacionVehiculo(vehiculoReferencia, historialMovimientos);
+            if (ubicacionDeterminada === "Dentro de las instalaciones") {
+                totalEnInstalaciones++;
+                if (idNormalizado) vehiculosDentroRegistrados.add(idNormalizado);
+                if (placaNormalizada && placaNormalizada !== 'SP') vehiculosDentroRegistrados.add(placaNormalizada);
+            }
+        }
+
+        // Evalúa vehículos institucionales autorizados.
+        coleccionVehiculos.forEach(function(vehiculo) {
+            if (vehiculo.estado_autorizacion === "Autorizado") {
+                registrarVehiculoSiEstaDentro(vehiculo.identificador_sistema, vehiculo.placa_vehicular, vehiculo.ubicacion_actual);
+            }
+        });
+
+        // Evalúa vehículos de visitas autorizadas o temporales.
+        coleccionAutorizaciones.forEach(function(autorizacion) {
+            const estadoAutorizacion = autorizacion.estado_solicitud || autorizacion.estado_autorizacion;
+            if (estadoAutorizacion === "Autorizado") {
+                const placaVisita = autorizacion.vehiculo ? autorizacion.vehiculo.placa_vehicular : "S/P";
+                registrarVehiculoSiEstaDentro(autorizacion.identificador_solicitud, placaVisita, autorizacion.ubicacion_actual);
+            }
+        });
+
+        // Evalúa cualquier vehículo en el historial de movimientos cuyo último evento registrado sea "Entrada".
+        historialMovimientos.forEach(function(movimiento) {
+            registrarVehiculoSiEstaDentro(movimiento.identificador, movimiento.placa_vehicular, "Fuera de las instalaciones");
+        });
+
         const etiquetaMetricaEnInstalaciones = document.getElementById('metrica-vehiculos-instalaciones');
         if (etiquetaMetricaEnInstalaciones) {
             etiquetaMetricaEnInstalaciones.textContent = totalEnInstalaciones;
+        }
+
+        // Sincroniza la propiedad ubicacion_actual en la colección de vehículos para mantener la coherencia del estado.
+        let huboCambiosUbicacion = false;
+        coleccionVehiculos.forEach(function(vehiculo) {
+            const ubicacionSincronizada = determinarUbicacionVehiculo(vehiculo, historialMovimientos);
+            if (vehiculo.ubicacion_actual !== ubicacionSincronizada) {
+                vehiculo.ubicacion_actual = ubicacionSincronizada;
+                huboCambiosUbicacion = true;
+            }
+        });
+        if (huboCambiosUbicacion) {
+            guardarCambios(baseDeDatos);
         }
 
         // Métrica 3: Total consolidado de solicitudes pendientes de revisión.
