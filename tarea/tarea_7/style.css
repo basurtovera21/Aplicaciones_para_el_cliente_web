@@ -1,0 +1,211 @@
+:root {
+    --fondo-pagina: #f5f5f7;
+    --fondo-tarjeta: #ffffff;
+    --texto-principal: #1d1d1f;
+    --texto-secundario: #86868b;
+    --borde-color: #d2d2d7;
+    --color-primario: #0071e3;
+    --color-primario-hover: #0077ed;
+    --color-secundario: #e8e8ed;
+    --color-secundario-hover: #d2d2d7;
+    --color-oscuro: #333336;
+    --color-oscuro-hover: #1d1d1f;
+    --color-error: #ff3b30;
+    --radio-borde: 12px;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: var(--fondo-pagina);
+    color: var(--texto-principal);
+    margin: 0;
+    padding: 40px 20px;
+    -webkit-font-smoothing: antialiased;
+}
+
+.contenedor {
+    max-width: 700px;
+    margin: auto;
+    background: var(--fondo-tarjeta);
+    padding: 35px;
+    border-radius: var(--radio-borde);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+h2, h3 {
+    text-align: center;
+    color: var(--texto-principal);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-top: 0;
+}
+
+h2 {
+    font-size: 16px;
+    margin-bottom: 24px;
+}
+
+h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+
+.curicula-formulario {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 16px;
+    width: 100%;
+}
+
+.grupo-formulario {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-bottom: 4px;
+}
+
+label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--texto-principal);
+}
+
+input {
+    width: 100%;
+    padding: 10px 12px;
+    box-sizing: border-box;
+    border: 1px solid var(--borde-color);
+    border-radius: 8px;
+    background-color: #fafafa;
+    font-size: 12px;
+    color: var(--texto-secundario);
+    transition: all 0.2s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+}
+
+
+input.error-input {
+    border-color: var(--color-error);
+    background-color: rgba(255, 59, 48, 0.02);
+}
+
+input.error-input:focus {
+    box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.12);
+}
+
+
+.mensaje-error {
+    font-size: 13px;
+    color: var(--color-error);
+    margin-top: 5px;
+    min-height: 14px;
+    font-weight: 500;
+    display: block;
+}
+
+
+button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+#formularioEstudiante {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#botonGuardar {
+    background-color: var(--color-primario);
+    color: white;
+    margin-top: 25px;
+    width: 30%;
+    display: block;
+}
+
+#botonGuardar:hover {
+    background-color: var(--color-primario-hover);
+}
+
+.botones-accion {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.botones-accion button {
+    padding: 10px 20px;
+    font-size: 13px;
+}
+
+.btn-secundario {
+    background-color: var(--color-secundario);
+    color: var(--texto-principal);
+}
+.btn-secundario:hover {
+    background-color: var(--color-secundario-hover);
+}
+
+.btn-peligro-apple {
+    background-color: var(--color-oscuro);
+    color: white;
+}
+.btn-peligro-apple:hover {
+    background-color: var(--color-oscuro-hover);
+}
+
+.contenedor-tabla {
+    margin-top: 35px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--borde-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 12px;
+}
+
+th {
+    background-color: #f5f5f7;
+    color: var(--texto-principal);
+    font-weight: 600;
+    border-bottom: 1px solid var(--borde-color);
+}
+
+td {
+    border-bottom: 1px solid var(--borde-color);
+    color: #333336;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}

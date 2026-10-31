@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de estudiantes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="contenedor">
+        <h2>Registro de estudiantes</h2>
+        
+        <!-- Formulario de registro -->
+        <form id="formularioEstudiante" novalidate>
+
+            <div class="curicula-formulario">
+                <div class="grupo-formulario">
+                    <label for="cedula">Número de cédula:</label>
+                    <input type="text" id="cedula" placeholder="Ej. 1316719804" required>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="apellidos">Apellidos:</label>
+                    <input type="text" id="apellidos" placeholder="Ej. Basurto Vera" required>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="nombres">Nombres:</label>
+                    <input type="text" id="nombres" placeholder="Ej. Carlos Eduardo" required>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="direccion">Dirección de domicilio:</label>
+                    <input type="text" id="direccion" placeholder="Ej. Calle 16, Av. 20" required>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="telefono">Numero de teléfono:</label>
+                    <input type="text" id="telefono" placeholder="Ej. 0995621013" required>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="correo">Correo electrónico:</label>
+                    <input type="email" id="correo" placeholder="Ej. e1316719804@live.uleam.edu.ec" required>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="facultad">Facultad:</label>
+                    <input type="text" id="facultad" placeholder="Ej. Facultad de Ciencias de la Vida y Tecnologías" required>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="nivel">Nivel:</label>
+                    <input type="text" id="nivel" placeholder="Ej. 4" required>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="paralelo">Paralelo:</label>
+                    <input type="text" id="paralelo" placeholder="Ej. A" required>
+                </div>
+            </div>
+
+            <button type="submit" id="botonGuardar">Registrar información</button>
+            
+            <div class="botones-accion">
+                <button type="button" id="botonDescargar" class="btn-secundario">Obtener registros</button>
+                <button type="button" id="botonReiniciar" class="btn-peligro-apple">Reiniciar registros</button>
+            </div>
+        </form>
+
+        <!-- Tabla y acciones -->
+        <div class="contenedor-tabla">
+            <h3>Estudiantes Registrados</h3>
+        
+            <table>
+                <thead>
+                    <tr>
+                        <th>Número de cédula</th>
+                        <th>Apellidos y Nombres</th>
+                        <th>Dirección de domicilio</th>
+                        <th>Número de teléfono</th>
+                        <th>Correo electrónico</th>
+                        <th>Facultad</th>
+                        <th>Nivel</th>
+                        <th>Paralelo</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTablaEstudiantes">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
