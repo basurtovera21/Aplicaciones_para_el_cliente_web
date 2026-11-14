@@ -1,8 +1,4 @@
 <script setup>
-// Vista de Punto de Control (Garitas de Acceso).
-// Permite al personal de operación verificar vehículos y visitas autorizadas,
-// registrar entradas y salidas en tiempo real, emitir autorizaciones temporales
-// y consultar el historial de movimientos exclusivo de la garita asignada.
 
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useInvehStore } from '../stores/inveh'
@@ -37,18 +33,18 @@ import {
 // Almacén global Pinia
 const store = useInvehStore()
 
-// Nombre del punto de control asignado a la sesión actual (ej. "Punto de control N01")
+// Nombre del punto de control asignado a la sesión actual
 const puntoControlAsignado = computed(() => {
   return store.usuarioActual?.area_asignada || 'Punto de control N01'
 })
 
-// Extrae los dígitos numéricos del punto de control (ej. "01")
+// Extrae los dígitos numéricos del punto de control
 const numeroPunto = computed(() => {
   const match = puntoControlAsignado.value.match(/\d+/)
   return match ? match[0].padStart(2, '0') : '01'
 })
 
-// Código normalizado del punto de control (ej. "N01")
+// Código normalizado del punto de control
 const codigoPuntoActual = computed(() => {
   return normalizarCodigoPunto(puntoControlAsignado.value) || 'N01'
 })

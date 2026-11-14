@@ -1,6 +1,4 @@
 <script setup>
-// GUÍA DIDÁCTICA: BOTONES DE DECISIÓN ADMINISTRATIVA (AccionesRevisionModal.vue)
-//
 // Reutiliza los botones de aprobación y rechazo en las solicitudes de revisión,
 // emitiendo 'aceptar' o 'rechazar' al componente padre.
 defineEmits(['aceptar', 'rechazar'])

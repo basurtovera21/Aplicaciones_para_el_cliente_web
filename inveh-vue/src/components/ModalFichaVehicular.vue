@@ -1,6 +1,4 @@
 <script setup>
-// GUÍA DIDÁCTICA: COMPONENTE REUTILIZABLE (ModalFichaVehicular.vue)
-//
 // 1. Composición sobre Herencia:
 //    Envuelve el componente estructural 'ModalBase', transmitiéndole props
 //    y re-emitiendo sus eventos hacia el componente padre que lo invocó.

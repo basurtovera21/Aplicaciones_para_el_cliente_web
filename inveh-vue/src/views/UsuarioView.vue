@@ -1,7 +1,4 @@
 <script setup>
-// Vista de Usuario Institucional (Estudiantes, Docentes, Administrativos).
-// Permite consultar vehículos autorizados, solicitar registro de un vehículo
-// y solicitar autorizaciones de acceso vehicular para visitas externas.
 
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useInvehStore } from '../stores/inveh'
@@ -49,14 +46,15 @@ onMounted(() => {
   revisarNotificacionesPendientes()
 })
 
-// Calcula las iniciales del usuario para el avatar
+// Calcula las iniciales del usuario para el avatar a partir de su nombre registrado
 const inicialesUsuario = computed(() => {
-  const nombre = (store.usuarioActual?.nombres_apellidos || 'Carlos Basurto').trim()
-  const palabras = nombre.split(/\s+/)
+  const nombre = (store.usuarioActual?.nombres_apellidos || '').trim()
+  if (!nombre) return ''
+  const palabras = nombre.split(/\s+/).filter(Boolean)
   if (palabras.length >= 2) {
     return (palabras[0][0] + palabras[1][0]).toUpperCase()
   }
-  return 'CB'
+  return palabras[0].slice(0, 2).toUpperCase()
 })
 
 // Vehículos con estado 'Autorizado' pertenecientes al usuario actual
@@ -155,7 +153,7 @@ const longitudMaximaPlaca = computed(() => {
 // Texto de ayuda para el campo placa
 const placeholderPlaca = computed(() => {
   if (formularioVehiculo.tipo === 'Motocicleta') return 'Ej. KH463S'
-  if (formularioVehiculo.tipo === 'Otro') return 'Opcional (Ej. BIC001)'
+  if (formularioVehiculo.tipo === 'Otro') return 'Opcional'
   return 'Ej. PCN9041'
 })
 

@@ -1,6 +1,5 @@
 <script setup>
-// GUÍA DIDÁCTICA: MODAL DE CONFIRMACIÓN O ÉXITO (ModalConfirmacionExito.vue)
-//
+
 // Componente modal especializado para feedback visual positivo (icono verde de confirmación).
 // Recibe 'titulo' y 'mensaje' como props obligatorias y notifica el cierre mediante el evento 'cerrar'.
 import ModalBase from './ModalBase.vue'

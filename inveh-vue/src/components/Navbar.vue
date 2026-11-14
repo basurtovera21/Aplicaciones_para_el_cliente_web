@@ -1,9 +1,7 @@
 <script setup>
-// GUÍA DIDÁCTICA: BARRA DE NAVEGACIÓN INSTITUCIONAL (Navbar.vue)
-//
 // 1. Vue Router ('useRoute' y 'useRouter'):
-//    - 'useRoute()': Proporciona información reactiva de la ruta activa (ej. 'route.name').
-//    - 'useRouter()': Objeto que permite redirigir al usuario programáticamente ('router.push').
+//    - 'useRoute()': Proporciona información reactiva de la ruta activa.
+//    - 'useRouter()': Objeto que permite redirigir al usuario programáticamente.
 //
 // 2. Renderizado Condicional:
 //    - Si estamos en la pantalla de login ('esPantallaInicioSesion'), muestra el lema de la universidad.

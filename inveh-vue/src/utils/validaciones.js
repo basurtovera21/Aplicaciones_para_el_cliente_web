@@ -1,5 +1,3 @@
-// Utilidades de validación para INVEH
-
 import { MOTIVOS_VISITA } from './catalogos.js'
 
 // Valida la autenticidad matemática de una cédula de identidad ecuatoriana mediante el algoritmo Módulo 10.

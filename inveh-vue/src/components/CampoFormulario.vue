@@ -1,7 +1,5 @@
 <script setup>
 // Componente envoltorio para campos de formulario.
-//
-// Concepto didáctico:
 // - Estandariza la etiqueta (label), el control de entrada (mediante <slot />)
 //   y el mensaje de error de validación en una sola estructura reutilizable.
 defineProps({

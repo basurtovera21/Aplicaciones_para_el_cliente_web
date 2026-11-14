@@ -142,7 +142,7 @@
   margin: 0 auto;
 }
 
-/* Distribución horizontal de botones (ej. Desvincular vs Cancelar) */
+/* Distribución horizontal de botones */
 .contenedor-acciones-horizontal {
   display: flex;
   justify-content: center;

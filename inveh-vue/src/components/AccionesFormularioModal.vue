@@ -1,6 +1,4 @@
 <script setup>
-// GUÍA DIDÁCTICA: BOTONES DE ACCIÓN PARA MODALES DE FORMULARIO (AccionesFormularioModal.vue)
-//
 // Reutiliza la botonera estándar de modales:
 // - Botón de envío (type="submit") con texto e icono configurables por prop.
 // - Botón de cancelación (type="button") que emite el evento 'cancelar'.

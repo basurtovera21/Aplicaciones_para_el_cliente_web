@@ -1,7 +1,6 @@
 <script setup>
-// Componente base para ventanas modales en Vue 3.
-//
-// Conceptos clave de Vue utilizados:
+// Componente base para ventanas modales en Vue 3
+
 // - defineProps: Declara los datos que este componente recibe desde su componente padre.
 // - defineEmits: Declara los eventos que este componente puede emitir hacia el componente padre.
 // - <slot />: Punto de inserción donde el componente padre inyecta su propio contenido HTML/Vue.

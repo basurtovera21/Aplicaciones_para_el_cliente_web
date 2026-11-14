@@ -1,6 +1,5 @@
 <script setup>
-// GUÍA DIDÁCTICA: MODAL DE ADVERTENCIA PARA ACCIONES DESTRUCTIVAS (ModalDesvincular.vue)
-//
+
 // Componente que solicita confirmación antes de anular la autorización de un vehículo.
 // Emite 'confirmar' al pulsar el botón de peligro y 'cerrar' si el usuario cancela.
 import ModalBase from './ModalBase.vue'

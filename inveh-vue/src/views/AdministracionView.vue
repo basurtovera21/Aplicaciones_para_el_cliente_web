@@ -1,7 +1,4 @@
 <script setup>
-// Vista de Administración Institucional.
-// Permite auditar solicitudes pendientes (vehículos propios y visitas externas),
-// consultar el padrón vehicular institucional, modificar vehículos y ver el historial de actividades.
 
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useInvehStore } from '../stores/inveh'
@@ -60,7 +57,6 @@ const vehiculosFiltrados = computed(() => {
   const tipoVehiculo = filtrosVehicularesAplicados.value.tipoVehiculo
 
   return store.vehiculos.filter(vehiculo => {
-    // Solo mostramos vehículos autorizados
     if (vehiculo.estadoAutorizacion !== 'Autorizado') return false
 
     // Filtro por texto libre

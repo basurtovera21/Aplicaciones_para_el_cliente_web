@@ -1,9 +1,6 @@
 <script setup>
 // Componente de acordeón / sección desplegable.
-//
-// Concepto didáctico de Vue 3 (Two-way binding con v-model con argumento):
-// - Soporta 'v-model:abierta': Permite que el padre controle la apertura externamente
-//   (por ejemplo, para abrirla automáticamente cuando hay errores de validación).
+// - Soporta 'v-model:abierta': Permite que el padre controle la apertura externamente.
 // - Si el padre no pasa 'v-model:abierta', el componente gestiona su propio estado interno
 //   mediante la variable reactiva 'internaAbierta'.
 import { ref, computed } from 'vue'
