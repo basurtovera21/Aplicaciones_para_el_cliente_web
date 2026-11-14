@@ -14,7 +14,7 @@ const CLAVE_BASE_DATOS = 'inveh_base_datos'
 const CLAVE_SESION_ACTIVA = 'inveh_sesion_activa'
 
 // Control de versión: al cambiar estructuras, incrementa este número para reiniciar los datos del navegador
-const VERSION_ESQUEMA_ACTUAL = 11
+const VERSION_ESQUEMA_ACTUAL = 12
 
 // Usuarios iniciales del sistema con roles y áreas asignadas
 const USUARIOS_INICIALES = [
@@ -149,7 +149,7 @@ const VISITAS_INICIALES = [
     visitante: {
       nombres_apellidos: "Coello Mendoza Joseph Alexander",
       tipo_identificacion: "Cédula de identidad",
-      numero_identificacion: "1316719812",
+      numero_identificacion: "0953920949",
       telefono: "0991237851"
     },
     vehiculo: {
@@ -163,7 +163,7 @@ const VISITAS_INICIALES = [
       fecha: "",
       hora: "",
       motivo: "academica",
-      destino: "Facultad de Ciencias de la Vida y Tecnologías - Laboratorio de Software"
+      destino: "Facultad de Ciencias de la Vida y Tecnologías"
     },
     estadoAutorizacion: "Pendiente",
     estadoPresencia: "Fuera de las instalaciones",
@@ -412,6 +412,17 @@ export const useInvehStore = defineStore('inveh', {
       this.vehiculos = VEHICULOS_INICIALES.map(prepararVehiculoInicial)
       this.autorizacionesVisitas = VISITAS_INICIALES.map(prepararVisitaInicial)
       this.historialMovimientos = []
+      this.usuarioActual = null
+      this.guardarEnStorage()
+    },
+
+    // Vacía todos los registros vehiculares y visitas manteniendo los usuarios institucionales
+    vaciarBaseDatos() {
+      this.usuarios = USUARIOS_INICIALES.map(u => ({ ...u }))
+      this.vehiculos = []
+      this.autorizacionesVisitas = []
+      this.historialMovimientos = []
+      this.usuarioActual = null
       this.guardarEnStorage()
     },
 
@@ -419,10 +430,20 @@ export const useInvehStore = defineStore('inveh', {
     importarBaseDatos(datos) {
       if (!datos || typeof datos !== 'object') return
 
-      if (Array.isArray(datos.usuarios)) this.usuarios = datos.usuarios
-      if (Array.isArray(datos.vehiculos)) this.vehiculos = datos.vehiculos
-      if (Array.isArray(datos.autorizaciones_visitas)) this.autorizacionesVisitas = datos.autorizaciones_visitas
-      if (Array.isArray(datos.historial_movimientos)) this.historialMovimientos = datos.historial_movimientos
+      // Si viene un objeto vacío {}, restablece a los registros iniciales limpios
+      if (Object.keys(datos).length === 0) {
+        this.reiniciarDatosCompletos()
+        return
+      }
+
+      this.usuarios = Array.isArray(datos.usuarios) ? datos.usuarios : USUARIOS_INICIALES.map(u => ({ ...u }))
+      this.vehiculos = Array.isArray(datos.vehiculos) ? datos.vehiculos : []
+      this.autorizacionesVisitas = Array.isArray(datos.autorizaciones_visitas) 
+        ? datos.autorizaciones_visitas 
+        : (Array.isArray(datos.autorizacionesVisitas) ? datos.autorizacionesVisitas : [])
+      this.historialMovimientos = Array.isArray(datos.historial_movimientos) 
+        ? datos.historial_movimientos 
+        : (Array.isArray(datos.historialMovimientos) ? datos.historialMovimientos : [])
 
       this.guardarEnStorage()
     },

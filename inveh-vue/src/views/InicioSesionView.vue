@@ -111,8 +111,17 @@ function handleImportarBD(evento) {
 
   const lector = new FileReader()
   lector.onload = function(e) {
+    const contenido = (e.target.result || '').trim()
+
+    // Si el archivo está en blanco o contiene {}, restablece la base de datos a los valores iniciales limpios
+    if (!contenido || contenido === '{}' || contenido === '[]') {
+      store.reiniciarDatosCompletos()
+      alert('Base de datos restablecida correctamente con los registros iniciales.')
+      return
+    }
+
     try {
-      const datosParseados = JSON.parse(e.target.result)
+      const datosParseados = JSON.parse(contenido)
       if (datosParseados && typeof datosParseados === 'object') {
         store.importarBaseDatos(datosParseados)
         alert('Información importada correctamente.')
