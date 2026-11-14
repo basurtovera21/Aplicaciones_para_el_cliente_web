@@ -1,0 +1,131 @@
+/* Estilos base para ventanas modales */
+
+/* Capa de fondo oscurecida con efecto translúcido que cubre todo el viewport */
+.superposicion-modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  padding: 20px;
+}
+
+.superposicion-modal.activo {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Caja blanca central con bordes redondeados y sombra de elevación */
+.contenedor-modal {
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  max-width: 95vw;
+  max-height: 90vh;
+  padding: 36px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Variantes de ancho del modal */
+.modal-ancho-ficha { width: 950px; }      /* Ficha técnica vehicular completa */
+.modal-ancho-registro { width: 680px; }    /* Formularios de registro y solicitudes */
+.modal-ancho-mediano { width: 600px; }     /* Diálogos de confirmación o información */
+.modal-ancho-pequeno { width: 450px; }     /* Modales compactos de éxito o alerta */
+.modal-ancho-confirmacion { width: 700px; } /* Diálogos de confirmación bloqueados */
+.modal-ancho-exito { width: 700px; }        /* Diálogos de confirmación y éxito idénticos */
+
+/* Margen específico de la pista de desplazamiento dentro del modal */
+.contenedor-modal::-webkit-scrollbar-track {
+  margin: 16px;
+}
+
+/* Cabecera centrada con espacio superior reservado para el botón de cierre */
+.cabecera-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 36px;
+  position: relative;
+  padding: 36px 36px 0;
+}
+
+.titulo-modal {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  text-align: center;
+}
+
+/* Botón de cierre (X) fijado en la esquina superior derecha */
+.boton-cerrar-modal {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dispositivos móviles (<= 768px) */
+@media (max-width: 768px) {
+  .superposicion-modal {
+    padding: 8px;
+  }
+
+  .contenedor-modal,
+  .modal-ancho-ficha,
+  .modal-ancho-registro,
+  .modal-ancho-mediano,
+  .modal-ancho-pequeno,
+  .modal-ancho-confirmacion,
+  .modal-ancho-exito,
+  .modal-contenedor-confirmacion,
+  .modal-contenedor-exito {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    resize: none;
+  }
+
+  .contenedor-modal {
+    max-height: 92vh;
+    padding: 24px 14px;
+    overflow-x: hidden;
+  }
+
+  .cabecera-modal {
+    margin-bottom: 20px;
+    padding: 32px 0 0;
+  }
+
+  .boton-cerrar-modal {
+    top: -4px;
+    right: -4px;
+  }
+
+  .titulo-modal {
+    font-size: 20px;
+  }
+}
+
+/* Dispositivos de escritorio (> 768px) */
+@media (min-width: 769px) {
+  .modal-ancho-registro {
+    width: 680px;
+    min-width: 680px;
+    max-width: 680px;
+    resize: none;
+  }
+}

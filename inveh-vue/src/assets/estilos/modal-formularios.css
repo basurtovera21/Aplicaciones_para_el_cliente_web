@@ -1,0 +1,294 @@
+/* Estilos de formularios dentro de modales (Registro y visitas) */
+
+/* Banner superior con información sobre el estado de autorización */
+.banner-informativo-registro {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 36px;
+  margin-bottom: 36px;
+}
+
+.icono-banner-grande {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.texto-banner-unico {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-texto-cuerpo);
+}
+
+.texto-banner-unico strong {
+  color: var(--color-texto-titulo);
+}
+
+/* Rejilla de distribución en dos columnas bloqueadas en PC */
+.cuerpo-grid-formulario {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 36px;
+  margin-bottom: 12px;
+}
+
+/* Contenedor relativo de cada campo de formulario */
+.bloque-campo-formulario {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-bottom: 30px;
+}
+
+.campo-ancho-completo {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+/* Alto editable para campos de ancho completo (ej. Área de destino y Observaciones) */
+.campo-ancho-completo .campo-texto-modal {
+  height: 36px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.campo-ancho-completo .campo-area-texto-modal {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.etiqueta-formulario {
+  font-size: 14px;
+  color: var(--color-texto-cuerpo);
+  margin-bottom: 8px;
+}
+
+/* Íconos vectoriales de fecha y hora embebidos en el fondo de los campos */
+input[type="date"],
+input[type="time"] {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input[type="date"].campo-texto-modal {
+  background-image: url("/recursos/imagenes/calendario.svg");
+}
+
+input[type="time"].campo-texto-modal {
+  background-image: url("/recursos/imagenes/reloj.svg");
+}
+
+/* Selector nativo transparente cubriendo el campo sin alterar el ancho */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0;
+}
+
+/* Área de texto ancha (Observaciones): alto fijo bloqueado sin redimensionar desde la vista */
+.campo-area-texto-modal {
+  height: 90px;
+  padding: 16px;
+  overflow-y: auto;
+  resize: none;
+}
+
+/* Botonera de acciones en los extremos */
+.contenedor-acciones-extremos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 12px;
+}
+
+/* Secciones desplegables (Acordeón compacto) */
+.boton-desplegar-compacto {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: opacity 0.2s ease;
+}
+
+.boton-desplegar-compacto:hover {
+  opacity: 0.8;
+}
+
+.icono-flecha-pequena {
+  width: 18px;
+  height: 18px;
+  opacity: 1;
+  object-fit: contain;
+  display: block;
+  transition: opacity 0.2s ease;
+}
+
+.titulo-seccion-grande {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+}
+
+.seccion-formulario-modal {
+  margin-bottom: 36px;
+}
+
+.seccion-formulario-modal > .titulo-seccion-grande {
+  margin-bottom: 24px;
+  display: block;
+}
+
+/* Contenido colapsable */
+.contenido-desplegable {
+  display: none;
+}
+
+.contenido-desplegable.visible {
+  display: block;
+}
+
+/* Bloqueo estricto del diseño de formularios y autorización en PC */
+@media (min-width: 769px) {
+  .modal-ancho-registro {
+    width: 680px;
+    min-width: 680px;
+    max-width: 680px;
+    resize: none;
+  }
+
+  .cuerpo-grid-formulario {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 36px;
+  }
+
+  .campo-ancho-completo {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .campo-ancho-completo .campo-texto-modal,
+  .campo-ancho-completo .campo-area-texto-modal {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* Adaptación y bloqueo del diseño en dispositivos móviles: apilado en una sola columna sin desbordamiento horizontal */
+@media (max-width: 768px) {
+  .banner-informativo-registro {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 12px 0;
+    margin-bottom: 24px;
+  }
+
+  .icono-banner-grande {
+    width: 72px;
+    height: 72px;
+  }
+
+  .formulario-registro-vehiculo,
+  .cuerpo-grid-formulario,
+  .seccion-formulario-modal,
+  .contenido-desplegable {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .cuerpo-grid-formulario {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+    margin-bottom: 8px;
+  }
+
+  .bloque-campo-formulario {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin-bottom: 34px;
+  }
+
+  .bloque-campo-formulario .texto-alerta-error {
+    top: calc(100% + 4px);
+    bottom: auto;
+    white-space: normal;
+    max-width: 100%;
+    line-height: 1.2;
+  }
+
+  /* Fecha y hora idénticas en ancho (100%) y proporciones a los demás campos en móvil */
+  input[type="date"].campo-texto-modal,
+  input[type="time"].campo-texto-modal {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  /* Área de destino y campos de ancho completo con el mismo formato que Observaciones */
+  .campo-ancho-completo {
+    grid-column: span 1;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .campo-ancho-completo .campo-texto-modal,
+  .campo-ancho-completo .campo-area-texto-modal {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .campo-ancho-completo .campo-area-texto-modal {
+    height: 90px;
+    padding: 16px;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-y: auto;
+    resize: none;
+  }
+
+  .contenedor-acciones-extremos {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .contenedor-acciones-extremos .boton-accion-modal {
+    max-width: 100%;
+  }
+
+  .seccion-formulario-modal {
+    margin-bottom: 24px;
+  }
+}

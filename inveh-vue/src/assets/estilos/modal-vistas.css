@@ -1,0 +1,238 @@
+/* Estilos de vistas informativas y confirmación en modales */
+
+/* Rejilla de dos columnas alineadas por fila para la ficha vehicular */
+.cuerpo-grid-ficha {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 36px;
+  align-items: start;
+}
+
+.fila-centrada-modal {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.identificador-texto-modal {
+  font-size: 14px;
+  color: var(--color-texto-cuerpo);
+}
+
+.tarjeta-informacion-modal {
+  padding: 36px;
+  min-width: 0;
+}
+
+/* Contenedor cuadrado de 200x200px para el código QR */
+.tarjeta-qr-modal {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.imagen-qr-modal {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.subtitulo-modal {
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 16px;
+  color: var(--color-texto-titulo);
+}
+
+/* Par de datos etiqueta y valor en la ficha */
+.item-dato-modal {
+  font-size: 12px;
+  margin-bottom: 12px;
+  color: var(--color-texto-atenuado);
+  display: flex;
+  gap: 8px;
+  line-height: 1.5;
+}
+
+.item-dato-modal span {
+  color: var(--color-texto-cuerpo);
+  font-weight: 500;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Botones de cierre y aceptación de modal */
+.contenedor-acciones-modal {
+  grid-column: 2;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Modales de confirmación, alerta y éxito */
+.modal-contenedor-confirmacion,
+.modal-contenedor-exito,
+.contenedor-modal:has(.cuerpo-modal-confirmacion),
+.modal-ancho-confirmacion,
+.modal-ancho-exito {
+  min-width: 320px;
+  max-width: 95vw;
+  height: auto;
+  min-height: 400px;
+  max-height: 90vh;
+  resize: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dimensiones en escritorio para confirmación y éxito */
+.modal-contenedor-confirmacion,
+.modal-contenedor-exito,
+.modal-ancho-confirmacion,
+.modal-ancho-exito {
+  width: 700px;
+  height: auto;
+}
+
+.cuerpo-modal-confirmacion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 24px;
+  margin-bottom: 36px;
+  text-align: center;
+}
+
+.contenedor-imagen-alerta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  width: 120px;
+  height: 120px;
+}
+
+.icono-visual-alerta {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+}
+
+.identificador-vehiculo-enfasis {
+  font-size: 14px;
+  color: var(--color-texto-titulo);
+  margin-bottom: 12px;
+}
+
+.descripcion-alerta-modal {
+  font-size: 14px;
+  color: var(--color-texto-cuerpo);
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Distribución horizontal de botones (ej. Desvincular vs Cancelar) */
+.contenedor-acciones-horizontal {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  margin-top: auto;
+}
+
+/* Alineación centrada para botón único de Aceptar */
+.contenedor-acciones-centrado {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+}
+
+/* Dispositivos de escritorio (> 768px) */
+@media (min-width: 769px) {
+  .identificador-texto-modal {
+    white-space: nowrap;
+  }
+}
+
+/* Dispositivos móviles (<= 768px) */
+@media (max-width: 768px) {
+  .cuerpo-grid-ficha {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .fila-centrada-modal {
+    height: auto;
+    min-height: 36px;
+  }
+
+  .etiqueta-placa-ficha,
+  .tarjeta-qr-modal {
+    max-width: 100%;
+  }
+
+  .tarjeta-informacion-modal {
+    padding: 20px;
+  }
+
+  .item-dato-modal {
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    text-align: left;
+  }
+
+  .contenedor-acciones-modal {
+    grid-column: 1;
+    justify-content: center;
+  }
+
+  .contenedor-acciones-modal .boton-accion-modal {
+    max-width: 100%;
+  }
+
+  .modal-contenedor-confirmacion,
+  .modal-contenedor-exito,
+  .contenedor-modal:has(.cuerpo-modal-confirmacion) {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: auto;
+    resize: none;
+    padding: 24px 20px;
+  }
+
+  .cuerpo-modal-confirmacion {
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .descripcion-alerta-modal,
+  .identificador-vehiculo-enfasis {
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .contenedor-acciones-horizontal {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .contenedor-acciones-horizontal .boton-accion-modal,
+  .contenedor-acciones-centrado .boton-accion-modal {
+    max-width: 100%;
+  }
+}

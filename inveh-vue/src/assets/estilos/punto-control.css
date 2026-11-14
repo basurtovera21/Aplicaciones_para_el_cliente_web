@@ -1,0 +1,302 @@
+/* Estilos de la vista de punto de control */
+
+/* Tarjeta 1: Buscador de comprobación y registro temporal */
+.fila-superior-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.bloque-identificador-punto {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.titulo-control {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  margin-bottom: 6px;
+}
+
+.descripcion-control {
+  font-size: 12px;
+  color: var(--color-texto-atenuado);
+}
+
+.formulario-comprobacion-control {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.campo-entrada-placa-contenedor {
+  width: 480px;
+  max-width: 480px;
+  flex: none;
+}
+
+.mensaje-sin-coincidencia {
+  text-align: center;
+  padding: 20px 16px;
+  color: #000000 !important;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #F8FAFC;
+  border-radius: var(--radio-redondeo-boton);
+  margin-top: 16px;
+}
+
+/* Tarjeta 2: Resultado de coincidencia y acción de movimiento */
+.cabecera-resultado-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: none;
+}
+
+.bloque-placa-id-control {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.identificador-control {
+  font-size: 14px;
+  color: var(--color-texto-cuerpo);
+}
+
+.identificador-control .dato-valor {
+  font-weight: 500;
+}
+
+.rejilla-detalles-control {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 36px;
+  margin-bottom: 24px;
+}
+
+.columna-detalle-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subtitulo-detalle-control {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  margin-bottom: 10px;
+}
+
+.item-detalle-control {
+  font-size: 14px;
+  color: var(--color-texto-atenuado);
+  line-height: 1.6;
+}
+
+.item-detalle-control .dato-valor {
+  font-size: 12px;
+  color: var(--color-texto-cuerpo);
+  font-weight: 500;
+}
+
+.filas-dos-datos-control {
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: 36px;
+}
+
+.pie-resultado-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding-top: 20px;
+  border-top: none;
+}
+
+.texto-ultimo-movimiento {
+  font-size: 14px;
+  color: #546A7B;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Tipo de movimiento en historial sin negrita */
+.movimiento-tabla-texto {
+  font-weight: 400 !important;
+  color: var(--color-texto-cuerpo) !important;
+}
+
+.tabla-gestion-inveh td strong {
+  font-weight: 400;
+  color: var(--color-texto-cuerpo);
+}
+
+/* Dispositivos móviles y tablets (<= 768px) */
+@media (max-width: 768px) {
+  .tarjeta-busqueda-control,
+  .tarjeta-resultado-vehiculo,
+  .tarjeta-historial-control {
+    padding: 24px;
+  }
+
+  /* Tarjeta 1: Cabecera y buscador apilados verticalmente */
+  .fila-superior-control {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .bloque-identificador-punto {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .textos-cabecera-control {
+    text-align: center;
+    width: 100%;
+  }
+
+  .descripcion-control {
+    text-align: left;
+    width: 100%;
+  }
+
+  .boton-registro-temporal {
+    width: 100% !important;
+    max-width: 100%;
+    justify-content: center;
+    align-self: center;
+  }
+
+  .formulario-comprobacion-control {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .campo-entrada-placa-contenedor {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  .entrada-busqueda-control {
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .boton-comprobar-control {
+    width: 100% !important;
+    max-width: 100%;
+    justify-content: center;
+  }
+
+  /* Tarjeta 2: Resultado de coincidencia apilado */
+  .cabecera-resultado-control {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .bloque-placa-id-control {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .etiqueta-estado-instalaciones {
+    align-self: center;
+  }
+
+  .rejilla-detalles-control {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    width: 100%;
+  }
+
+  .columna-detalle-control {
+    width: 100%;
+    text-align: left;
+  }
+
+  .filas-dos-datos-control {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .pie-resultado-control {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .boton-ficha-control {
+    width: 100% !important;
+    max-width: 100%;
+    justify-content: center;
+  }
+
+  .texto-ultimo-movimiento {
+    text-align: center;
+    margin: 4px 0;
+    width: 100%;
+    word-break: break-word;
+  }
+
+  .boton-accion-movimiento {
+    width: 100% !important;
+    max-width: 100%;
+    justify-content: center;
+  }
+
+  /* Tarjeta 3: Contenedor de tabla con desplazamiento táctil horizontal */
+  .contenedor-tabla-desplazable {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+    padding-bottom: 8px;
+    margin: 0;
+  }
+
+  .tabla-gestion-inveh {
+    min-width: 560px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tarjeta-busqueda-control,
+  .tarjeta-resultado-vehiculo,
+  .tarjeta-historial-control {
+    padding: 16px;
+  }
+
+  .titulo-control {
+    font-size: 16px;
+  }
+}

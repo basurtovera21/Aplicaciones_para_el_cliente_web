@@ -1,0 +1,13 @@
+/* Hoja de estilos unificada para INVEH */
+
+@import './general.css';
+@import './modal-base.css';
+@import './modal-formularios.css';
+@import './modal-vistas.css';
+@import './modal-modificar.css';
+@import './modal-revision.css';
+@import './ficha-exportada.css';
+@import './inicio-sesion.css';
+@import './usuario-inicio.css';
+@import './administracion.css';
+@import './punto-control.css';

@@ -1,0 +1,364 @@
+/* Estilos de la pantalla de administración */
+
+/* Tarjeta 1: Resumen de métricas (banner superior) */
+.tarjeta-resumen-metricas {
+  width: 100%;
+  padding: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.rejilla-contadores-metricas {
+  display: flex;
+  align-items: center;
+  gap: 20px 48px;
+}
+
+.bloque-metrica-individual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.numero-metrica {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+/* Énfasis en solicitudes pendientes */
+.color-alerta {
+  color: var(--color-alerta-salmon-fondo) !important;
+}
+
+.descripcion-metrica {
+  font-size: 12px;
+  color: var(--color-texto-atenuado);
+  font-weight: 400;
+}
+
+/* Barra de filtros vehiculares (tarjeta 3) */
+.barra-filtros-vehiculares,
+.barra-filtros-actividades {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.campo-busqueda-contenedor {
+  flex: 2 1 260px;
+  min-width: 220px;
+}
+
+.select-filtro-contenedor {
+  flex: 1 1 180px;
+  min-width: 180px;
+  position: relative;
+}
+
+.selector-filtro-inveh {
+  cursor: pointer;
+}
+
+.selector-filtro-inveh option {
+  font-size: 12px;
+  color: var(--color-texto-cuerpo);
+  background-color: #FFFFFF;
+  padding: 12px;
+}
+
+/* Resalte de valores específicos dentro de celdas en administración */
+.tabla-gestion-inveh td .dato-valor {
+  color: var(--color-texto-cuerpo);
+  font-weight: 500;
+}
+
+/* Botones con ícono dentro de cada fila de la tabla */
+.boton-tabla-icono {
+  width: 42px;
+  height: 32px;
+  background-color: var(--boton-primario-fondo);
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.boton-tabla-icono:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+.boton-tabla-icono img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+/* Botonera horizontal de la ficha vehicular en administración */
+.contenedor-acciones-ficha-admin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 36px;
+  width: 100%;
+}
+
+.grupo-acciones-ficha-izq {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.grupo-acciones-ficha-der {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.boton-ficha-admin {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.boton-ficha-admin-corto,
+#btn-admin-modificar-vehiculo,
+#btn-admin-exportar-pdf {
+  width: 140px;
+}
+
+#btn-admin-desvincular-ficha,
+#btn-admin-aceptar-ficha {
+  width: 243px;
+}
+
+/* Modal de registro de actividades y capas z-index */
+.modal-ancho-actividades {
+  width: 1150px;
+}
+
+/* Jerarquía de profundidad (z-index) para evitar solapamientos entre modales superpuestos */
+#modal-registro-actividades { z-index: 1000 !important; }
+#modal-ficha-vehicular { z-index: 1050 !important; }
+#modal-modificar-vehiculo,
+#modal-desvincular-vehiculo,
+#modal-revision-registro,
+#modal-revision-autorizacion { z-index: 1060 !important; }
+#modal-desvinculacion-exito,
+#modal-admin-exito { z-index: 1070 !important; }
+
+/* Dispositivos de escritorio (> 768px) */
+@media (min-width: 769px) {
+  .tarjeta-resumen-metricas {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(16px, 2.5vw, 32px);
+    padding: 36px;
+  }
+
+  .bloque-identidad-admin {
+    flex-shrink: 0;
+  }
+
+  .rejilla-contadores-metricas {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: clamp(16px, 3vw, 48px);
+    flex-shrink: 1;
+  }
+
+  .bloque-metrica-individual {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .bloque-accion-registro {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  .boton-registro-actividades {
+    width: 243px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .tarjeta-panel-fijo {
+    height: 480px;
+    padding: 36px;
+  }
+
+  .barra-filtros-vehiculares {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .boton-comprobar-filtros {
+    width: 243px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+/* Dispositivos móviles (<= 768px) */
+@media (max-width: 768px) {
+  /* Tarjetas con padding adaptativo */
+  .tarjeta-resumen-metricas,
+  .tarjeta-panel {
+    padding: 24px;
+  }
+
+  /* Tarjeta 1: Resumen de métricas apilado verticalmente */
+  .tarjeta-resumen-metricas {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 24px;
+  }
+
+  .bloque-identidad-admin {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .rejilla-contadores-metricas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 16px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .bloque-metrica-individual {
+    width: 100%;
+  }
+
+  .bloque-accion-registro {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-left: 0;
+  }
+
+  .boton-registro-actividades {
+    width: 100%;
+    max-width: 100%;
+    justify-content: center;
+  }
+
+  /* Tarjetas 2 y 3: Altura flexible para albergar contenido apilado sin cortes */
+  .tarjeta-panel-fijo {
+    height: auto;
+    min-height: 0;
+  }
+
+  .cabecera-panel-tabla {
+    margin-bottom: 20px;
+  }
+
+  /* Barra de filtros vehiculares y de actividades apilada al 100% */
+  .barra-filtros-vehiculares,
+  .barra-filtros-actividades {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .campo-busqueda-contenedor,
+  .select-filtro-contenedor {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex: none;
+  }
+
+  .entrada-busqueda-inveh,
+  .selector-filtro-inveh {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .boton-comprobar-filtros {
+    width: 100%;
+    max-width: 100%;
+    justify-content: center;
+  }
+
+  /* Tablas con desplazamiento horizontal táctil sin desbordar el contenedor */
+  .contenedor-tabla-desplazable {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+    padding-bottom: 8px;
+    margin: 0;
+  }
+
+  .tabla-gestion-inveh {
+    min-width: 560px;
+  }
+
+  /* Modal de actividades ajustado a la pantalla móvil */
+  .modal-ancho-actividades {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Apilado vertical de acciones de ficha vehicular en móviles */
+  .contenedor-acciones-ficha-admin {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    width: 100%;
+  }
+
+  .grupo-acciones-ficha-izq,
+  .grupo-acciones-ficha-der {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .contenedor-acciones-ficha-admin .boton-ficha-admin,
+  .boton-ficha-admin-corto,
+  #btn-admin-modificar-vehiculo,
+  #btn-admin-exportar-pdf,
+  #btn-admin-desvincular-ficha,
+  #btn-admin-aceptar-ficha {
+    width: 100% !important;
+    max-width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Pantallas móviles muy pequeñas (<= 480px): Métricas en 1 columna */
+@media (max-width: 480px) {
+  .rejilla-contadores-metricas {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}

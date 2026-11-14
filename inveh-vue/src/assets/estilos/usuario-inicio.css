@@ -1,0 +1,277 @@
+/* Estilos de la pantalla principal de usuario */
+
+/* Tarjeta 1: Resumen y perfil del usuario */
+.tarjeta-resumen-usuario {
+  width: 100%;
+  padding: 36px;
+}
+
+.bloque-perfil-informacion {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.detalles-personales-usuario {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0;
+}
+
+.fila-superior-perfil {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.nombre-rol-usuario {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+}
+
+/* Indicador tipo píldora del cupo vehicular autorizado */
+.indicador-contador-vehiculos {
+  background-color: #E2E8F0;
+  color: var(--color-texto-cuerpo);
+  font-size: 14px;
+  font-weight: 400;
+  padding: 10px 32px;
+  border-radius: 16px;
+  box-shadow: 0 3px 6px rgba(141, 153, 174, 0.3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fila-datos-institucionales {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 12px 36px;
+  font-size: 12px;
+  color: var(--color-texto-atenuado);
+}
+
+.fila-datos-institucionales .dato-valor {
+  color: var(--color-texto-cuerpo);
+  font-weight: 400;
+}
+
+/* Fila alineada a la derecha para solicitar un vehículo adicional */
+.fila-accion-vehiculo-adicional {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+/* Rejilla de tarjetas vehiculares del usuario */
+.rejilla-vehiculos-usuario {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 36px;
+  width: 100%;
+}
+
+.rejilla-vehiculos-usuario:empty {
+  display: none;
+}
+
+.tarjeta-vehiculo-registrado {
+  width: 100%;
+  min-width: 0;
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.fila-cabecera-vehiculo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.bloque-identificador-sistema {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-texto-cuerpo);
+}
+
+.bloque-identificador-sistema strong {
+  font-weight: 500;
+}
+
+.rejilla-especificaciones-vehiculo {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  font-size: 12px;
+  color: var(--color-texto-atenuado);
+  line-height: 1.8;
+  width: 100%;
+}
+
+.rejilla-especificaciones-vehiculo span {
+  color: var(--color-texto-cuerpo);
+}
+
+.fila-botones-accion-vehiculo {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Tarjeta 2: Autorización de visitas */
+.tarjeta-autorizacion-visitas {
+  width: 100%;
+  padding: 36px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.titulo-seccion-visitas {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  margin-bottom: 12px;
+}
+
+.descripcion-seccion-visitas {
+  font-size: 12px;
+  color: var(--color-texto-atenuado);
+}
+
+/* Pantallas medianas / tablet (<= 1220px) */
+@media (max-width: 1220px) {
+  .rejilla-vehiculos-usuario {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .fila-superior-perfil,
+  .fila-datos-institucionales,
+  .tarjeta-autorizacion-visitas {
+    flex-wrap: wrap;
+  }
+}
+
+/* Dispositivos móviles (<= 768px) */
+@media (max-width: 768px) {
+  .tarjeta-resumen-usuario,
+  .tarjeta-vehiculo-registrado,
+  .tarjeta-autorizacion-visitas {
+    padding: 24px;
+  }
+
+  .bloque-perfil-informacion {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .fila-superior-perfil {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .nombre-rol-usuario {
+    font-size: 20px;
+  }
+
+  .indicador-contador-vehiculos {
+    padding: 10px 20px;
+    max-width: 100%;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .fila-datos-institucionales {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 10px;
+    margin-top: 16px;
+    width: 100%;
+  }
+
+  .fila-datos-institucionales > span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .fila-accion-vehiculo-adicional {
+    justify-content: center;
+  }
+
+  .boton-requerir-vehiculo {
+    max-width: 100%;
+  }
+
+  .tarjeta-autorizacion-visitas {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .textos-autorizacion-visitas {
+    text-align: left;
+  }
+
+  .boton-crear-autorizacion {
+    align-self: center;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .fila-cabecera-vehiculo {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .fila-cabecera-vehiculo .etiqueta-placa-vehicular,
+  .fila-cabecera-vehiculo .etiqueta-estado-instalaciones {
+    max-width: 100%;
+  }
+
+  .bloque-identificador-sistema {
+    margin-top: 18px;
+    margin-bottom: 16px;
+  }
+
+  .rejilla-especificaciones-vehiculo {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0;
+    text-align: left;
+  }
+
+  .fila-botones-accion-vehiculo {
+    margin-top: 18px;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .fila-botones-accion-vehiculo .boton-ficha-vehicular,
+  .fila-botones-accion-vehiculo .boton-desvincular-vehiculo {
+    max-width: 100%;
+  }
+}

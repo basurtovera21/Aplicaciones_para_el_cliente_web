@@ -1,0 +1,185 @@
+/* Estilos de la pantalla de inicio de sesión */
+
+/* Contenedor principal centrado horizontalmente */
+.pantalla-inicio-sesion-contenedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(100vh - 98px);
+  padding: 0 16px 36px;
+  background-color: var(--fondo-principal);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Título superior de la sección de autenticación */
+.titulo-accion-inicio-sesion {
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  margin-top: 80px;
+  margin-bottom: 0;
+}
+
+/* Ancho máximo compartido para que los botones de BD no superen la tarjeta */
+.tarjeta-formulario-inicio-sesion,
+.contenedor-acciones-bd {
+  width: min(400px, 100%);
+}
+
+/* Tarjeta contenedora: márgenes y paddings superior/inferior editables libremente */
+.tarjeta-formulario-inicio-sesion {
+  height: auto;
+  padding-top: 40px;
+  padding-right: 40px;
+  padding-bottom: 40px;
+  padding-left: 40px;
+  margin-top: 24px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Subtítulo instructivo */
+.indicacion-texto-inicio-sesion {
+  font-size: 12px;
+  color: var(--color-texto-atenuado);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+/* Distribución flex del formulario interno */
+.cuerpo-formulario-inicio-sesion {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Agrupador relativo: ajusta este width (ej. 280px o 100%) para centrar todo el bloque */
+.bloque-campo-inicio-sesion {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  max-width: 100%;
+  align-self: center;
+  margin-bottom: 26px;
+}
+
+.bloque-campo-inicio-sesion:last-of-type {
+  margin-bottom: 0;
+}
+
+.etiqueta-formulario-inicio-sesion {
+  font-size: 14px;
+  color: var(--color-texto-cuerpo);
+  margin-bottom: 8px;
+}
+
+/* Contenedor relativo para alojar el input y los íconos internos */
+.caja-entrada-con-icono {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icono-entrada-izquierda {
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  left: 14px;
+  pointer-events: none;
+}
+
+/* Input desbloqueado e independiente para ajustar su ancho libremente */
+.campo-texto-inicio-sesion {
+  width: 100%;
+  max-width: 100%;
+  height: 36px;
+  padding: 0 16px 0 48px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-texto-atenuado);
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-redondeo-boton);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campo-texto-inicio-sesion:focus {
+  border-color: var(--fondo-barra-superior);
+  box-shadow: 0 0 0 2px rgba(141, 153, 174, 0.2);
+}
+
+/* Botón interactivo para alternar la visibilidad de la contraseña */
+.boton-mostrar-clave {
+  position: absolute;
+  left: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* Botón principal de acceso: margin-top controla la separación respecto a los inputs */
+.boton-acceder {
+  width: 300px;
+  max-width: 100%;
+  height: 36px;
+  background-color: var(--fondo-barra-superior);
+  color: var(--boton-primario-texto);
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  cursor: pointer;
+  margin-top: 36px;
+  transition: background-color 0.2s;
+  align-self: center;
+}
+
+.boton-acceder:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+/* Contenedor de botones de respaldo pegados a los bordes de la tarjeta sin superarla */
+.contenedor-acciones-bd {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 36px; /* Separación editable entre la tarjeta y los botones de BD */
+  flex-wrap: nowrap;
+}
+
+.boton-gestion-bd {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  padding: 10px 18px; /* Padding interno editable sin superar la tarjeta */
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+/* Mantiene tamaños de letra y proporciones visuales consistentes en celulares */
+@media (max-width: 420px) {
+  .pantalla-inicio-sesion-contenedor {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .tarjeta-formulario-inicio-sesion {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}

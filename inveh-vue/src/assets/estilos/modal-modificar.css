@@ -1,0 +1,133 @@
+/* Modal de modificación de registro vehicular */
+
+/* Contenedor de información fija y solo lectura */
+.bloque-seccion-no-editable {
+  margin-bottom: 28px;
+  width: 100%;
+}
+
+/* Subtítulo central de la sección no editable */
+.bloque-seccion-no-editable .subtitulo-seccion-revision {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+/* Fila central destacada para mostrar el identificador o código vehicular */
+.bloque-seccion-no-editable .fila-centrada-modal {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Tipografía y jerarquía visual del código identificador */
+.bloque-seccion-no-editable .identificador-texto-modal {
+  font-size: 14px;
+  color: var(--color-texto-cuerpo);
+}
+
+.bloque-seccion-no-editable .identificador-texto-modal .dato-valor {
+  color: var(--color-texto-titulo);
+  font-weight: 500;
+}
+
+/* Cuadrícula de datos no editables en dos columnas */
+.rejilla-no-editable-columnas {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 36px;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Columna vertical para agrupar las filas de datos informativos */
+.columna-datos-no-editable {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Dispositivos de escritorio (> 768px) */
+@media (min-width: 769px) {
+  #modal-modificar-vehiculo {
+    resize: none;
+  }
+
+  .rejilla-no-editable-columnas {
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: 36px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .columna-datos-no-editable .item-revision {
+    white-space: nowrap;
+  }
+}
+
+/* Dispositivos móviles (<= 768px) */
+@media (max-width: 768px) {
+  .bloque-seccion-no-editable {
+    margin-bottom: 20px;
+    width: 100%;
+  }
+
+  .bloque-seccion-no-editable .subtitulo-seccion-revision {
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+
+  .bloque-seccion-no-editable .fila-centrada-modal {
+    height: auto;
+    min-height: 36px;
+    margin-bottom: 12px;
+  }
+
+  .rejilla-no-editable-columnas {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .columna-datos-no-editable {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .columna-datos-no-editable .item-revision {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    font-size: 13px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .columna-datos-no-editable .item-revision .dato-valor {
+    font-size: 13px;
+    color: var(--color-texto-cuerpo);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .contenedor-acciones-extremos {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    width: 100%;
+  }
+
+  .contenedor-acciones-extremos .boton-accion-modal {
+    width: 100% !important;
+    max-width: 100%;
+    justify-content: center;
+  }
+}

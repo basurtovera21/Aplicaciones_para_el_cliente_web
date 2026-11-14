@@ -1,0 +1,740 @@
+/* Variables globales y tokens de diseño */
+
+/* Paleta de colores, tipografías, bordes y sombras compartidas en toda la aplicación */
+:root {
+  /* Fondos generales */
+  --fondo-principal: #FFFFFF;
+  --fondo-tarjeta: #FFFFFF;
+  --fondo-barra-superior: #343a40;
+
+  /* Jerarquía de color tipográfica */
+  --color-texto-titulo: #000000;
+  --color-texto-cuerpo: #292929;
+  --color-texto-atenuado: #424242;
+  --color-texto-campos:#7B899D;
+  --color-texto-blanco: #FFFFFF;
+
+  /* Estados de botones primarios */
+  --boton-primario-fondo: var(--fondo-barra-superior);
+  --boton-primario-hover: #23272b;
+  --boton-primario-texto: var(--color-texto-blanco);
+
+  /* Estados de botones neutros */
+  --boton-neutro-fondo: #FFFFFF;
+  --boton-neutro-hover: #CBD5E1;
+  --boton-neutro-texto: #000000;
+
+  /* Alertas visuales y estados de peligro (salmón) */
+  --color-alerta-salmon-fondo: #F3A0A2;
+  --color-alerta-salmon-hover: #FC9898;
+  --color-alerta-salmon-texto: #000000;
+
+  /* Dimensiones, radios de redondeo y sombras */
+  --borde-suave: #8D99AE;
+  --radio-redondeo-tarjeta: 16px;
+  --radio-redondeo-boton: 16px;
+  --sombra-tarjeta: 0px 4px 4px rgba(141, 153, 174, 0.25);
+}
+
+/* Reseteo base y tipografía global */
+
+/* Normalización de modelo de caja y familia tipográfica institucional */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "SF Pro", "Inter", -apple-system, sans-serif;
+  letter-spacing: 0.6px;
+}
+
+/* Color del texto del marcador de posición en campos de entrada */
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-texto-campos);
+  opacity: 1;
+}
+
+/* Color para campos de selección, fecha y hora sin opción o valor seleccionado */
+select:has(option[value=""]:checked),
+select:has(option:not([value]):checked),
+select.campo-sin-seleccion,
+input[type="date"].campo-sin-seleccion,
+input[type="time"].campo-sin-seleccion {
+  color: var(--color-texto-campos);
+}
+
+/* Color estándar para las opciones dentro del menú desplegable */
+select option {
+  color: var(--color-texto-cuerpo);
+}
+
+select option[value=""] {
+  color: var(--color-texto-campos);
+}
+
+/* Bloqueo de reescalado automático de texto en navegadores móviles */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Estructura base del lienzo de la página */
+body {
+  background-color: var(--fondo-principal);
+  color: var(--color-texto-cuerpo);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* Íconos y componentes visuales compartidos */
+
+/* Ícono estándar para botones e indicadores */
+.icono-imagen {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+/* Ícono de gran formato para modales informativos y de éxito */
+.icono-imagen-grande {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 16px;
+}
+
+/* Barra de navegación institucional */
+
+/* Contenedor principal de la cabecera superior persistente */
+.barra-navegacion {
+  background-color: var(--fondo-barra-superior);
+  color: var(--color-texto-titulo);
+  height: 98px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  position: relative;
+  z-index: 10;
+}
+
+/* Logotipo e identidad institucional a la izquierda */
+.barra-navegacion-identidad {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Isotipo circular institucional */
+.barra-navegacion-identificador {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Contenedor vertical de títulos institucionales */
+.barra-navegacion-textos-identidad {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+/* Título principal de la aplicación */
+.barra-navegacion-titulo {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: #FFFFFF;
+}
+
+/* Subtítulo descriptivo de la plataforma vehicular */
+.barra-navegacion-subtitulo {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #FFFFFF;
+}
+
+/* Área de información del usuario en sesión activa a la derecha */
+.barra-navegacion-usuario {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Denominación universitaria a la derecha en pantalla de acceso */
+.barra-navegacion-institucion {
+  font-size: 14px;
+  font-weight: 500;
+  color: #FFFFFF;
+}
+
+/* Adaptación en móviles */
+@media (max-width: 768px) {
+  .barra-navegacion.barra-navegacion-inicio-sesion {
+    padding: 0 20px;
+    justify-content: flex-start;
+  }
+
+  .barra-navegacion.barra-navegacion-inicio-sesion .barra-navegacion-usuario {
+    display: none;
+  }
+
+  .barra-navegacion.barra-navegacion-inicio-sesion .barra-navegacion-identidad {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .barra-navegacion.barra-navegacion-inicio-sesion .barra-navegacion-textos-identidad {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Módulos autenticados */
+  .barra-navegacion:not(.barra-navegacion-inicio-sesion) {
+    height: auto;
+    min-height: 98px;
+    padding: 12px 16px;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .barra-navegacion:not(.barra-navegacion-inicio-sesion) .barra-navegacion-identidad {
+    flex-shrink: 0;
+  }
+
+  .barra-navegacion:not(.barra-navegacion-inicio-sesion) .barra-navegacion-textos-identidad {
+    display: none;
+  }
+
+  .barra-navegacion:not(.barra-navegacion-inicio-sesion) .barra-navegacion-usuario {
+    flex: 1;
+    min-width: 0;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .barra-navegacion:not(.barra-navegacion-inicio-sesion) .barra-navegacion-detalles-usuario {
+    align-items: flex-start;
+    text-align: left;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .barra-navegacion:not(.barra-navegacion-inicio-sesion) .nombre-usuario-sesion,
+  .barra-navegacion:not(.barra-navegacion-inicio-sesion) .rol-usuario-sesion {
+    white-space: normal;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+
+  .barra-navegacion:not(.barra-navegacion-inicio-sesion) .boton-cerrar-sesion {
+    flex-shrink: 0;
+  }
+}
+
+/* Bloque vertical con el nombre o rol del usuario activo */
+.barra-navegacion-detalles-usuario {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  gap: 2px;
+}
+
+/* Nombre o identificación primaria de la sesión en cabecera */
+.nombre-usuario-sesion,
+.etiqueta-rol-cabecera {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+/* Rol o perfil institucional secundario en cabecera */
+.rol-usuario-sesion {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+/* Textos de cabecera en escritorio */
+@media (min-width: 769px) {
+  .barra-navegacion-titulo,
+  .barra-navegacion-subtitulo,
+  .barra-navegacion-institucion,
+  .nombre-usuario-sesion,
+  .rol-usuario-sesion {
+    white-space: nowrap;
+  }
+}
+
+/* Botón interactivo para cerrar la sesión activa */
+.boton-cerrar-sesion {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.boton-cerrar-sesion img,
+.boton-cerrar-sesion .icono-imagen {
+  width: 28px;
+  height: 28px;
+}
+
+.boton-cerrar-sesion:hover {
+  background-color: rgba(141, 153, 174, 0.25);
+}
+
+/* Componentes y utilidades compartidas */
+
+/* Contenedor principal centrado para las vistas autenticadas */
+.contenedor-principal {
+  min-height: calc(100vh - 98px);
+  max-width: 1440px;
+  width: min(1440px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 36px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 36px;
+  background-color: var(--fondo-principal);
+}
+
+/* Superficie base compartida entre tarjetas de vistas y modales */
+.tarjeta-formulario-inicio-sesion,
+.tarjeta-resumen-usuario,
+.tarjeta-vehiculo-registrado,
+.tarjeta-autorizacion-visitas,
+.tarjeta-resumen-metricas,
+.tarjeta-panel,
+.banner-informativo-registro,
+.tarjeta-informacion-modal,
+.tarjeta-qr-modal {
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-redondeo-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+}
+
+/* Tarjeta estándar de panel en administración y punto de control */
+.tarjeta-panel {
+  width: 100%;
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tarjeta-panel-fijo {
+  height: 480px;
+}
+
+.cabecera-panel-tabla {
+  margin-bottom: 24px;
+}
+
+.titulo-panel {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-texto-titulo);
+}
+
+/* Insignia circular compartida (iniciales de usuario/admin o número de punto) */
+.insignia-circular {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--fondo-barra-superior);
+  color: var(--color-texto-blanco);
+  font-size: 26px;
+  font-weight: 500;
+  box-shadow: 0 4px 8px rgba(141, 153, 174, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Píldoras vehiculares y estado en instalaciones */
+.etiqueta-placa-vehicular,
+.etiqueta-placa-ficha,
+.etiqueta-estado-instalaciones {
+  width: 243px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: var(--radio-redondeo-boton);
+  flex-shrink: 0;
+}
+
+.etiqueta-placa-vehicular,
+.etiqueta-placa-ficha {
+  background-color:  var(--fondo-barra-superior);
+  color: var(--color-texto-blanco);
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(84, 106, 123, 0.35);
+}
+
+.etiqueta-estado-instalaciones {
+  background-color: #BDD5EA55;
+  color: var(--color-texto-cuerpo);
+  font-size: 14px;
+  padding: 0 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(141, 153, 174, 0.25);
+}
+
+/* Tablas institucionales con desplazamiento interno */
+.contenedor-tabla-desplazable {
+  flex: 1;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.contenedor-modal::-webkit-scrollbar,
+.contenedor-tabla-desplazable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.contenedor-modal::-webkit-scrollbar-track,
+.contenedor-tabla-desplazable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.contenedor-tabla-desplazable::-webkit-scrollbar-track {
+  margin: 8px 0;
+}
+
+.contenedor-modal::-webkit-scrollbar-thumb,
+.contenedor-tabla-desplazable::-webkit-scrollbar-thumb {
+  background-color: rgba(141, 153, 174, 0.3);
+  border-radius: 10px;
+  border: 2px solid #FFFFFF;
+}
+
+.tabla-gestion-inveh {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tabla-gestion-inveh th {
+  background-color: #E2E8F0;
+  color: var(--color-texto-cuerpo);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 18px;
+  white-space: nowrap;
+}
+
+.tabla-gestion-inveh th:first-child {
+  border-top-left-radius: var(--radio-redondeo-boton);
+  border-bottom-left-radius: var(--radio-redondeo-boton);
+}
+
+.tabla-gestion-inveh th:last-child {
+  border-top-right-radius: var(--radio-redondeo-boton);
+  border-bottom-right-radius: var(--radio-redondeo-boton);
+}
+
+.tabla-gestion-inveh td {
+  padding: 14px 18px;
+  font-size: 12px;
+  color: var(--color-texto-cuerpo);
+  border-bottom: none;
+}
+
+.columna-centrada {
+  text-align: center !important;
+}
+
+.mensaje-tabla-vacia {
+  text-align: center;
+  color: var(--color-texto-atenuado);
+  font-size: 12px;
+  background-color: #FFFFFF !important;
+  border-radius: var(--radio-redondeo-boton);
+}
+
+.tabla-gestion-inveh td.mensaje-tabla-vacia {
+  padding: 24px;
+  background-color: #FFFFFF !important;
+}
+
+/* Entradas de texto, selects y mensajes de validación */
+.campo-texto-modal,
+.campo-area-texto-modal,
+.entrada-busqueda-inveh,
+.selector-filtro-inveh,
+.entrada-busqueda-control {
+  width: 100%;
+  padding: 0 16px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-texto-atenuado);
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-redondeo-boton);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campo-texto-modal,
+.entrada-busqueda-inveh,
+.selector-filtro-inveh,
+.entrada-busqueda-control {
+  height: 36px;
+}
+
+.campo-texto-modal:focus,
+.campo-area-texto-modal:focus,
+.entrada-busqueda-inveh:focus,
+.selector-filtro-inveh:focus,
+.entrada-busqueda-control:focus {
+  border-color: var(--fondo-barra-superior);
+  box-shadow: 0 0 0 2px rgba(141, 153, 174, 0.2);
+}
+
+/* Posicionamiento e ícono vectorial compartido para selectores y campos con SVG */
+select.campo-texto-modal,
+input[type="date"].campo-texto-modal,
+input[type="time"].campo-texto-modal,
+.selector-filtro-inveh {
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 18px;
+}
+
+select.campo-texto-modal,
+.selector-filtro-inveh {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("/recursos/imagenes/select.svg");
+  padding: 0 42px 0 16px;
+  line-height: 34px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+select.campo-texto-modal::-ms-expand,
+.selector-filtro-inveh::-ms-expand {
+  display: none;
+}
+
+select.campo-texto-modal::picker-icon,
+.selector-filtro-inveh::picker-icon {
+  display: none;
+}
+
+@supports (appearance: base-select) {
+  select.campo-texto-modal,
+  .selector-filtro-inveh,
+  select.campo-texto-modal::picker(select),
+  .selector-filtro-inveh::picker(select) {
+    appearance: base-select;
+  }
+
+  select.campo-texto-modal,
+  .selector-filtro-inveh {
+    align-items: center;
+    line-height: 1.5;
+  }
+
+  select.campo-texto-modal::picker-icon,
+  .selector-filtro-inveh::picker-icon {
+    display: none;
+  }
+}
+
+.campo-con-error .campo-texto-modal,
+.campo-con-error .campo-texto-inicio-sesion {
+  border-color: var(--color-alerta-salmon-fondo);
+}
+
+/* Mensaje de error absoluto debajo de los campos de formulario */
+.texto-alerta-error {
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-alerta-salmon-fondo);
+  background: none;
+  display: none;
+  white-space: nowrap;
+}
+
+.texto-alerta-error.visible {
+  display: block;
+}
+
+/* Botonera base compartida, variantes de color e íconos */
+.boton-accion-modal,
+.boton-solicitud-admin,
+.boton-ficha-admin,
+.boton-requerir-vehiculo,
+.boton-ficha-vehicular,
+.boton-desvincular-vehiculo,
+.boton-crear-autorizacion,
+.boton-registro-actividades,
+.boton-comprobar-filtros,
+.boton-registro-temporal,
+.boton-comprobar-control,
+.boton-ficha-control,
+.boton-accion-movimiento {
+  padding: 8px 14px;
+  min-height: 37px;
+  border: none;
+  border-radius: var(--radio-redondeo-boton);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.2s, filter 0.2s;
+}
+
+.boton-accion-modal,
+.boton-solicitud-admin,
+.boton-ficha-admin,
+.boton-registro-actividades,
+.boton-comprobar-filtros,
+.boton-registro-temporal,
+.boton-comprobar-control,
+.boton-ficha-control,
+.boton-accion-movimiento,
+.boton-gestion-bd {
+  font-weight: 500;
+}
+
+.boton-requerir-vehiculo {
+  height: 37px;
+  line-height: 21px;
+  white-space: nowrap;
+}
+
+.boton-accion-modal,
+.boton-ficha-vehicular,
+.boton-desvincular-vehiculo,
+.boton-crear-autorizacion,
+.boton-registro-actividades,
+.boton-comprobar-filtros,
+.boton-registro-temporal,
+.boton-comprobar-control,
+.boton-ficha-control,
+.boton-accion-movimiento {
+  width: 243px;
+  height: 37px;
+  line-height: 21px;
+  white-space: nowrap;
+}
+
+/* Modificadores de fondo para botones de acción */
+.fondo-neutro,
+.movimiento-entrada,
+.boton-requerir-vehiculo,
+.boton-ficha-vehicular,
+.boton-crear-autorizacion,
+.boton-registro-actividades,
+.boton-comprobar-filtros,
+.boton-registro-temporal,
+.boton-comprobar-control,
+.boton-ficha-control {
+  background-color: var(--boton-primario-fondo);
+  color: var(--boton-primario-texto);
+}
+
+.fondo-neutro:hover,
+.movimiento-entrada:hover,
+.boton-requerir-vehiculo:hover,
+.boton-ficha-vehicular:hover,
+.boton-crear-autorizacion:hover,
+.boton-registro-actividades:hover,
+.boton-comprobar-filtros:hover,
+.boton-registro-temporal:hover,
+.boton-comprobar-control:hover,
+.boton-ficha-control:hover {
+  background-color: var(--boton-primario-hover);
+}
+
+/* Convierte a blanco los íconos SVG oscuros dentro de botones primarios oscuros */
+.fondo-neutro img,
+.movimiento-entrada img,
+.boton-requerir-vehiculo img,
+.boton-ficha-vehicular img,
+.boton-crear-autorizacion img,
+.boton-registro-actividades img,
+.boton-comprobar-filtros img,
+.boton-registro-temporal img,
+.boton-comprobar-control img,
+.boton-ficha-control img,
+.boton-tabla-icono img,
+.boton-acceder img {
+  filter: brightness(0) invert(1);
+}
+
+.fondo-peligro,
+.movimiento-salida,
+.boton-desvincular-vehiculo {
+  background-color: var(--color-alerta-salmon-fondo);
+  color: var(--color-alerta-salmon-texto);
+}
+
+.fondo-peligro:hover,
+.movimiento-salida:hover,
+.boton-desvincular-vehiculo:hover {
+  background-color: var(--color-alerta-salmon-hover);
+}
+
+.fondo-cancelar,
+.boton-gestion-bd {
+  background-color: #F1F5F9;
+  color: var(--color-texto-cuerpo);
+}
+
+.fondo-cancelar:hover,
+.boton-gestion-bd:hover {
+  background-color: #E2E8F0;
+  filter: brightness(0.95);
+}
+
+/* Tamaño estándar compartido para íconos de botones y controles */
+.icono-cerrar-modal,
+.icono-boton-modal,
+.icono-imagen-boton,
+.icono-boton-accion,
+.icono-comprobar,
+.boton-solicitud-admin img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.icono-flecha-pequena {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
