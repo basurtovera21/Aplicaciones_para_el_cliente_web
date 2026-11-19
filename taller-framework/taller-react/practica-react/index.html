@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Práctica React - Tarjeta de Producto</title>
+  <link rel="stylesheet" href="estilos.css" />
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div class="tarjeta">
+    <h2>Audífonos Gamer Pro</h2>
+    <p>Sonido envolvente y micrófono con cancelación de ruido.</p>
+    <p class="precio">$45.00</p>
+
+    <!-- Botón tradicional controlado por JavaScript puro -->
+    <button id="btn-js">Me gusta (JS): <span id="conteo-js">0</span></button>
+    <hr />
+
+    <!-- Contenedor donde se monta el componente de React -->
+    <div id="root"></div>
+  </div>
+
+  <script src="script.js"></script>
+  <script type="text/babel" src="ContadorReact.jsx"></script>
+</body>
+</html>
