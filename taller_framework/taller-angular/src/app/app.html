@@ -1,0 +1,47 @@
+<div class="contenedor">
+  <header>
+    <h1>Sistema de Gestión de Tutorías</h1>
+    <p>Administración de tutorías académicas</p>
+  </header>
+
+  <section class="resumen">
+    <h2>Mis tutorías</h2>
+    <p>
+      Total de tutorías:
+      <strong>{{ tutorias().length }}</strong>
+    </p>
+  </section>
+
+  <section class="registro">
+    <h2>Registrar tutoría</h2>
+    <input
+      type="text"
+      #materia
+      placeholder="Nombre de la materia"
+    >
+    <button
+      (click)="agregar(materia.value); materia.value = ''">
+      Agregar tutoría
+    </button>
+  </section>
+
+  <section class="listado">
+    <h2>Listado de tutorías</h2>
+
+    @for (tutoria of tutorias(); track tutoria.id) {
+      <article class="tarjeta">
+        <div>
+          <h3>{{ tutoria.materia }}</h3>
+          <p>Estado: {{ tutoria.estado }}</p>
+        </div>
+
+        <button
+          (click)="cambiarEstado(tutoria.id)">
+          Cambiar estado
+        </button>
+      </article>
+    } @empty {
+      <p>No existen tutorías registradas.</p>
+    }
+  </section>
+</div>
