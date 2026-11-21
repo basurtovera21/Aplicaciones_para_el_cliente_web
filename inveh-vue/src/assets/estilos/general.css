@@ -518,6 +518,7 @@ body {
 select.campo-texto-modal,
 input[type="date"].campo-texto-modal,
 input[type="time"].campo-texto-modal,
+input[list].campo-texto-modal,
 .selector-filtro-inveh {
   background-repeat: no-repeat;
   background-position: right 16px center;
@@ -535,6 +536,19 @@ select.campo-texto-modal,
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Campos de texto con autocompletado datalist: usan la flecha SVG de INVEH y ocultan el indicador nativo gris */
+input[list].campo-texto-modal {
+  background-image: url("/recursos/imagenes/select.svg");
+  padding-right: 42px;
+}
+
+input[list].campo-texto-modal::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+  width: 28px;
+  height: 100%;
 }
 
 select.campo-texto-modal::-ms-expand,

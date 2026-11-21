@@ -12,6 +12,7 @@ import BannerInformativo from '../components/BannerInformativo.vue'
 import AccionesFormularioModal from '../components/AccionesFormularioModal.vue'
 import { useTeclaEscape } from '../composables/useTeclaEscape'
 import { TIPOS_VEHICULO, TIPOS_IDENTIFICACION, MOTIVOS_VISITA } from '../utils/catalogos'
+import { FABRICANTES_COMUNES, obtenerModelosPorFabricante } from '../utils/apiVehiculos'
 import {
   limpiarCampos,
   tieneErrores,
@@ -273,12 +274,26 @@ function validarPlacaTemporal() {
   }
 }
 
+// Lista reactiva de modelos sugeridos mediante la API REST de la NHTSA para visitas temporales en garita
+const modelosSugeridosTemporal = ref([])
+
 function abrirModalTemporal() {
   limpiarCampos(erroresTemporal)
   limpiarCampos(formularioTemporal)
+  modelosSugeridosTemporal.value = []
   seccionVehiculoTemporalAbierta.value = true
   seccionVisitaTemporalAbierta.value = true
   modalRegistroTemporalAbierto.value = true
+}
+
+// Consulta asíncrona de modelos en la API externa al escribir o seleccionar el fabricante en garita
+async function alCambiarFabricanteTemporal() {
+  normalizarDetalleVehiculo(formularioTemporal, erroresTemporal, 'fabricante')
+  if (formularioTemporal.fabricante && formularioTemporal.fabricante.trim().length >= 2) {
+    modelosSugeridosTemporal.value = await obtenerModelosPorFabricante(formularioTemporal.fabricante)
+  } else {
+    modelosSugeridosTemporal.value = []
+  }
 }
 
 function enviarAutorizacionTemporal() {
@@ -616,10 +631,15 @@ function enviarAutorizacionTemporal() {
                   v-model="formularioTemporal.fabricante" 
                   type="text" 
                   class="campo-texto-modal" 
+                  list="lista-fabricantes-temporal"
                   :maxlength="LIMITES_VEHICULO.longitudMaximaFabricante"
                   placeholder="Ej. Toyota"
-                  @input="normalizarDetalleVehiculo(formularioTemporal, erroresTemporal, 'fabricante')"
+                  @input="alCambiarFabricanteTemporal"
+                  @change="alCambiarFabricanteTemporal"
                 />
+                <datalist id="lista-fabricantes-temporal">
+                  <option v-for="fab in FABRICANTES_COMUNES" :key="fab" :value="fab" />
+                </datalist>
               </CampoFormulario>
 
               <CampoFormulario etiqueta="Modelo" :error="erroresTemporal.modelo">
@@ -627,10 +647,14 @@ function enviarAutorizacionTemporal() {
                   v-model="formularioTemporal.modelo" 
                   type="text" 
                   class="campo-texto-modal" 
+                  list="lista-modelos-temporal"
                   :maxlength="LIMITES_VEHICULO.longitudMaximaModelo"
                   placeholder="Ej. Raize"
                   @input="normalizarDetalleVehiculo(formularioTemporal, erroresTemporal, 'modelo')"
                 />
+                <datalist id="lista-modelos-temporal">
+                  <option v-for="mod in modelosSugeridosTemporal" :key="mod" :value="mod" />
+                </datalist>
               </CampoFormulario>
 
               <CampoFormulario etiqueta="Color" :error="erroresTemporal.color">

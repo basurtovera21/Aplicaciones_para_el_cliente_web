@@ -13,6 +13,7 @@ import BannerInformativo from '../components/BannerInformativo.vue'
 import AccionesFormularioModal from '../components/AccionesFormularioModal.vue'
 import { useTeclaEscape } from '../composables/useTeclaEscape'
 import { TIPOS_VEHICULO, TIPOS_IDENTIFICACION, MOTIVOS_VISITA } from '../utils/catalogos'
+import { FABRICANTES_COMUNES, obtenerModelosPorFabricante } from '../utils/apiVehiculos'
 import {
   LIMITES_VEHICULO,
   limpiarCampos,
@@ -157,11 +158,25 @@ const placeholderPlaca = computed(() => {
   return 'Ej. PCN9041'
 })
 
+// Lista reactiva de modelos sugeridos mediante la API REST de la NHTSA
+const modelosSugeridosVehiculo = ref([])
+
 // Abre el modal para registrar un vehículo y limpia datos anteriores
 function abrirModalRegistro() {
   limpiarCampos(erroresVehiculo)
   limpiarCampos(formularioVehiculo)
+  modelosSugeridosVehiculo.value = []
   modalRegistroAbierto.value = true
+}
+
+// Consulta asíncrona de modelos en la API externa al escribir o seleccionar el fabricante
+async function alCambiarFabricanteVehiculo() {
+  normalizarDetalleVehiculo(formularioVehiculo, erroresVehiculo, 'fabricante')
+  if (formularioVehiculo.fabricante && formularioVehiculo.fabricante.trim().length >= 2) {
+    modelosSugeridosVehiculo.value = await obtenerModelosPorFabricante(formularioVehiculo.fabricante)
+  } else {
+    modelosSugeridosVehiculo.value = []
+  }
 }
 
 // Al cambiar el tipo de vehículo, revalida la placa si ya fue escrita
@@ -289,13 +304,27 @@ function validarPlacaVisita() {
   }
 }
 
+// Lista reactiva de modelos sugeridos mediante la API REST de la NHTSA para visitas
+const modelosSugeridosVisita = ref([])
+
 // Abre el modal para autorizar una visita
 function abrirModalVisita() {
   limpiarCampos(erroresVisita)
   limpiarCampos(formularioVisita)
+  modelosSugeridosVisita.value = []
   seccionVehiculoVisitaAbierta.value = true
   seccionDetalleVisitaAbierta.value = true
   modalVisitaAbierto.value = true
+}
+
+// Consulta asíncrona de modelos en la API externa al escribir o seleccionar el fabricante de la visita
+async function alCambiarFabricanteVisita() {
+  normalizarDetalleVehiculo(formularioVisita, erroresVisita, 'fabricante')
+  if (formularioVisita.fabricante && formularioVisita.fabricante.trim().length >= 2) {
+    modelosSugeridosVisita.value = await obtenerModelosPorFabricante(formularioVisita.fabricante)
+  } else {
+    modelosSugeridosVisita.value = []
+  }
 }
 
 // Envía la solicitud de visita externa
@@ -514,10 +543,15 @@ function ejecutarDesvinculacion() {
                 v-model="formularioVehiculo.fabricante" 
                 type="text" 
                 class="campo-texto-modal" 
+                list="lista-fabricantes-vehiculo"
                 :maxlength="LIMITES_VEHICULO.longitudMaximaFabricante"
                 placeholder="Ej. Toyota"
-                @input="normalizarDetalleVehiculo(formularioVehiculo, erroresVehiculo, 'fabricante')"
+                @input="alCambiarFabricanteVehiculo"
+                @change="alCambiarFabricanteVehiculo"
               />
+              <datalist id="lista-fabricantes-vehiculo">
+                <option v-for="fab in FABRICANTES_COMUNES" :key="fab" :value="fab" />
+              </datalist>
             </CampoFormulario>
 
             <!-- Modelo -->
@@ -526,10 +560,14 @@ function ejecutarDesvinculacion() {
                 v-model="formularioVehiculo.modelo" 
                 type="text" 
                 class="campo-texto-modal" 
+                list="lista-modelos-vehiculo"
                 :maxlength="LIMITES_VEHICULO.longitudMaximaModelo"
                 placeholder="Ej. Raize"
                 @input="normalizarDetalleVehiculo(formularioVehiculo, erroresVehiculo, 'modelo')"
               />
+              <datalist id="lista-modelos-vehiculo">
+                <option v-for="mod in modelosSugeridosVehiculo" :key="mod" :value="mod" />
+              </datalist>
             </CampoFormulario>
 
             <!-- Color -->
@@ -719,10 +757,15 @@ function ejecutarDesvinculacion() {
                   v-model="formularioVisita.fabricante" 
                   type="text" 
                   class="campo-texto-modal" 
+                  list="lista-fabricantes-visita"
                   :maxlength="LIMITES_VEHICULO.longitudMaximaFabricante"
                   placeholder="Ej. Toyota"
-                  @input="normalizarDetalleVehiculo(formularioVisita, erroresVisita, 'fabricante')"
+                  @input="alCambiarFabricanteVisita"
+                  @change="alCambiarFabricanteVisita"
                 />
+                <datalist id="lista-fabricantes-visita">
+                  <option v-for="fab in FABRICANTES_COMUNES" :key="fab" :value="fab" />
+                </datalist>
               </CampoFormulario>
 
               <CampoFormulario etiqueta="Modelo" :error="erroresVisita.modelo">
@@ -730,10 +773,14 @@ function ejecutarDesvinculacion() {
                   v-model="formularioVisita.modelo" 
                   type="text" 
                   class="campo-texto-modal" 
+                  list="lista-modelos-visita"
                   :maxlength="LIMITES_VEHICULO.longitudMaximaModelo"
                   placeholder="Ej. Raize"
                   @input="normalizarDetalleVehiculo(formularioVisita, erroresVisita, 'modelo')"
                 />
+                <datalist id="lista-modelos-visita">
+                  <option v-for="mod in modelosSugeridosVisita" :key="mod" :value="mod" />
+                </datalist>
               </CampoFormulario>
 
               <CampoFormulario etiqueta="Color" :error="erroresVisita.color">
